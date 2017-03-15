@@ -1,0 +1,11 @@
+{% extends "colsan/base_colsan.html" %}
+{% load otree_tags staticfiles %}
+{% block title %}
+Results {{block.super}}
+{% endblock %}
+
+
+{% block content %}
+{% include 'colsan/resulttable.html' %}
+{{block.super}}
+{% endblock %}

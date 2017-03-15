@@ -1,0 +1,15 @@
+{% extends "colsan/base_colsan.html" %}
+{% load otree_tags staticfiles %}
+{% block title %}
+Stage 3 {{block.super}}
+{% endblock %}
+{% block content %}
+
+{% include 'colsan/resulttable.html' %}
+{% formfield player.ingroup_punishment %}
+
+  {% include 'colsan/inner_instructions_s3.html' %}
+
+
+{{block.super}}
+{% endblock %}

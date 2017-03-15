@@ -1,0 +1,35 @@
+{% load otree_tags staticfiles %}
+
+<div class="instructions well well-lg">
+  In each round one member of your group is randomly matched with one
+   participant from another group.
+If you are picked from your group to participate in a collective decision
+making with a member of another group you and the one member of another group
+will have to choose between ‘Yes’ and ‘No’ decision.
+<p>
+Look at this payoff table below.  You can think of yourself as the row player.
+ If you decided YES and your partner from another group decided YES, too,
+ both of you get <b>{{Constants.yesyes_payoff}}</b> points on your accounts.
+  If you decided YES and your partner
+  from another group decided NO, your payoff is <b>{{Constants.yesno_payoff}}</b>
+   points and your partner
+  from another group gets <b>{{Constants.noyes_payoff}}</b>  points.
+  If you decided NO and your partner from
+  another group decided NO, too, both of you get <b>{{Constants.nono_payoff}}</b> points.
+   If you decided NO
+  and your partner from another group decided YES, your payoff is <b>{{Constants.noyes_payoff}}</b>
+   points and
+   your partner from another group gets <b>{{Constants.yesno_payoff}}</b>
+    points on her account.</p>
+    <p> That means
+   two participants together earn most if both decide YES (you <b>{{Constants.yesyes_payoff}}</b>
+   / another participant <b>{{Constants.yesyes_payoff}}</b> ).
+    But you earn more, if you decide NO and your partner from another group
+    YES (you <b>{{Constants.noyes_payoff}}</b>  / neighbor <b>{{Constants.yesno_payoff}}</b>
+    ). In case of both decide NO, you earn less than
+    if both have decided YES (you <b>{{Constants.nono_payoff}}</b>
+     / another participant <b>{{Constants.nono_payoff}}</b> ).</p>
+<p><b>Table with your earnings</b></p>
+  <img height="200px" src="{% static "colsan/pdtable.png" %}"/>
+
+</div>

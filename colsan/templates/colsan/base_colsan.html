@@ -1,0 +1,14 @@
+{% extends "Global/Page.html" %}
+{% load otree_tags staticfiles %}
+{% block styles %}
+
+{% endblock %}
+{% block title %}
+(Period {{ subsession.round_number }} of {{ Constants.num_rounds }})
+{% endblock %}
+
+{% block content %}
+
+
+{% next_button %}
+{% endblock %}

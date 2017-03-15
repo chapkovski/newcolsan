@@ -1,0 +1,27 @@
+{% extends "colsan/base_colsan.html" %}
+{% load otree_tags staticfiles %}
+{% block title %}
+  Introduction
+{% endblock %}
+{% block content %}
+<div class="instructions well well-lg">
+    <p>
+This is an experiment in the decision making. You are participating in an
+experiment where you will decide in a team jointly with <strong>{{Constants.A_group_size}}</strong> other participants.
+</p>
+<p>The members of your team will anonymously interact with members of another
+ team which also consists of <strong>{{Constants.B_group_size}}</strong> persons.</p>
+<p>
+  Your payoff depends on your own decisions and the decisions of both your team
+  and the other team’s decisions.
+
+</p>
+<p>
+  We will describe the decision situation that you and other participants will
+   have to make below. This decision situation will be repeated for <strong>{{Constants.num_rounds_first}}</strong> rounds.
+      Then we will inform you how the experiment proceeds for extra <strong>{{Constants.num_rounds_second}}</strong>  rounds.
+</p>
+
+</div>
+  {{block.super}}
+{% endblock %}

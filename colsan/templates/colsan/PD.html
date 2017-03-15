@@ -1,0 +1,11 @@
+{% extends "colsan/base_colsan.html" %}
+{% load otree_tags staticfiles %}
+{% block title %}
+Your decision {{block.super}}
+{% endblock %}
+
+{% block content %}
+{% formfield player.pd_decision %}
+{% include 'colsan/inner_instructions_s1.html' %}
+{{block.super}}
+{% endblock %}

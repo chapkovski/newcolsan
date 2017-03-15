@@ -1,0 +1,10 @@
+{% extends "colsan/base_colsan.html" %}
+{% load otree_tags staticfiles %}
+{% block title %}
+Stage 2. Comprehension questions {{block.super}}
+{% endblock %}
+{% block content %}
+<p>QUESTIONS HERE</p><p></p>
+  {% include 'colsan/inner_instructions_s2.html' %}
+  {{block.super}}
+{% endblock %}

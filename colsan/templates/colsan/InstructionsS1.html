@@ -1,0 +1,9 @@
+{% extends "colsan/base_colsan.html" %}
+{% load otree_tags staticfiles %}
+{% block title %}
+  Instructions
+{% endblock %}
+{% block content %}
+  {% include 'colsan/inner_instructions_s1.html' %}
+  {{block.super}}
+{% endblock %}
