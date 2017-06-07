@@ -1,16 +1,21 @@
+{% load otree_tags staticfiles %}
 <div class="instructions well well-lg">
   <h2>Stage 2:</h2>
           <p>
-            In stage 2 you will be shown the decisions of another pair: one member of your own group (Participant A) and a person from group B with whom Participant A was matched in Stage 1 (Participant B). For example:</p>
+            In stage 2 you see the decisions of <b>another</b> pair:
+            one member of your own group (Participant A) and a person from group
+             B with whom Participant A was matched in Stage 1 (Participant B).
+             For example:</p>
 
-           <table class="table table-hover table-striped table-bordered">
+           <table class="table  table-striped table-bordered">
             <tbody>
-              <tr>
+              <tr class='danger'>
                 <th class='leftjust'>Participant from your group (A) chose</th>
                 <td><span class="red">Red</span></td>
               </tr>
-              <tr>
-                <th class='leftjust'>A partner from another group (B) with whom he or she was matched chose</th>
+              <tr class='info'>
+                <th class='leftjust'>A partner from another group (B) with whom
+                  he or she was matched chose</th>
                 <td><span class="blue">Blue</span></td>
               </tr>
             </tbody>
@@ -19,25 +24,73 @@
           <table>
 
           </table>
-          <p class="nonbaseline is cs ingroup outgroup">
-            At the beginning of stage 2 all participants receive an additional endowment of 15 points.
-             By transferring points from this endowment you can decrease <span class="ingroup is cs nonbaseline"> incomes of
-            other participants</span>
-            <span class="outgroup is cs nonbaseline">an income of a participant from Group B</span>.
-            <span class="ingroup is cs nonbaseline">For example if you send one deduction token to a Participant A, your endowment will be decreased by 1 point, but a payoff of Participant A will be decreased by 3 points.</span>
-            <span class="cs ingroup outgroup nonbaseline">If you send 1 deduction point to a Participant B (a member of group B who was matched with Participant A), we will choose randomly one member of a group B and we will decrease his or her income by 3 points. It is not known who exactly from a group B will be picked to have his or her income diminished by your deduction tokens.
-      </span>
+{% if session.config.outgroup %}
+          <p>
+            At the beginning of stage 2 all participants receive an additional
+             endowment of <b>{{Constants.punishment_endowment}}</b> points.
+             By transferring points from this endowment you can decrease
+             {% if session.config.ingroup %}
+               incomes of other participants.
+             {% else %}
+               an income of a participant from Group B.
+             {% endif%}
+             {% if session.config.ingroup %}</p>
+             <p>
 
-            <span class="is ingroup outgroup nonbaseline">If you send 1 deduction point to a Participant B (a member of group B who was matched with Participant A), your endowment will be decreased by 1 point, but a payoff of Participant B will be decreased by 3 points. </span>
-          </p>
-          <p class="nonbaseline is cs outgroup ingroup">
-            Other members of your group can make the same decisions. The members of group B also make the same decisions about sending deduction tokens to a <span class="cs ingroup outgroup nonbaseline">random</span> member of your group <span class="ingroup is cs nonbaseline">and/or to the specific member of their group</span>.
+
+             For example if you send <b>1</b>
+                deduction token to a participant from your own group (Participant A), your endowment will be
+                decreased by <b>1</b>&nbsp;point, but a payoff of Participant A will be
+                 decreased by <b>{{Constants.punishment_factor}}</b>&nbsp;points.
+             {% endif%}
+              {% if session.config.colsan %}
+                If you send <b>1</b> deduction point to a Participant B
+                (a member of group B who
+                was matched with Participant A), we will choose <i><b>randomly</b></i> one
+                member of a group B and we will decrease his or her income by
+                <b>{{Constants.punishment_factor}}</b> points.
+                It is not known who exactly from a group B will be
+                picked to have his or her income diminished by your deduction
+                tokens.
+
+              {% else %}
+            If you send <b>1</b>
+               deduction point to a Participant B (a member of group B who
+               was matched with Participant A), your endowment will be
+               decreased by <b>1</b> point, but a payoff of Participant B will
+               be decreased by <b>{{Constants.punishment_factor}}</b> points.
+               {% endif%}
           </p>
           <p>
-            When you<span class="nonbaseline is cs ingroup outgroup"> take
-              your decision in Stage 2 and</span> click ‘Next’ you will
+            Other members of your group can make the same decisions.</p> <p> The
+            members of group B also make the same decisions about sending
+            deduction tokens to a
+              {% if session.config.colsan %}
+                <i><b>random</b></i>
+              {% endif%}
+              member of your group
+              {% if session.config.ingroup %}
+                and/or to
+                {% if session.config.colsan %}
+                  the specific
+                {% else %}
+                  a
+                {% endif%}
+                member of their group
+              {% endif%}.
+          </p>
+          <p>
+{% endif%}
+              When you
+              {% if session.config.outgroup %}
+                make your decision in Stage 2 and
+              {% endif%}
+              click ‘Next’ you will
               be shown your and your partner’s decisions made in Stage 1 and
               your payoff for this round.
           </p>
 
 </div>
+{% block styles %}
+    <link href="{% static "colsan/colsan.css" %}" rel="stylesheet">
+{% endblock %}

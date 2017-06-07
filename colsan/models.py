@@ -22,6 +22,7 @@ class Constants(BaseConstants):
     noyes_payoff = 9
     yesno_payoff = 0
     punishment_factor = 3
+    punishment_endowment = 2
     groupset = ['A', 'A', 'A', 'B', 'B', 'B', ]
     punishment_choices = [0, 1]
     threesome = list(range(1, 4))

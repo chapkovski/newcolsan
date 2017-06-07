@@ -1,3 +1,4 @@
+{% load otree_tags staticfiles %}
 <div class="instructions well well-lg">
 <h2>The Task</h2>
         <p>
@@ -13,7 +14,7 @@
           of your group and of the other group will affect your outcome.
         </p>
         <p>
-          The experiment consists of <strong>10</strong> rounds.
+          The experiment consists of <strong>{{Constants.num_rounds}}</strong> rounds.
           Each round consists of two stages as follows:
         </p>
         <h2>Stage 1:</h2>
@@ -28,13 +29,13 @@
         </p>
         <ul class="list-group">
 
-          <li class="list-group-item">If you both choose <span class="red">RED</span>: you gain <b>3</b>
-            points, your partner gains 3 points.</li>
+          <li class="list-group-item">If you both choose <span class="red">RED</span>: you gain <b>{{Constants.yesyes_payoff}}</b>
+            points, and your partner gains {{Constants.yesyes_payoff}} points.</li>
           <li class="list-group-item">If you choose <span class="red">RED</span> and your partner chooses
-            <span class="blue">BLUE</span>: you gain <b>0</b>, your partner gains 5.</li>
+            <span class="blue">BLUE</span>: you gain <b>{{Constants.yesno_payoff}}</b>, your partner gains {{Constants.noyes_payoff}}.</li>
           <li class="list-group-item">If you choose <span class="blue">BLUE</span> and your partner
-            chooses <span class="red">RED</span>: you gain <b>5</b>, your partner gains 0.</li>
-          <li class="list-group-item">If you both choose <span class="blue">BLUE</span>: you gain <b>1</b>, your partner gains 1.</li>
+            chooses <span class="red">RED</span>: you gain <b>{{Constants.noyes_payoff}}</b>, your partner gains {{Constants.yesno_payoff}}.</li>
+          <li class="list-group-item">If you both choose <span class="blue">BLUE</span>: you gain <b>{{Constants.nono_payoff}}</b>, your partner gains {{Constants.nono_payoff}}.</li>
         </ul>
         <p>
           These choices are depicted in the table below. The first entry in each
@@ -60,14 +61,14 @@
             <tr>
               <th rowspan="2" class='vertical-center'>Your decision</th>
               <td><span class="red">Red</span></td>
-              <td><b>3</b>, 3</td>
-              <td><b>0</b>, 5</td>
+              <td><b>{{Constants.yesyes_payoff}}</b>, {{Constants.yesyes_payoff}}</td>
+              <td><b>{{Constants.noyes_payoff}}</b>, {{Constants.yesno_payoff}}</td>
             </tr>
             <tr>
 
               <td><span class="blue">Blue</span></td>
-              <td><b>5</b>, 0</td>
-              <td><b>1</b>, 1</td>
+              <td><b>{{Constants.yesno_payoff}}</b>, {{Constants.noyes_payoff}}</td>
+              <td><b>{{Constants.nono_payoff}}</b>, {{Constants.nono_payoff}}</td>
             </tr>
           </tbody>
         </table>
@@ -77,3 +78,7 @@
         </p>
 
 </div>
+
+{% block styles %}
+    <link href="{% static "colsan/colsan.css" %}" rel="stylesheet">
+{% endblock %}
