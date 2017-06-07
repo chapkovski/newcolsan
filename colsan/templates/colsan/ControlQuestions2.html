@@ -1,0 +1,35 @@
+{% extends "global/Page.html" %}
+{% load otree_tags staticfiles %}
+{% block title %}
+  Comprehension questions - page 2/2
+{% endblock %}
+{% block content %}
+<div class="well ">
+
+        <h1>Control questions for stage 2:</h1>
+        <h5>RANDOMIZING THE FOLLOWING QUESTIONS</h5>
+        <h5>for both collective and individual sanctions</h5>
+        <h5>for ingroup</h5>
+        <p>Question 4: In the stage 2, you chose to send XXX deduction tokens
+           to a Participant A. </p>
+        <p>By how many tokens the Particiapnt's A income will be decreased?</p>
+        <p>By how many tokens your own income will be decreased?</p>
+        <h5>for outgroup: </h5>
+        <p>Question 4: In the stage 2, you chose to send XXX deduction tokens
+           to a Participant B. </p>
+        <p>By how many tokens the Particiapnt's A income will be decreased?</p>
+        <p>By how many tokens your own income will be decreased?</p>
+        <p>FOR COLLECTIVE SANCTIONS::: </p>
+        <p>Question 4: You decided to send XXX deduction tokens to a Participant B. </p>
+        <p>Question 4: Do you know if these deduction tokens will decrease the income of
+        the Participant B, whose decision you observed? YES/NO </p>
+        <p>Imagine, that you were the one whose decision was shown to someone from the Group B. This
+        person decides to send you XXX deduction tokens. Whose income from your group A will be decreased:
+      Your own/A random member of your group (A)   </p>
+
+      </div>
+
+
+      {% include Constants.instructions_stage2_wrapper %}
+{% next_button %}
+{% endblock %}

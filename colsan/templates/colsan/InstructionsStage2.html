@@ -1,14 +1,9 @@
 {% extends "global/Page.html" %}
 {% load otree_tags staticfiles %}
-{% block styles %}
-
-{% endblock %}
 {% block title %}
-(Period {{ subsession.round_number }} of {{ Constants.num_rounds }})
+  Instructions - page 2/2
 {% endblock %}
-
 {% block content %}
-
-
+  {% include 'colsan/instructions_s2.html' %}
 {% next_button %}
 {% endblock %}

@@ -1,0 +1,50 @@
+{% extends "global/Page.html" %}
+{% load otree_tags staticfiles %}
+{% block title %}
+Punishment
+{% endblock %}
+
+
+{% block content %}
+
+<table class="table table-hover table-striped table-bordered">
+        <tbody>
+          <tr>
+            <th class='leftjust'>Participant from your group (A) chose</th>
+            <td><span class="red">Red</span></td>
+          </tr>
+          <tr>
+            <th class='leftjust'>A partner from another group (B) with whom he or she was matched chose</th>
+            <td><span class="blue">Blue</span></td>
+          </tr>
+        </tbody>
+      </table>
+<table class="table table-striped">
+  <tr>
+    <td>Your group player's decision:</td>
+    <td>{{random_pair_A.pd_decision}}</td>
+    {% if session.config.ingroup %}
+      <td>
+        {% formfield player.ingroup_punishment  with label='' %}
+      </td>
+    {% endif%}
+  </tr>
+  <tr>
+    <td>Another group player's decision:</td>
+    <td>  {{random_pair_B.pd_decision}}</td>
+    {% if session.config.outgroup %}
+      <td>
+        {% formfield player.outgroup_punishment with label='' %}
+      </td>
+    {% endif%}
+  </tr>
+
+</table>
+
+{% include Constants.instructions_stage2_wrapper %}
+
+{% next_button %}
+{% endblock %}
+{% block styles %}
+    <link href="{% static "colsan/colsan.css" %}" rel="stylesheet">
+{% endblock %}

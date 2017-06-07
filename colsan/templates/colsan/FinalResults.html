@@ -1,5 +1,8 @@
-{% extends "colsan/base_colsan.html" %}
+{% extends "global/Page.html" %}
 {% load otree_tags staticfiles %}
 {% block title %}
-Final results {{block.super}}
+Final results
+{% endblock %}
+{% block content %}
+{% next_button %}
 {% endblock %}

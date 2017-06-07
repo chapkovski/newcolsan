@@ -109,40 +109,13 @@ SESSION_CONFIG_DEFAULTS = {
 SESSION_CONFIGS = [
     {
         'name': 'colsanbaseline',
-        'display_name': 'Colsan - baseline',
-        'num_demo_participants': 1,
+        'display_name': 'Colsan - Stoff',
+        'num_demo_participants': 6,
         'app_sequence': ['colsan'],
         'colsan':False,
-        'outgroup':False,
-        'ingroup': False,
-    },
-    {
-        'name': 'colsanipoutgroup',
-        'display_name': 'Colsan - IP - Outgroup',
-        'num_demo_participants': 1,
-        'app_sequence': ['colsan'],
-        'colsan':False,
-        'outgroup':False,
-        'ingroup': False,
-    },
-    {
-        'name': 'colsancpoutgroup',
-        'display_name': 'Colsan - CP - Outgroup',
-        'num_demo_participants': 1,
-        'app_sequence': ['colsan'],
-        'colsan':True,
-        'outgroup':True,
-        'ingroup': False,
-    },
-    {
-        'name': 'colsancpoutgroupingroup',
-        'display_name': 'Colsan - CP - Outgroup - Ingroup',
-        'num_demo_participants': 1,
-        'app_sequence': ['colsan'],
-        'colsan':True,
-        'outgroup':True,
         'ingroup': True,
-    }
+        'outgroup': True,
+    },
 ]
 
 # anything you put after the below line will override

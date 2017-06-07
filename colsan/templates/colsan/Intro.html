@@ -1,7 +1,7 @@
-{% extends "colsan/base_colsan.html" %}
+{% extends "global/Page.html" %}
 {% load otree_tags staticfiles %}
 {% block title %}
-  Introduction
+  Instructions - page 1/2
 {% endblock %}
 {% block content %}
 <div class="instructions well well-lg">
@@ -23,5 +23,5 @@ experiment where you will decide in a team jointly with <strong>{{Constants.A_gr
 </p>
 
 </div>
-  {{block.super}}
+{% next_button %}
 {% endblock %}

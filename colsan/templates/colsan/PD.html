@@ -1,11 +1,42 @@
-{% extends "colsan/base_colsan.html" %}
+{% extends "global/Page.html" %}
 {% load otree_tags staticfiles %}
 {% block title %}
-Your decision {{block.super}}
+Decision
 {% endblock %}
 
 {% block content %}
-{% formfield player.pd_decision %}
-{% include 'colsan/inner_instructions_s1.html' %}
-{{block.super}}
+<table class="table">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Your decision</th>
+
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="info">
+      <th>Blue</th>
+      <td>
+        <input type="radio" id="id_pd_decision_1" value="False" name="pd_decision" required="" >
+      </td>
+
+    </tr>
+    <tr class="danger">
+      <th>Red</th>
+      <td>
+        <input type="radio" id="id_pd_decision_2" value="True" name="pd_decision" required="">
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+{% include Constants.instructions_stage1_wrapper %}
+
+{% next_button %}
+{% endblock %}
+
+{% block styles %}
+    <link href="{% static "colsan/colsan.css" %}" rel="stylesheet">
 {% endblock %}

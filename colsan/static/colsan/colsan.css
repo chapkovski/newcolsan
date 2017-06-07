@@ -1,0 +1,38 @@
+
+    th, td, tr {
+        text-align: center!important;
+    }
+    span.change {background-color:Orange;}
+    .nonbaseline {
+      background-color:Yellow;
+      display:none;
+    }
+
+    .is {
+      background-color:LightGreen ;
+    }
+    .cs {
+      background-color:lightblue;
+    }
+    .ingroup {
+      background-color:lightsalmon;
+    }
+    .outgroup {
+      background-color:MediumAquaMarine ;
+    }
+
+    .vertical-center {
+        vertical-align: middle !important;
+    }
+    .leftjust {
+       text-align: left!important;
+    }
+    span.red{
+      font-weight:bold;
+      color:darkred;
+    }
+    span.blue{
+      font-weight:bold;
+      color:darkblue;
+    }
+.info{background: skyblue;}

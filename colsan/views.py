@@ -5,19 +5,41 @@ import random
 from otree.common import safe_json
 
 
-class Introduction(Page):
+class FirstWP(WaitPage):
+    group_by_arrival_time = True
+    template_name = 'colsan/FirstWP.html'
+
+    def is_displayed(self):
+        return self.round_number == 1
+
+    def after_all_players_arrive(self):
+        allplayers = self.group.get_players()
+        if Constants.debug:
+            for p in allplayers:
+                p.pd_decision=random.choice([True, False])
+        g = self.group
+        for i, p in enumerate(allplayers):
+            p.subgroup = Constants.groupset[i]
+            p.pair = Constants.threesomesets[i]
+
+
+class InstructionsStage1(Page):
     def is_displayed(self):
         return self.subsession.round_number == 1
 
-class InstructionsS1(Page):
+class InstructionsStage2(Page):
+    def is_displayed(self):
+        return self.subsession.round_number == 1 and \
+         self.session.config['ingroup'] or self.session.config['outgroup']
+
+class ControlQuestions1(Page):
     def is_displayed(self):
         return self.subsession.round_number == 1
 
-
-class QuestionsS1(Page):
+class ControlQuestions2(Page):
     def is_displayed(self):
-        return self.subsession.round_number == 1
-
+        return self.subsession.round_number == 1 and \
+         self.session.config['ingroup'] or self.session.config['outgroup']
 
 class PD(Page):
     form_model = models.Player
@@ -25,72 +47,48 @@ class PD(Page):
 
 
 class WaitPD(WaitPage):
+    template_name = 'colsan/WaitPD.html'
+
     def after_all_players_arrive(self):
-        ...
+        for p in self.group.get_players():
+            p.random_id = random.choice([_ for _ in
+                                        Constants.threesome if _ != p.pair])
 
 
-class InstructionsS2(Page):
-    def is_displayed(self):
-        midround = (self.subsession.round_number
-                    == Constants.num_rounds_first + 1)
-        return midround and self.group.outgroup
-
-
-class QuestionsS2(Page):
-    def is_displayed(self):
-        midround = (self.subsession.round_number
-                    == Constants.num_rounds_first + 1)
-        return midround and self.group.outgroup
-
-
-class InstructionsS3(Page):
-    def is_displayed(self):
-        midround = (self.subsession.round_number
-                    == Constants.num_rounds_first + 1)
-        return midround and self.group.ingroup
-
-
-class QuestionsS3(Page):
-    def is_displayed(self):
-        midround = (self.subsession.round_number
-                    == Constants.num_rounds_first + 1)
-        return midround and self.group.ingroup
-
-
-class OutgroupP(Page):
+class Pun(Page):
     form_model = models.Player
-    form_fields = ['outgroup_punishment']
 
-    def is_displayed(self):
-        return (self.subsession.round_number >
-                Constants.num_rounds_first) and self.group.outgroup
+    def vars_for_template(self):
+        random_pair = [p
+                       for p in self.player.get_others_in_group()
+                       if p.pair == self.player.random_id]
+        random_pair_A  = [p
+                          for p in random_pair
+                          if p.subgroup == self.player.subgroup][0]
+        random_pair_B  = [p
+                          for p in random_pair
+                          if p.subgroup != self.player.subgroup][0]
+        # myform = self.get_form()
+        return {
+               'random_pair_A': random_pair_A,
+               'random_pair_B': random_pair_B,
+               'myform': myform,
+               }
 
+    def get_form_fields(self):
+        fields = []
+        if self.session.config['ingroup']:
+            fields.append('ingroup_punishment')
+        if self.session.config['outgroup']:
+            fields.append('outgroup_punishment')
 
-class WaitOutgroup(WaitPage):
-    def is_displayed(self):
-        return (self.subsession.round_number >
-                Constants.num_rounds_first) and self.group.outgroup
+        return fields
+
+class WaitResults(WaitPage):
+    template_name = 'colsan/WaitResults.html'
 
     def after_all_players_arrive(self):
-        ...
-
-
-class IngroupP(Page):
-    def is_displayed(self):
-        return (self.subsession.round_number >
-                Constants.num_rounds_first) and self.group.ingroup
-
-    form_model = models.Player
-    form_fields = ['ingroup_punishment']
-
-
-class WaitIngroup(WaitPage):
-    def is_displayed(self):
-        return (self.subsession.round_number >
-                Constants.num_rounds_first) and self.group.ingroup
-
-    def after_all_players_arrive(self):
-        ...
+        self.group.set_payoffs()
 
 
 class Results(Page):
@@ -99,23 +97,19 @@ class Results(Page):
 
 class FinalResults(Page):
     def is_displayed(self):
-        return self.subsession.round_number == Constants.num_rounds
+        return self.round_number == Constants.num_rounds
+
 
 page_sequence = [
-    Introduction,
-    InstructionsS1,
-    QuestionsS1,
-    InstructionsS2,
-    QuestionsS2,
-    InstructionsS3,
-    QuestionsS3,
+    FirstWP,
+    InstructionsStage1,
+    InstructionsStage2,
+    ControlQuestions1,
+    ControlQuestions2,
     PD,
     WaitPD,
-
-    OutgroupP,
-    WaitOutgroup,
-    IngroupP,
-    WaitIngroup,
-    Results,
-    FinalResults,
+    Pun,
+    WaitResults,
+    # Results,
+    # FinalResults,
 ]
