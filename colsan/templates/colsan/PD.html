@@ -5,7 +5,7 @@ Decision
 {% endblock %}
 
 {% block content %}
-<table class="table">
+<table class="table" id='tableSelect'>
   <thead>
     <tr>
       <th></th>
@@ -39,4 +39,13 @@ Decision
 
 {% block styles %}
     <link href="{% static "colsan/colsan.css" %}" rel="stylesheet">
+{% endblock %}
+
+{% block scripts %}
+    <script>
+
+        $('#tableSelect tr').click(function() {
+        $(this).find('td input[type=radio]').prop('checked', true);
+    })
+    </script>
 {% endblock %}
