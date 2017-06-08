@@ -29,17 +29,40 @@ class InstructionsStage1(Page):
 
 class InstructionsStage2(Page):
     def is_displayed(self):
-        return self.subsession.round_number == 1 and \
-         self.session.config['ingroup'] or self.session.config['outgroup']
+        return self.subsession.round_number == 1
 
 class ControlQuestions1(Page):
+    form_model = models.Player
+
     def is_displayed(self):
         return self.subsession.round_number == 1
 
+    def get_form_fields(self):
+        q_set = ['q1', 'q2', 'q3']
+        random.shuffle(q_set)
+        return q_set
+
+
 class ControlQuestions2(Page):
+    form_model = models.Player
+    form_fields = ['q_pun_received', 'q_pun_sent', 'q_colsan']
+
     def is_displayed(self):
         return self.subsession.round_number == 1 and \
          self.session.config['ingroup'] or self.session.config['outgroup']
+
+    def vars_for_template(self):
+        if self.session.config['ingroup']:
+            q_pun_received_label = "By how many tokens the Participant A's income will be decreased?"
+
+        else:
+            q_pun_received_label = "By how many tokens the Participant B's income will be decreased?"
+
+        return {
+                'q_pun_received_label': q_pun_received_label,
+
+                }
+
 
 class PD(Page):
     form_model = models.Player

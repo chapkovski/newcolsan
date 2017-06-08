@@ -4,19 +4,19 @@
   Comprehension questions {% if session.config.outgroup %}- page 1/2{% endif%}
 {% endblock %}
 {% block content %}
-<div class="well ">
-      <h1>Control questions for stage 1:</h1>
-      <h5>RANDOMZING THE FOLLOWING QUESTIONS</h5>
-      <p>Question 1: If you choose <span class="red">Red</span>,
-        and your partner chooses <span class="blue">Blue</span>, what will be your payoff
-        at the end of Stage 1 of that round?
-      </p>
-      <p>Question 2: If you and your partner chose <span class="red">Red</span>, what will be your payoff at the end of Stage 1?</p>
-      <p>Question 3: If you and your partner chose <span class="blue">Blue</span>, what will be your payoff at the end of Stage 1?</p>
-</div
 
-
+<table class="table table-hover table-striped table-bordered">
+  <tbody>
+  {% for f in form %}
+    <tr>
+      <th class='leftjust'>{{f.label}}</th>
+      <td><span class="red">{{f}}</span></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% next_button %}
 {% include Constants.instructions_stage1_wrapper %}
 
-{% next_button %}
+
 {% endblock %}

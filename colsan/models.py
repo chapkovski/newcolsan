@@ -71,3 +71,33 @@ class Player(BasePlayer):
                                               'Punishing another group member',
                                               widget=widgets.RadioSelectHorizontal()
                                                )
+
+
+
+
+# control questions
+# control questions for stage 1
+    q1 = models.IntegerField(verbose_name="""
+        If you choose Red, and your partner chooses Blue, what will be your payoff at the end of Stage 1 of that round?
+    """)
+    q2 = models.IntegerField(verbose_name="""
+        If you and your partner chose Red, what will be your payoff at the end of Stage 1?
+    """)
+    q3 = models.IntegerField(verbose_name="""
+        If you and your partner chose Blue, what will be your payoff at the end of Stage 1?
+    """)
+# control questions for stage 2
+# Question 4: In the stage 2, you chose to send XXX deduction tokens to a Participant A.
+
+    q_pun_received = models.IntegerField()
+    q_pun_sent = models.IntegerField(verbose_name="""
+        By how many tokens your own income will be decreased?""")
+
+
+
+    # Question 4: You decided to send XXX deduction tokens to a Participant B.
+    q_colsan  = models.CharField(
+        verbose_name="As a result whose income will be decreased?",
+        choices=['My own', 'A random member of my group'],
+        widget=widgets.RadioSelectHorizontal(),
+        )

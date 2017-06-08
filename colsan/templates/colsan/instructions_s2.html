@@ -2,20 +2,20 @@
 <div class="instructions well well-lg">
   <h2>Stage 2:</h2>
           <p>
-            In stage 2 you see the decisions of <b>another</b> pair:
-            one member of your own group (Participant A) and a person from group
+            In Stage 2 you see the decisions of <b>another</b> pair:
+            one <b>random</b> member of your own group (Participant A) and a person from group
              B with whom Participant A was matched in Stage 1 (Participant B).
              For example:</p>
 
            <table class="table  table-striped table-bordered">
             <tbody>
               <tr class='danger'>
-                <th class='leftjust'>Participant from your group (A) chose</th>
+                <th class='leftjust'>Participant from your group (A) chose:</th>
                 <td><span class="red">Red</span></td>
               </tr>
               <tr class='info'>
                 <th class='leftjust'>A partner from another group (B) with whom
-                  he or she was matched chose</th>
+                  he or she was matched chose:</th>
                 <td><span class="blue">Blue</span></td>
               </tr>
             </tbody>
@@ -40,10 +40,10 @@
 
              For example if you send <b>1</b>
                 deduction token to a participant from your own group (Participant A), your endowment will be
-                decreased by <b>1</b>&nbsp;point, but a payoff of Participant A will be
+                decreased by <b>1</b>&nbsp;point, but a payoff of this specific Participant A will be
                  decreased by <b>{{Constants.punishment_factor}}</b>&nbsp;points.
              {% endif%}
-              {% if session.config.colsan %}
+              {% if session.config.colsan %} </p><p>
                 If you send <b>1</b> deduction point to a Participant B
                 (a member of group B who
                 was matched with Participant A), we will choose <i><b>randomly</b></i> one
@@ -62,22 +62,17 @@
                {% endif%}
           </p>
           <p>
-            Other members of your group can make the same decisions.</p> <p> The
+            Other members of your group can make the same decisions.</p>
+            <p> The
             members of group B also make the same decisions about sending
-            deduction tokens to a
+            deduction tokens to
               {% if session.config.colsan %}
-                <i><b>random</b></i>
-              {% endif%}
-              member of your group
-              {% if session.config.ingroup %}
-                and/or to
-                {% if session.config.colsan %}
-                  the specific
+              a <i><b>random</b></i> member of your group
                 {% else %}
-                  a
-                {% endif%}
-                member of their group
-              {% endif%}.
+                the member of your group, whose decision was shown to them,
+              {% endif%}
+            {% if session.config.ingroup %}
+                and/or to the specific member of their own group{% endif%}.
           </p>
           <p>
 {% endif%}
