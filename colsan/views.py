@@ -1,6 +1,6 @@
 from . import models
 from ._builtin import Page, WaitPage
-from .models import Constants
+from .models import Constants, Player
 import random
 from otree.common import safe_json
 
@@ -42,6 +42,12 @@ class ControlQuestions1(Page):
         random.shuffle(q_set)
         return q_set
 
+def A_or_B(self):
+    if self.session.config['ingroup']:
+        return 'A'
+    else:
+        return 'B'
+
 
 class ControlQuestions2(Page):
     form_model = models.Player
@@ -52,16 +58,42 @@ class ControlQuestions2(Page):
          self.session.config['ingroup'] or self.session.config['outgroup']
 
     def vars_for_template(self):
-        if self.session.config['ingroup']:
-            q_pun_received_label = "By how many tokens the Participant A's income will be decreased?"
-
-        else:
-            q_pun_received_label = "By how many tokens the Participant B's income will be decreased?"
+        q_pun_received_label = "By how many tokens the Participant {}'s income will be decreased?".format(A_or_B(self))
 
         return {
                 'q_pun_received_label': q_pun_received_label,
 
                 }
+class CheckingAnswers(Page):
+
+    def is_displayed(self):
+        return self.subsession.round_number == 1
+
+    def vars_for_template(self):
+
+        q4_5 = 'In the stage 2, you chose to send a deduction token to a Participant {}.'.format(A_or_B(self))
+        q4 = q4_5 + " By how many tokens the Participant {}'s income will be decreased?".format(A_or_B(self))
+        q5 = q4_5 + Player._meta.get_field('q_pun_sent').verbose_name
+        q6 = """
+        Imagine, that you were the one whose decision was shown to someone
+           from the Group B. This person decides to send you a deduction token.
+        """
+        q6 += str(Player._meta.get_field('q_colsan').verbose_name)
+        if self.session.config['colsan']:
+            corr_q6 =Constants.q6_choices[1]
+        else:
+            corr_q6 =Constants.q6_choices[0]
+        ca = [[Player._meta.get_field('q1').verbose_name, Constants.yesno_payoff, self.player.q1 ],
+             [Player._meta.get_field('q2').verbose_name, Constants.yesyes_payoff, self.player.q2 ],
+             [Player._meta.get_field('q3').verbose_name, Constants.nono_payoff, self.player.q3 ],
+             [q4, Constants.punishment_factor, self.player.q_pun_received],
+             [q5, 1, self.player.q_pun_sent],
+             [q6, corr_q6, self.player.q_colsan ],]
+        self.player.num_correct=sum([1 for _ in ca if _[1]==_[2]])
+        self.player.payoff_correct = \
+            self.player.num_correct * Constants.correct_answer_payoff
+        print('###### ', ca)
+        return {'q_n_a': ca}
 
 
 class PD(Page):
@@ -129,6 +161,7 @@ page_sequence = [
     InstructionsStage2,
     ControlQuestions1,
     ControlQuestions2,
+    CheckingAnswers,
     PD,
     WaitPD,
     Pun,
