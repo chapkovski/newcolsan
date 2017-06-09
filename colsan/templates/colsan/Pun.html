@@ -6,44 +6,67 @@ Punishment
 
 
 {% block content %}
-
+<div class="alert alert-info" role="alert">
+  You receive <b>{{Constants.punishment_endowment}}</b> extra points which you can use to send deduction tokens to other participants.
+</div>
 <table class="table table-hover table-striped table-bordered">
+  {% if session.config.outgroup %}
+    <thead>
+      <th colspan=2></th>
+      <th colspan=2>Send deduction tokens:</th>
+    </thead>
+  {% endif %}
         <tbody>
           <tr>
             <th class='leftjust'>Participant from your group (A) chose</th>
-            <td><span class="red">Red</span></td>
+            <td><span class="{{random_pair_A.pd_decision|yesno:"red, blue"}}">{{random_pair_A.pd_decision|yesno:"Red, Blue"}}</span></td>
+            {% if session.config.ingroup %}
+              <td>
+                  <label class="radio-inline" for="id_ingroup_punishment_1"><input type="radio" id="id_ingroup_punishment_1" value="True" name="ingroup_punishment" required> Yes</label>
+              </td>
+              <td>
+                  <label class="radio-inline" for="id_ingroup_punishment_2"><input type="radio" id="id_ingroup_punishment_2" value="False" name="ingroup_punishment" required> No</label>
+              </td>
+              {% else %}
+                {% if session.config.outgroup %} <td colspan=2></td> {% endif %}
+            {% endif %}
           </tr>
           <tr>
             <th class='leftjust'>A partner from another group (B) with whom he or she was matched chose</th>
-            <td><span class="blue">Blue</span></td>
+            <td><span class="{{random_pair_B.pd_decision|yesno:"red, blue"}}">{{random_pair_B.pd_decision|yesno:"Red, Blue"}}</span></td>
+            {% if session.config.outgroup %}
+            <td>
+                <label class="radio-inline" for="id_outgroup_punishment_1"><input type="radio" id="id_outgroup_punishment_1" value="True" name="outgroup_punishment" required> Yes</label>
+            </td>
+            <td>
+                <label class="radio-inline" for="id_outgroup_punishment_2"><input type="radio" id="id_outgroup_punishment_2" value="False" name="outgroup_punishment" required> No</label>
+            </td>
+            {% endif %}
           </tr>
         </tbody>
       </table>
-<table class="table table-striped">
-  <tr>
-    <td>Your group player's decision:</td>
-    <td>{{random_pair_A.pd_decision}}</td>
-    {% if session.config.ingroup %}
-      <td>
-        {% formfield player.ingroup_punishment  with label='' %}
-      </td>
-    {% endif%}
-  </tr>
-  <tr>
-    <td>Another group player's decision:</td>
-    <td>  {{random_pair_B.pd_decision}}</td>
-    {% if session.config.outgroup %}
-      <td>
-        {% formfield player.outgroup_punishment with label='' %}
-      </td>
-    {% endif%}
-  </tr>
 
-</table>
+      {% if session.config.colsan  and  session.config.outgroup%}
+      <div class="alert alert-warning alert-dismissable">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+        If you send the deduction tokens to a Participant B, an income of a <b>random</b> participant from group B will be decreased.
+      </div>
+
+
+      {% endif %}
+
+{% next_button %}
+
+
+
+
+
+
+
 
 {% include Constants.instructions_stage2_wrapper %}
 
-{% next_button %}
+
 {% endblock %}
 {% block styles %}
     <link href="{% static "colsan/colsan.css" %}" rel="stylesheet">

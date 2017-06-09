@@ -55,7 +55,7 @@ class ControlQuestions2(Page):
 
     def is_displayed(self):
         return self.subsession.round_number == 1 and \
-         self.session.config['ingroup'] or self.session.config['outgroup']
+          self.session.config['outgroup']
 
     def vars_for_template(self):
         q_pun_received_label = "By how many tokens the Participant {}'s income will be decreased?".format(A_or_B(self))
@@ -92,7 +92,7 @@ class CheckingAnswers(Page):
         self.player.num_correct=sum([1 for _ in ca if _[1]==_[2]])
         self.player.payoff_correct = \
             self.player.num_correct * Constants.correct_answer_payoff
-        print('###### ', ca)
+
         return {'q_n_a': ca}
 
 
@@ -123,11 +123,11 @@ class Pun(Page):
         random_pair_B  = [p
                           for p in random_pair
                           if p.subgroup != self.player.subgroup][0]
-        # myform = self.get_form()
+
         return {
                'random_pair_A': random_pair_A,
                'random_pair_B': random_pair_B,
-               'myform': myform,
+
                }
 
     def get_form_fields(self):
@@ -136,8 +136,9 @@ class Pun(Page):
             fields.append('ingroup_punishment')
         if self.session.config['outgroup']:
             fields.append('outgroup_punishment')
-
         return fields
+
+
 
 class WaitResults(WaitPage):
     template_name = 'colsan/WaitResults.html'
@@ -157,15 +158,15 @@ class FinalResults(Page):
 
 page_sequence = [
     FirstWP,
-    InstructionsStage1,
-    InstructionsStage2,
-    ControlQuestions1,
-    ControlQuestions2,
-    CheckingAnswers,
-    PD,
+    # InstructionsStage1,
+    # InstructionsStage2,
+    # ControlQuestions1,
+    # ControlQuestions2,
+    # CheckingAnswers,
+    # PD,
     WaitPD,
     Pun,
     WaitResults,
-    # Results,
-    # FinalResults,
+    Results,
+    FinalResults,
 ]

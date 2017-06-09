@@ -69,10 +69,8 @@
               {% if session.config.colsan %}
               a <i><b>random</b></i> member of your group
                 {% else %}
-                the member of your group, whose decision was shown to them,
-              {% endif%}
-            {% if session.config.ingroup %}
-                and/or to the specific member of their own group{% endif%}.
+                the member of your group, whose decision was shown to them{% endif%}{% if session.config.ingroup %}
+                , and/or to the specific member of their own group{% endif%}.
           </p>
           <p>
 {% endif%}

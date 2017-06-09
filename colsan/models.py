@@ -21,6 +21,12 @@ class Constants(BaseConstants):
     nono_payoff = 3
     noyes_payoff = 9
     yesno_payoff = 0
+    pd_pintayoff_dict = {
+        '11': yesyes_payoff,
+        '00': nono_payoff,
+        '01': noyes_payoff,
+        '10': yesno_payoff,
+        }
     punishment_factor = 3
     punishment_endowment = 2
     groupset = ['A', 'A', 'A', 'B', 'B', 'B', ]
@@ -34,35 +40,62 @@ class Constants(BaseConstants):
     instructions_stage1_wrapper = 'colsan/ins_s1_wrapper.html'
     instructions_stage2_wrapper = 'colsan/ins_s2_wrapper.html'
     q6_choices = ['My own', 'A random member of my group']
+
+
 class Subsession(BaseSubsession):
-    ...
+
     def before_session_starts(self):
-        ...
+        if self.session.config['ingroup']:
+            assert self.session.config['outgroup'], "You can't create ingroup treatment without outgroup"
+
 
 
 class Group(BaseGroup):
-    pair_to_show = models.IntegerField()
-    def set_payoffs(self):
-            # whom_to_punish_B = [p for p in self.get_players() if p.subgroup == 'B' and p.id == random.choice(Constants.threesome)]
-            # whom_to_punish = whom_to_punish_A + whom_to_punish_B
-        # else:
-        whom_to_punish = [p for p in self.get_players() if p.chosen_for_punishment]
-        for p in whom_to_punish:
-            totpun_ingroup = sum([o.ingroup_punishment or 0 for o in self.get_players() if o.subgroup == p.subgroup])
-            totpun_outgroup = sum([o.outgroup_punishment or 0  for o in self.get_players() if o.subgroup != p.subgroup])
-            p.punishment_received = (totpun_ingroup + totpun_outgroup) * Constants.punishment_factor
-            p.punishment_sent = (p.ingroup_punishment or 0)  + (p.outgroup_punishment or 0)
 
+    def set_payoffs(self):
+        for p in self.get_players():
+            chosen = [o for o in p.get_others_in_group()
+                      if o.pair == p.random_id]
+            assert len(chosen) == 2, 'Too few chosen!'
+            ingroup_punishee = [_ for _ in chosen if _.subgroup == p.subgroup][0]
+            outgroup_punishee = [_ for _ in chosen if _.subgroup != p.subgroup][0]
+            if p.ingroup_punishment:
+                ingroup_punishee.punishment_received += 1
+            if p.outgroup_punishment:
+                outgroup_punishee.punishment_received += 1
+
+        for p in self.get_players():
+            p.set_pd_payoff()
+            p.punishment_sent = (p.ingroup_punishment or 0) + \
+                (p.outgroup_punishment or 0)
+            p.payoff = p.payoff_correct + p.pd_payoff + \
+                Constants.punishment_endowment - \
+                p.punishment_sent - \
+                p.punishment_received * Constants.punishment_factor
 
 class Player(BasePlayer):
+    def get_my_pair(self):
+        those_needed = [p for p in self.get_others_in_group() if
+                        p.pair == self.pair and p.subgroup != self.subgroup]
+        assert len(those_needed) == 1, 'Something is wrong'
+        return those_needed[0]
+
+    def set_pd_payoff(self):
+        self.pd_payoff = \
+            Constants.pd_pintayoff_dict[(str(int(self.pd_decision)) \
+                + str(int(self.get_my_pair().pd_decision)))]
     # next field defines which pair will be shown at the punishment stage
     random_id = models.IntegerField(choices = Constants.threesome)
-    chosen_for_punishment = models.BooleanField(initial=False)
-    punishment_sent = models.IntegerField()
-    punishment_received = models.IntegerField()
+    punishment_sent = models.IntegerField(initial=0)
+    punishment_received = models.IntegerField(initial=0)
+    # to which pair (out of 3) a player belongs:
     pair = models.IntegerField()
+    # to which subgroup (A or B) the player belongs:
     subgroup = models.CharField()
-    pd_decision = models.BooleanField(verbose_name='Your decision', choices=[(False,'Reject'),(True,'Accept')],)
+    pd_decision = models.BooleanField(verbose_name='Your decision',
+                                      choices=[(False, 'Reject'),
+                                               (True, 'Accept')],)
+    pd_payoff = models.IntegerField(initial=0)
     ingroup_punishment = models.BooleanField(verbose_name=
                                              'Punishing your group member',
                                               widget=widgets.RadioSelectHorizontal(),
@@ -77,8 +110,8 @@ class Player(BasePlayer):
 
     # control questions
     # counting the number of correct control answers
-    num_correct = models.IntegerField()
-    payoff_correct = models.FloatField()
+    num_correct = models.IntegerField(initial=0)
+    payoff_correct = models.FloatField(initial=0)
     # control questions for stage 1
     q1 = models.IntegerField(verbose_name="""
         If you choose Red, and your partner chooses Blue, what will be your payoff at the end of Stage 1 of that round?
