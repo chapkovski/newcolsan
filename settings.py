@@ -6,6 +6,7 @@ from boto.mturk import qualification
 
 import otree.settings
 
+SENTRY_DSN = 'http://7c5c585cf09a40a99907285d455d12cd:c33248dd43e04a27a9129191629bf453@sentry.otree.org/64'
 POINTS_DECIMAL_PLACES = 2
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
