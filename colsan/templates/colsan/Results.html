@@ -1,17 +1,57 @@
 {% extends "global/Page.html" %}
 {% load otree_tags staticfiles %}
 {% block title %}
-Results
+Stage 1. Results. Round {{view.round_number}} of {{Constants.num_rounds}}
 {% endblock %}
 
 
 {% block content %}
-<p>your decision in PD: {{player.pd_decision}}</p>
-<p>your partner decsion in PD: {{partner_decision}}</p>
-<p>your payoff from Stage 1: {{player.pd_payoff}}</p>
-<p>Endowment for Stage 2: {{Constants.punishment_endowment}}</p>
-<p>deduction tokens you sent: {{player.punishment_sent}}</p>
-<p>deduction tokens sent to you: - {{player.punishment_received}} X {{Constants.punishment_factor}}</p>
-  <p>your payoff: {{player.payoff}}</p>
+
+
+  <table class="table table-hover table-striped table-bordered">
+
+          <tbody>
+            <tr>
+              <th class='leftjust'>Your decision in Stage 1:</th>
+              <td><span class="{{player.pd_decision|yesno:"red, blue"}}">{{player.pd_decision|yesno:"Red, Blue"}}</span></td>
+
+            </tr>
+            <tr>
+              <th class='leftjust'>Your partner from group B decision in Stage 1:</th>
+              <td><span class="{{partner_decision|yesno:"red, blue"}}">{{partner_decision|yesno:"Red, Blue"}}</span></td>
+            </tr>
+            <tr>
+              <th class='leftjust'>Your payoff from Stage 1:</th>
+              <td>{{player.pd_payoff}}</td>
+            </tr>
+            <tr>
+              <th class='leftjust'>Endowment for Stage 2:</th>
+              <td>{{Constants.punishment_endowment}}</td>
+            </tr>
+            <tr>
+              <th class='leftjust'>Deduction tokens you sent: </th>
+              <td>- {{player.punishment_sent}}</td>
+            </tr>
+            <tr>
+              <th class='leftjust'>Deduction tokens you received:</th>
+              <td>- {{player.punishment_received}} X {{Constants.punishment_factor}}</td>
+            </tr>
+            {% if view.round_number == 1 %}
+
+              <tr>
+                <th class='leftjust'>Payoff for correct answers:</th>
+                <td>{{player.payoff_correct}}</td>
+              </tr>
+            {% endif %}
+            <tr>
+              <th class='leftjust'>Your payoff for this round:</th>
+              <td>{{player.payoff}}</td>
+            </tr>
+          </tbody>
+        </table>
+
 {% next_button %}
+{% endblock %}
+{% block styles %}
+    <link href="{% static "colsan/colsan.css" %}" rel="stylesheet">
 {% endblock %}

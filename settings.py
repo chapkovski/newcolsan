@@ -6,7 +6,7 @@ from boto.mturk import qualification
 
 import otree.settings
 
-
+POINTS_DECIMAL_PLACES = 2
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # the environment variable OTREE_PRODUCTION controls whether Django runs in
@@ -108,11 +108,20 @@ SESSION_CONFIG_DEFAULTS = {
 
 SESSION_CONFIGS = [
     {
-        'name': 'colsanbaseline',
-        'display_name': 'Colsan - Stoff',
+        'name': 'nocolsan',
+        'display_name': 'Individual sanctions - Outgroup and Ingroup',
         'num_demo_participants': 6,
         'app_sequence': ['colsan'],
         'colsan':False,
+        'ingroup': True,
+        'outgroup': True,
+    },
+    {
+        'name': 'colsan',
+        'display_name': 'Collective sanctions - Outgroup and Ingroup',
+        'num_demo_participants': 6,
+        'app_sequence': ['colsan'],
+        'colsan':True,
         'ingroup': True,
         'outgroup': True,
     },

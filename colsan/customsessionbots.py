@@ -32,7 +32,8 @@ class MySessionBotRunner(SessionBotRunner):
             if len(self.bots) == 0:
                 return
             # bots got stuck if there's 2 wait pages in a row
-            # if loops_without_progress > 10:
+            if loops_without_progress > 1000:
+                return
             #     raise AssertionError('Bots got stuck')
             print(loops_without_progress)
             time.sleep(2)
