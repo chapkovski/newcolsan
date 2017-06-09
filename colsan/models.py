@@ -58,7 +58,12 @@ class Group(BaseGroup):
                       if o.pair == p.random_id]
             assert len(chosen) == 2, 'Too few chosen!'
             ingroup_punishee = [_ for _ in chosen if _.subgroup == p.subgroup][0]
-            outgroup_punishee = [_ for _ in chosen if _.subgroup != p.subgroup][0]
+            if self.session.config['colsan']:
+                outgroup_punishee = random.choice([_ for _ in
+                                                  p.get_others_in_group()
+                                                  if _.subgroup != p.subgroup])
+            else:
+                outgroup_punishee = [_ for _ in chosen if _.subgroup != p.subgroup][0]
             if p.ingroup_punishment:
                 ingroup_punishee.punishment_received += 1
             if p.outgroup_punishment:
