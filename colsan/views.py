@@ -3,7 +3,10 @@ from ._builtin import Page, WaitPage
 from .models import Constants, Player
 import random
 from otree.common import safe_json
-
+from otree.bots.bot import ParticipantBot
+# from otree.bots.runner import SessionBotRunner
+from .customsessionbots import MySessionBotRunner
+import threading
 
 class FirstWP(WaitPage):
     group_by_arrival_time = True
@@ -12,16 +15,31 @@ class FirstWP(WaitPage):
     def is_displayed(self):
         return self.round_number == 1
 
+    def get_players_for_group(self, waiting_players):
+            if len(waiting_players) == 1:
+                player = waiting_players[0]
+                slowpokes = [p.participant for p in self.subsession.get_players()
+                    if p.participant._index_in_pages < player.participant._index_in_pages]
+                if len(slowpokes) + 1 >= Constants.players_per_group:
+                    others = slowpokes[:Constants.players_per_group-1]
+                    bots = [ParticipantBot(o) for o in others]
+                    mybotrunner = MySessionBotRunner(bots)
+                    t = threading.Thread(target=mybotrunner.play)
+                    t.daemon = True
+                    t.start()
+            if len(waiting_players) == Constants.players_per_group:
+                return waiting_players
+
+
+class SecondWP(WaitPage):
     def after_all_players_arrive(self):
         allplayers = self.group.get_players()
         if Constants.debug:
             for p in allplayers:
                 p.pd_decision=random.choice([True, False])
-        g = self.group
         for i, p in enumerate(allplayers):
             p.subgroup = Constants.groupset[i]
             p.pair = Constants.threesomesets[i]
-
 
 class InstructionsStage1(Page):
     def is_displayed(self):
@@ -117,6 +135,8 @@ class Pun(Page):
         random_pair = [p
                        for p in self.player.get_others_in_group()
                        if p.pair == self.player.random_id]
+        print('MY RANDOM ID IS:: ', self.player.random_id)
+        print('MY RANDOM PAIR::::', random_pair)
         random_pair_A  = [p
                           for p in random_pair
                           if p.subgroup == self.player.subgroup][0]
@@ -162,12 +182,13 @@ class FinalResults(Page):
 
 page_sequence = [
     FirstWP,
-    # InstructionsStage1,
-    # InstructionsStage2,
-    # ControlQuestions1,
-    # ControlQuestions2,
-    # CheckingAnswers,
-    # PD,
+    SecondWP,
+    InstructionsStage1,
+    InstructionsStage2,
+    ControlQuestions1,
+    ControlQuestions2,
+    CheckingAnswers,
+    PD,
     WaitPD,
     Pun,
     WaitResults,

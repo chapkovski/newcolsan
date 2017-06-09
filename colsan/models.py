@@ -14,7 +14,7 @@ new collective sanctions experiment based on Stoff's paper
 class Constants(BaseConstants):
     name_in_url = 'colsan'
     players_per_group = 6
-    num_rounds = 2
+    num_rounds = 10
     A_group_size = players_per_group/2 - 1
     B_group_size = players_per_group/2
     yesyes_payoff = 6
