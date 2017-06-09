@@ -8,6 +8,9 @@ from otree.bots.bot import ParticipantBot
 from .customsessionbots import MySessionBotRunner
 import threading
 
+class MyPage(Page):
+    timeout_seconds = 120
+    
 class FirstWP(WaitPage):
     group_by_arrival_time = True
     template_name = 'colsan/FirstWP.html'
@@ -41,15 +44,15 @@ class SecondWP(WaitPage):
             p.subgroup = Constants.groupset[i]
             p.pair = Constants.threesomesets[i]
 
-class InstructionsStage1(Page):
+class InstructionsStage1(MyPage):
     def is_displayed(self):
         return self.subsession.round_number == 1
 
-class InstructionsStage2(Page):
+class InstructionsStage2(MyPage):
     def is_displayed(self):
         return self.subsession.round_number == 1
 
-class ControlQuestions1(Page):
+class ControlQuestions1(MyPage):
     form_model = models.Player
 
     def is_displayed(self):
@@ -67,7 +70,7 @@ def A_or_B(self):
         return 'B'
 
 
-class ControlQuestions2(Page):
+class ControlQuestions2(MyPage):
     form_model = models.Player
     form_fields = ['q_pun_received', 'q_pun_sent', 'q_colsan']
 
@@ -82,7 +85,7 @@ class ControlQuestions2(Page):
                 'q_pun_received_label': q_pun_received_label,
 
                 }
-class CheckingAnswers(Page):
+class CheckingAnswers(MyPage):
 
     def is_displayed(self):
         return self.subsession.round_number == 1
@@ -114,7 +117,7 @@ class CheckingAnswers(Page):
         return {'q_n_a': ca}
 
 
-class PD(Page):
+class PD(MyPage):
     form_model = models.Player
     form_fields = ['pd_decision']
 
@@ -128,7 +131,7 @@ class WaitPD(WaitPage):
                                         Constants.threesome if _ != p.pair])
 
 
-class Pun(Page):
+class Pun(MyPage):
     form_model = models.Player
 
     def vars_for_template(self):
@@ -167,7 +170,7 @@ class WaitResults(WaitPage):
         self.group.set_payoffs()
 
 
-class Results(Page):
+class Results(MyPage):
     def vars_for_template(self):
         partner = [_ for _ in self.player.get_others_in_group()
                    if _.pair == self.player.pair][0]
@@ -175,7 +178,7 @@ class Results(Page):
         return {'partner_decision': partner_decision}
 
 
-class FinalResults(Page):
+class FinalResults(MyPage):
     def is_displayed(self):
         return self.round_number == Constants.num_rounds
 
