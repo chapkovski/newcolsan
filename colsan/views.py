@@ -148,7 +148,11 @@ class WaitResults(WaitPage):
 
 
 class Results(Page):
-    ...
+    def vars_for_template(self):
+        partner = [_ for _ in self.player.get_others_in_group()
+                   if _.pair == self.player.pair][0]
+        partner_decision = partner.pd_decision
+        return {'partner_decision': partner_decision}
 
 
 class FinalResults(Page):
