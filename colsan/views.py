@@ -7,10 +7,12 @@ from otree.bots.bot import ParticipantBot
 # from otree.bots.runner import SessionBotRunner
 from .customsessionbots import MySessionBotRunner
 import threading
+from customwp.views import CustomWaitPage
+
 
 class MyPage(Page):
     timeout_seconds = 120
-    
+
 class FirstWP(WaitPage):
     group_by_arrival_time = True
     template_name = 'colsan/FirstWP.html'
@@ -19,6 +21,7 @@ class FirstWP(WaitPage):
         return self.round_number == 1
 
     def get_players_for_group(self, waiting_players):
+        if Constants.debug:
             if len(waiting_players) == 1:
                 player = waiting_players[0]
                 slowpokes = [p.participant for p in self.subsession.get_players()
@@ -30,11 +33,11 @@ class FirstWP(WaitPage):
                     t = threading.Thread(target=mybotrunner.play)
                     t.daemon = True
                     t.start()
-            if len(waiting_players) == Constants.players_per_group:
-                return waiting_players
+        if len(waiting_players) == Constants.players_per_group:
+            return waiting_players
 
 
-class SecondWP(WaitPage):
+class SecondWP(CustomWaitPage):
     def after_all_players_arrive(self):
         allplayers = self.group.get_players()
         if Constants.debug:
@@ -122,11 +125,12 @@ class PD(MyPage):
     form_fields = ['pd_decision']
 
 
-class WaitPD(WaitPage):
-    template_name = 'colsan/WaitPD.html'
+class WaitPD(CustomWaitPage):
+    # template_name = 'colsan/WaitPD.html'
 
     def after_all_players_arrive(self):
         for p in self.group.get_players():
+            # we define the which random pair will be shown to the participants
             p.random_id = random.choice([_ for _ in
                                         Constants.threesome if _ != p.pair])
 
@@ -163,8 +167,8 @@ class Pun(MyPage):
 
 
 
-class WaitResults(WaitPage):
-    template_name = 'colsan/WaitResults.html'
+class WaitResults(CustomWaitPage):
+    # template_name = 'colsan/WaitResults.html'
 
     def after_all_players_arrive(self):
         self.group.set_payoffs()
@@ -184,7 +188,7 @@ class FinalResults(MyPage):
 
 
 page_sequence = [
-    FirstWP,
+    # FirstWP,
     SecondWP,
     InstructionsStage1,
     InstructionsStage2,

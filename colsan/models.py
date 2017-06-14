@@ -33,7 +33,7 @@ class Constants(BaseConstants):
     punishment_choices = [0, 1]
     threesome = list(range(1, 4))
     threesomesets = threesome + threesome
-    debug = True
+    debug = False
     # payment for each correct answer in control question set of pages:
     correct_answer_payoff = 0.5
     # set of constants to include instructions to other pages:

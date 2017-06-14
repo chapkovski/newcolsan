@@ -5,7 +5,7 @@ import dj_database_url
 from boto.mturk import qualification
 
 import otree.settings
-
+CHANNEL_ROUTING = 'customwp.routing.channel_routing'
 SENTRY_DSN = 'http://7c5c585cf09a40a99907285d455d12cd:c33248dd43e04a27a9129191629bf453@sentry.otree.org/64'
 POINTS_DECIMAL_PLACES = 2
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -112,7 +112,7 @@ SESSION_CONFIGS = [
         'name': 'nocolsan',
         'display_name': 'Individual sanctions - Outgroup and Ingroup',
         'num_demo_participants': 6,
-        'app_sequence': ['colsan'],
+        'app_sequence': ['customwp', 'colsan'],
         'colsan':False,
         'ingroup': True,
         'outgroup': True,
@@ -121,7 +121,7 @@ SESSION_CONFIGS = [
         'name': 'colsan',
         'display_name': 'Collective sanctions - Outgroup and Ingroup',
         'num_demo_participants': 6,
-        'app_sequence': ['colsan'],
+        'app_sequence': ['customwp', 'colsan'],
         'colsan':True,
         'ingroup': True,
         'outgroup': True,
@@ -130,4 +130,8 @@ SESSION_CONFIGS = [
 
 # anything you put after the below line will override
 # oTree's default settings. Use with caution.
+
 otree.settings.augment_settings(globals())
+# print('BEFORE::: ', CHANNEL_LAYERS['inmemory']['BACKEND'])
+# CHANNEL_LAYERS['inmemory']['BACKEND'] = 'otree.channels.asgi_redis.RedisChannelLayer'
+# print('AFTER::: ', CHANNEL_LAYERS['inmemory']['BACKEND'])
