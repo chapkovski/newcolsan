@@ -7,34 +7,34 @@ from otree.bots.bot import ParticipantBot
 # from otree.bots.runner import SessionBotRunner
 from .customsessionbots import MySessionBotRunner
 import threading
-from customwp.views import CustomWaitPage
+from customwp.views import CustomWaitPage, CustomPage
 
 
-class MyPage(Page):
+class MyPage(CustomPage):
     timeout_seconds = 120
 
-class FirstWP(WaitPage):
-    group_by_arrival_time = True
-    template_name = 'colsan/FirstWP.html'
-
-    def is_displayed(self):
-        return self.round_number == 1
-
-    def get_players_for_group(self, waiting_players):
-        if Constants.debug:
-            if len(waiting_players) == 1:
-                player = waiting_players[0]
-                slowpokes = [p.participant for p in self.subsession.get_players()
-                    if p.participant._index_in_pages < player.participant._index_in_pages]
-                if len(slowpokes) + 1 >= Constants.players_per_group:
-                    others = slowpokes[:Constants.players_per_group-1]
-                    bots = [ParticipantBot(o) for o in others]
-                    mybotrunner = MySessionBotRunner(bots)
-                    t = threading.Thread(target=mybotrunner.play)
-                    t.daemon = True
-                    t.start()
-        if len(waiting_players) == Constants.players_per_group:
-            return waiting_players
+# class FirstWP(CustomWaitPage):
+#     group_by_arrival_time = True
+#     template_name = 'colsan/FirstWP.html'
+#
+#     def is_displayed(self):
+#         return self.round_number == 1
+#
+#     def get_players_for_group(self, waiting_players):
+#         if Constants.debug:
+#             if len(waiting_players) == 1:
+#                 player = waiting_players[0]
+#                 slowpokes = [p.participant for p in self.subsession.get_players()
+#                     if p.participant._index_in_pages < player.participant._index_in_pages]
+#                 if len(slowpokes) + 1 >= Constants.players_per_group:
+#                     others = slowpokes[:Constants.players_per_group-1]
+#                     bots = [ParticipantBot(o) for o in others]
+#                     mybotrunner = MySessionBotRunner(bots)
+#                     t = threading.Thread(target=mybotrunner.play)
+#                     t.daemon = True
+#                     t.start()
+#         if len(waiting_players) == Constants.players_per_group:
+#             return waiting_players
 
 
 class SecondWP(CustomWaitPage):
@@ -48,17 +48,17 @@ class SecondWP(CustomWaitPage):
             p.pair = Constants.threesomesets[i]
 
 class InstructionsStage1(MyPage):
-    def is_displayed(self):
+    def extra_is_displayed(self):
         return self.subsession.round_number == 1
 
 class InstructionsStage2(MyPage):
-    def is_displayed(self):
+    def extra_is_displayed(self):
         return self.subsession.round_number == 1
 
 class ControlQuestions1(MyPage):
     form_model = models.Player
 
-    def is_displayed(self):
+    def extra_is_displayed(self):
         return self.subsession.round_number == 1
 
     def get_form_fields(self):
@@ -77,7 +77,7 @@ class ControlQuestions2(MyPage):
     form_model = models.Player
     form_fields = ['q_pun_received', 'q_pun_sent', 'q_colsan']
 
-    def is_displayed(self):
+    def extra_is_displayed(self):
         return self.subsession.round_number == 1 and \
           self.session.config['outgroup']
 
@@ -90,7 +90,7 @@ class ControlQuestions2(MyPage):
                 }
 class CheckingAnswers(MyPage):
 
-    def is_displayed(self):
+    def extra_is_displayed(self):
         return self.subsession.round_number == 1
 
     def vars_for_template(self):
@@ -183,7 +183,7 @@ class Results(MyPage):
 
 
 class FinalResults(MyPage):
-    def is_displayed(self):
+    def extra_is_displayed(self):
         return self.round_number == Constants.num_rounds
 
 

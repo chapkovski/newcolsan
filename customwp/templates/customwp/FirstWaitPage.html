@@ -7,6 +7,7 @@
 </style>
 {% endblock %}
 {% block content %}
+<br>
     {{block.super}}
     {% if subsession.not_enough_players %}
 
@@ -16,7 +17,7 @@
         <br>
         Please, click 'Finish the study'.
         <br>
-        <b>You are still eligible for the participation fee!</b>
+        <b>You still will receive your participant fee!</b>
         <br>
         We apologise for the inconvenience.
       </div>
@@ -27,9 +28,13 @@
                 <span class="glyphicon glyphicon-time"></span>
                 <span id="minutes"></span>:<span id="seconds"></span>
             </span>
+
         </p>
     </div>
     {% endif %}
+      <div id="part_fee_info" class="alert alert-danger" role="alert" style='display:none;'>
+          <b>If you click 'Finish the study' you still will receive your participant fee!</b>
+        </div>
     <form action="" method="post" role="form" class="form">
     {% csrf_token %}
     <div>
@@ -62,7 +67,7 @@
                     case "finished":
                         $('#otree-timeout').hide(duration=0);
                         $('#finish_study').show();
-
+                        $('#part_fee_info').show();
                         break;
                 }
             });

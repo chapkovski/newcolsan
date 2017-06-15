@@ -23,14 +23,30 @@ from .consumers import get_group_name
 class CustomWaitPage(WaitPage):
     template_name = 'customwp/CustomWaitPage.html'
 
+    def is_displayed(self):
+        if 'outofthegame' in self.player.participant.vars:
+            return not self.player.participant.vars['outofthegame'] and self.extra_is_displayed()
+        return self.extra_is_displayed()
 
+    def extra_is_displayed(self):
+        return True
 
+class CustomPage(Page):
+    timeout_seconds = 60
+
+    def is_displayed(self):
+        if 'outofthegame' in self.player.participant.vars:
+            return not self.player.participant.vars['outofthegame'] and self.extra_is_displayed()
+        return self.extra_is_displayed()
+
+    def extra_is_displayed(self):
+        return True
 
 class StartWP(CustomWaitPage):
     group_by_arrival_time = True
     template_name = 'customwp/FirstWaitPage.html'
 
-    def is_displayed(self):
+    def extra_is_displayed(self):
         return self.subsession.round_number == 1
 
     def vars_for_template(self):
@@ -51,13 +67,11 @@ class StartWP(CustomWaitPage):
             self.subsession.not_enough_players = True
         if endofgame:
             curplayer = [p for p in waiting_players if p.pk == int(endofgame)][0]
-            curplayer.outofthegame = True
+            curplayer.participant.vars['outofthegame'] = True
             return [curplayer]
         if len(waiting_players) == Constants.players_per_group:
             return waiting_players
 
-    def is_displayed(self):
-        return self.round_number == 1
 
 
 
