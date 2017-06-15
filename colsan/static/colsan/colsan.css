@@ -36,3 +36,7 @@
       color:darkblue;
     }
 .info{background: skyblue;}
+
+div#instructions{
+  display: none;
+}

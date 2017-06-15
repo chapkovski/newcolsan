@@ -11,7 +11,7 @@ from customwp.views import CustomWaitPage, CustomPage
 
 
 class MyPage(CustomPage):
-    timeout_seconds = 120
+    timeout_seconds = 12000
 
 # class FirstWP(CustomWaitPage):
 #     group_by_arrival_time = True
