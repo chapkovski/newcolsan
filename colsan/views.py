@@ -37,15 +37,9 @@ class MyPage(CustomPage):
 #             return waiting_players
 
 
-class SecondWP(CustomWaitPage):
-    def after_all_players_arrive(self):
-        allplayers = self.group.get_players()
-        if Constants.debug:
-            for p in allplayers:
-                p.pd_decision=random.choice([True, False])
-        for i, p in enumerate(allplayers):
-            p.subgroup = Constants.groupset[i]
-            p.pair = Constants.threesomesets[i]
+# class SecondWP(CustomWaitPage):
+#     def after_all_players_arrive(self):
+
 
 class InstructionsStage1(MyPage):
     def extra_is_displayed(self):
@@ -88,6 +82,8 @@ class ControlQuestions2(MyPage):
                 'q_pun_received_label': q_pun_received_label,
 
                 }
+
+
 class CheckingAnswers(MyPage):
 
     def extra_is_displayed(self):
@@ -129,10 +125,16 @@ class WaitPD(CustomWaitPage):
     # template_name = 'colsan/WaitPD.html'
 
     def after_all_players_arrive(self):
-        for p in self.group.get_players():
+        allplayers = self.group.get_players()
+        # assign subgroups
+        for i, p in enumerate(allplayers):
+            p.subgroup = Constants.groupset[i]
+            p.pair = Constants.threesomesets[i]
+        for p in allplayers:
             # we define the which random pair will be shown to the participants
             p.random_id = random.choice([_ for _ in
                                         Constants.threesome if _ != p.pair])
+            p.set_pd_payoff()
 
 
 class Pun(MyPage):
@@ -178,8 +180,7 @@ class Results(MyPage):
     def vars_for_template(self):
         partner = [_ for _ in self.player.get_others_in_group()
                    if _.pair == self.player.pair][0]
-        partner_decision = partner.pd_decision
-        return {'partner_decision': partner_decision}
+        return {'partner_decision': partner.pd_decision}
 
 
 class FinalResults(MyPage):
@@ -189,7 +190,7 @@ class FinalResults(MyPage):
 
 page_sequence = [
     # FirstWP,
-    SecondWP,
+    # SecondWP,
     InstructionsStage1,
     InstructionsStage2,
     ControlQuestions1,

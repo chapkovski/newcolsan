@@ -4,29 +4,13 @@
           <p>
             In Stage 2 you see the decisions of <b>another</b> pair:
             one <b>random</b> member of your own group (Participant A) and a person from group
-             B with whom Participant A was matched in Stage 1 (Participant B).
-             For example:</p>
+             B with whom he or she was matched (Participant B).
 
-           <table class="table  table-striped table-bordered">
-            <tbody>
-              <tr class='danger'>
-                <th class='leftjust'>Participant from your group (A) chose:</th>
-                <td><span class="red">Red</span></td>
-              </tr>
-              <tr class='info'>
-                <th class='leftjust'>A partner from another group (B) with whom
-                  he or she was matched chose:</th>
-                <td><span class="blue">Blue</span></td>
-              </tr>
-            </tbody>
-          </table>
 
-          <table>
 
-          </table>
 {% if session.config.outgroup %}
           <p>
-            At the beginning of stage 2 all participants receive an additional
+            At the beginning of Stage 2 all participants receive an additional
              endowment of <b>{{Constants.punishment_endowment}}</b> points.
              By transferring points from this endowment you can decrease
              {% if session.config.ingroup %}
@@ -44,9 +28,7 @@
                  decreased by <b>{{Constants.punishment_factor}}</b>&nbsp;points.
              {% endif%}
               {% if session.config.colsan %} </p><p>
-                If you send <b>1</b> deduction point to a Participant B
-                (a member of group B who
-                was matched with Participant A), we will choose <i><b>randomly</b></i> one
+                If you send <b>1</b> deduction point to a Participant B, we will choose <i><b>randomly</b></i> one
                 member of a group B and we will decrease his or her income by
                 <b>{{Constants.punishment_factor}}</b> points.
                 It is not known who exactly from a group B will be
@@ -67,10 +49,8 @@
             members of group B also make the same decisions about sending
             deduction tokens to
               {% if session.config.colsan %}
-              a <i><b>random</b></i> member of your group
-                {% else %}
-                the member of your group, whose decision was shown to them{% endif%}{% if session.config.ingroup %}
-                , and/or to the specific member of their own group{% endif%}.
+              a <i><b>random</b></i> member of your group{% else %}
+                the member of your group, whose decision was shown to them{% endif%}{% if session.config.ingroup %}, and/or to the specific member of their own group{% endif%}.
           </p>
           <p>
 {% endif%}

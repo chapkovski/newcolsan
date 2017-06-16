@@ -1,51 +1,69 @@
 {% extends "global/Page.html" %}
 {% load otree_tags staticfiles %}
 {% block title %}
-Stage 1. Decision. Round {{view.round_number}} of {{Constants.num_rounds}}
+Round {{view.round_number}} of {{Constants.num_rounds}}: Stage 1. Decision
 {% endblock %}
 
 {% block content %}
+
+
+
 <table class="table" id='tableSelect'>
   <thead>
     <tr>
       <th></th>
-      <th>Your decision</th>
+        <th></th>
+      <th>Red</th>
+      <th>Blue</th>
 
     </tr>
   </thead>
   <tbody>
-    <tr class="info">
-      <th>Blue</th>
+    <tr>
+      <th colspan=2>Your decision</th>
       <td>
-        <input type="radio" id="id_pd_decision_1" value="False" name="pd_decision" required="" >
+        <input type="radio" id="id_pd_decision_1" value="False" name="pd_decision" required="" class='red' >
       </td>
-
+      <td>
+        <input type="radio" id="id_pd_decision_2" value="True" name="pd_decision" required="" class='blue'>
+      </td>
     </tr>
-    <tr class="danger">
-      <th>Red</th>
-      <td>
-        <input type="radio" id="id_pd_decision_2" value="True" name="pd_decision" required="">
-      </td>
+    <tr>
+      <td rowspan=2>Your payoff <br>if another person chooses:</td>
+      <td>Red</td>
+      <td class='red radio1'>{{Constants.yesyes_payoff}}</td>
+      <td class='blue radio1'>{{Constants.noyes_payoff}}</td>
+    </tr>
+    <tr>
+      <td>Blue</td>
+      <td class='red radio1'>{{Constants.yesno_payoff}}</td>
+      <td class='blue radio1'>{{Constants.nono_payoff}}</td>
     </tr>
   </tbody>
 </table>
-
-
-
+{% next_button %}
 {% include Constants.instructions_stage1_wrapper %}
 
-{% next_button %}
+
 {% endblock %}
 
 {% block styles %}
     <link href="{% static "colsan/colsan.css" %}" rel="stylesheet">
+
+    <style>
+    .table>tbody>tr>td {
+      vertical-align: middle!important;
+    }
+    .bold { font-weight: bold; }
+    </style>
+
 {% endblock %}
 
 {% block scripts %}
     <script>
-
-        $('#tableSelect tr').click(function() {
-        $(this).find('td input[type=radio]').prop('checked', true);
-    })
+    $('td input[type=radio]').click(function() {
+      $('.radio1').css("font-weight","normal");
+    $('.'+$(this).prop('class')).css("font-weight","Bold");
+});
     </script>
 {% endblock %}

@@ -10,41 +10,59 @@ Stage 2. Decision. Round {{view.round_number}} of {{Constants.num_rounds}}
   You receive <b>{{Constants.punishment_endowment}}</b> extra points which you can use to send deduction tokens to other participants.
 </div>
 <table class="table table-hover table-striped table-bordered">
-  {% if session.config.outgroup %}
+
     <thead>
-      <th colspan=2></th>
-      <th colspan=2>Send deduction tokens:</th>
+      <th ></th>
+      <th>Participant A <br> (Your group)</th>
+      <th>Participant B <br> (Another group)</th>
     </thead>
-  {% endif %}
-        <tbody>
-          <tr>
-            <th class='leftjust'>Participant from your group (A) chose</th>
-            <td><span class="{{random_pair_A.pd_decision|yesno:"red, blue"}}">{{random_pair_A.pd_decision|yesno:"Red, Blue"}}</span></td>
-            {% if session.config.ingroup %}
-              <td>
-                  <label class="radio-inline" for="id_ingroup_punishment_1"><input type="radio" id="id_ingroup_punishment_1" value="True" name="ingroup_punishment" required> Yes</label>
-              </td>
-              <td>
-                  <label class="radio-inline" for="id_ingroup_punishment_2"><input type="radio" id="id_ingroup_punishment_2" value="False" name="ingroup_punishment" required> No</label>
-              </td>
-              {% else %}
-                {% if session.config.outgroup %} <td colspan=2></td> {% endif %}
-            {% endif %}
-          </tr>
-          <tr>
-            <th class='leftjust'>A partner from another group (B) with whom he or she was matched chose</th>
-            <td><span class="{{random_pair_B.pd_decision|yesno:"red, blue"}}">{{random_pair_B.pd_decision|yesno:"Red, Blue"}}</span></td>
-            {% if session.config.outgroup %}
-            <td>
-                <label class="radio-inline" for="id_outgroup_punishment_1"><input type="radio" id="id_outgroup_punishment_1" value="True" name="outgroup_punishment" required> Yes</label>
-            </td>
-            <td>
-                <label class="radio-inline" for="id_outgroup_punishment_2"><input type="radio" id="id_outgroup_punishment_2" value="False" name="outgroup_punishment" required> No</label>
-            </td>
-            {% endif %}
-          </tr>
-        </tbody>
-      </table>
+
+    <tbody>
+      <tr>
+        <td>Their decisions:</td>
+        <td><span class="{{random_pair_A.pd_decision|yesno:"red, blue"}}">{{random_pair_A.pd_decision|yesno:"Red, Blue"}}</span></td>
+        <td><span class="{{random_pair_B.pd_decision|yesno:"red, blue"}}">{{random_pair_B.pd_decision|yesno:"Red, Blue"}}</span></td>
+      </tr>
+      <tr>
+        <td>Their payoffs:</td>
+        <td>{{random_pair_A.pd_payoff}}</td>
+        <td>{{random_pair_B.pd_payoff}}</td>
+      </tr>
+      <tr>
+        <td rowspan=2>Send a deduction token</td>
+        <td><label class="radio-inline" for="id_ingroup_punishment_1">
+          <input class='pun_choice' type="radio" id="id_ingroup_punishment_1" value="True" name="ingroup_punishment" required>
+          Yes
+        </label>
+        </td>
+        <td>
+          <label class="radio-inline" for="id_outgroup_punishment_1">
+            <input class='pun_choice' type="radio" id="id_outgroup_punishment_1" value="True" name="outgroup_punishment" required>
+            Yes
+          </label>
+          </td>
+      </tr>
+      <tr>
+
+        <td><label class="radio-inline" for="id_ingroup_punishment_2">
+          <input  class='pun_choice' type="radio" id="id_ingroup_punishment_2" value="False" name="ingroup_punishment" required>
+          No
+        </label>
+      </td>
+        <td>
+          <label class="radio-inline" for="id_outgroup_punishment_2">
+            <input  class='pun_choice' type="radio" id="id_outgroup_punishment_2" value="False" name="outgroup_punishment" required>
+            No
+          </label>
+        </td>
+      </tr>
+      <tr>
+        <td>Their payoffs are decreased by:</td>
+        <td id='ingroup_punishment'></td>
+        <td id='outgroup_punishment'> </td>
+      </tr>
+    </tbody>
+  </table>
 
       {% if session.config.colsan  and  session.config.outgroup%}
       <div class="alert alert-warning alert-dismissable">
@@ -69,5 +87,21 @@ Stage 2. Decision. Round {{view.round_number}} of {{Constants.num_rounds}}
 
 {% endblock %}
 {% block styles %}
+<style>
+.table>tbody>tr>td {
+  vertical-align: middle!important;
+}
+</style>
+{% endblock %}
+{% block scripts %}
+<script type="text/javascript">
+  $( "input.pun_choice" ).change(function(){
+    var name = $(this).attr("name");
+    curval = $('input[name='+name+']:checked').val();
 
+    $('td#'+name).html(curval=='True'?{{Constants.punishment_factor}}:0);
+
+  });
+
+</script>
 {% endblock %}

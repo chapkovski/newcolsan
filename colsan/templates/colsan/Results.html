@@ -24,6 +24,7 @@ Stage 1. Results. Round {{view.round_number}} of {{Constants.num_rounds}}
               <th class='leftjust'>Your payoff from Stage 1:</th>
               <td>{{player.pd_payoff}}</td>
             </tr>
+              {% if session.config.outgroup %}
             <tr>
               <th class='leftjust'>Endowment for Stage 2:</th>
               <td>{{Constants.punishment_endowment}}</td>
@@ -33,9 +34,16 @@ Stage 1. Results. Round {{view.round_number}} of {{Constants.num_rounds}}
               <td>- {{player.punishment_sent}}</td>
             </tr>
             <tr>
-              <th class='leftjust'>Deduction tokens you received:</th>
-              <td>- {{player.punishment_received}} X {{Constants.punishment_factor}}</td>
+              <th class='leftjust'>Deduction tokens you received from another group:</th>
+              <td>- {{player.punishment_received_out}} X {{Constants.punishment_factor}}</td>
             </tr>
+                {% if session.config.ingroup %}
+                    <tr>
+                      <th class='leftjust'>Deduction tokens you received from your group:</th>
+                      <td>- {{player.punishment_received_in}} X {{Constants.punishment_factor}}</td>
+                    </tr>
+                  {% endif %}
+              {% endif %}
             {% if view.round_number == 1 %}
 
               <tr>
@@ -43,9 +51,9 @@ Stage 1. Results. Round {{view.round_number}} of {{Constants.num_rounds}}
                 <td>{{player.payoff_correct}}</td>
               </tr>
             {% endif %}
-            <tr>
+            <tr class='success'>
               <th class='leftjust'>Your payoff for this round:</th>
-              <td>{{player.payoff}}</td>
+              <th>{{player.payoff}}</th>
             </tr>
           </tbody>
         </table>

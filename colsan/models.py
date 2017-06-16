@@ -65,11 +65,14 @@ class Group(BaseGroup):
             else:
                 outgroup_punishee = [_ for _ in chosen if _.subgroup != p.subgroup][0]
             if p.ingroup_punishment:
+                ingroup_punishee.punishment_received_in += 1
                 ingroup_punishee.punishment_received += 1
             if p.outgroup_punishment:
+                outgroup_punishee.punishment_received_out += 1
                 outgroup_punishee.punishment_received += 1
-
         for p in self.get_players():
+            assert p.punishment_received_out + p.punishment_received_in == \
+                p.punishment_received, 'Miscalculation in punishment received'
             p.set_pd_payoff()
             p.punishment_sent = (p.ingroup_punishment or 0) + \
                 (p.outgroup_punishment or 0)
@@ -92,7 +95,12 @@ class Player(BasePlayer):
     # next field defines which pair will be shown at the punishment stage
     random_id = models.IntegerField(choices = Constants.threesome)
     punishment_sent = models.IntegerField(initial=0)
+    # total amount of punishment received
     punishment_received = models.IntegerField(initial=0)
+    # separately: punishment received by ingroup members
+    punishment_received_in = models.IntegerField(initial=0)
+    # separately: punishment received by outgroup memebers
+    punishment_received_out = models.IntegerField(initial=0)
     # to which pair (out of 3) a player belongs:
     pair = models.IntegerField()
     # to which subgroup (A or B) the player belongs:
