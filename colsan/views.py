@@ -187,8 +187,16 @@ class FinalResults(MyPage):
     def extra_is_displayed(self):
         return self.round_number == Constants.num_rounds
 
+class Survey(MyPage):
+    form_model=models.Player
+    def extra_is_displayed(self):
+        return self.round_number == 1
+    def get_form_fields(self):
+        q_set = ['survey_q{}'.format(i) for i in range(1,6)]
+        return q_set
 
 page_sequence = [
+    Survey,
     # FirstWP,
     # SecondWP,
     InstructionsStage1,

@@ -1,3 +1,2 @@
-# this is for Heroku and other servers.
-# Locally, you should install requirements_base.txt
--r requirements_server.txt
+Django==1.8.8
+otree-core==1.3.9

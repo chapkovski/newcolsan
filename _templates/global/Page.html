@@ -72,15 +72,9 @@ input:checked + .slider:before {
 {% endblock %}
 
 {% block global_scripts  %}
-<script>
-$('#instr_check').change(function(){
-  console.log('dorow');
-  // var instruction_block = ;
-  $('div#instructions').toggle();
-  // if $(this).is(":checked") {instruction_block.show()} else {}
-});
-
-
-</script>
-
+  <script>
+    $('#instr_check').change(function(){
+      $('div#instructions').toggle();
+    });
+  </script>
 {% endblock %}

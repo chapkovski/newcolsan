@@ -150,3 +150,18 @@ class Player(BasePlayer):
         choices=Constants.q6_choices,
         widget=widgets.RadioSelectHorizontal(),
         )
+
+
+import itertools as it
+filename='colsan/questions.txt'
+qstart = '=='
+with open(filename,'r') as f:
+    i = 0
+    for key,group in it.groupby(f,lambda line: line.startswith(qstart)):
+        if not key:
+            i += 1
+            group = list(group)
+            print('CHOICES:::: ', group[1:])
+            Player.add_to_class("survey_q{}".format(i),
+                    models.CharField(verbose_name=group[0],
+                                    choices=group[1:]))
