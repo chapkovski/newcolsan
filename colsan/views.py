@@ -144,8 +144,8 @@ class Pun(MyPage):
         random_pair = [p
                        for p in self.player.get_others_in_group()
                        if p.pair == self.player.random_id]
-        print('MY RANDOM ID IS:: ', self.player.random_id)
-        print('MY RANDOM PAIR::::', random_pair)
+        # print('MY RANDOM ID IS:: ', self.player.random_id)
+        # print('MY RANDOM PAIR::::', random_pair)
         random_pair_A  = [p
                           for p in random_pair
                           if p.subgroup == self.player.subgroup][0]
@@ -196,18 +196,18 @@ class Survey(MyPage):
         return q_set
 
 page_sequence = [
-    Survey,
+    # Survey,
     # FirstWP,
     # SecondWP,
-    InstructionsStage1,
-    InstructionsStage2,
-    ControlQuestions1,
-    ControlQuestions2,
-    CheckingAnswers,
+    # InstructionsStage1,
+    # InstructionsStage2,
+    # ControlQuestions1,
+    # ControlQuestions2,
+    # CheckingAnswers,
     PD,
     WaitPD,
     Pun,
     WaitResults,
-    Results,
-    FinalResults,
+    # Results,
+    # FinalResults,
 ]

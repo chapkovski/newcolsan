@@ -92,6 +92,8 @@ class Player(BasePlayer):
         self.pd_payoff = \
             Constants.pd_pintayoff_dict[(str(int(self.pd_decision)) \
                 + str(int(self.get_my_pair().pd_decision)))]
+    # bot's strategy recorded:
+    bot_strategy = models.CharField()
     # next field defines which pair will be shown at the punishment stage
     random_id = models.IntegerField(choices = Constants.threesome)
     punishment_sent = models.IntegerField(initial=0)
@@ -152,16 +154,16 @@ class Player(BasePlayer):
         )
 
 
-import itertools as it
-filename='colsan/questions.txt'
-qstart = '=='
-with open(filename,'r') as f:
-    i = 0
-    for key,group in it.groupby(f,lambda line: line.startswith(qstart)):
-        if not key:
-            i += 1
-            group = list(group)
-            print('CHOICES:::: ', group[1:])
-            Player.add_to_class("survey_q{}".format(i),
-                    models.CharField(verbose_name=group[0],
-                                    choices=group[1:]))
+# import itertools as it
+# filename='colsan/questions.txt'
+# qstart = '=='
+# with open(filename,'r') as f:
+#     i = 0
+#     for key,group in it.groupby(f,lambda line: line.startswith(qstart)):
+#         if not key:
+#             i += 1
+#             group = list(group)
+#             print('CHOICES:::: ', group[1:])
+#             Player.add_to_class("survey_q{}".format(i),
+#                     models.CharField(verbose_name=group[0],
+#                                     choices=group[1:]))

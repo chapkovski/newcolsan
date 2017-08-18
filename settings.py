@@ -126,6 +126,15 @@ SESSION_CONFIGS = [
         'ingroup': True,
         'outgroup': True,
     },
+    {
+        'name': 'colsanoutgroup',
+        'display_name': 'Individual sanctions - Outgroup and Ingroup',
+        'num_demo_participants': 6,
+        'app_sequence': ['customwp', 'colsan'],
+        'colsan':True,
+        'ingroup': False,
+        'outgroup': True,
+    },
 ]
 
 # anything you put after the below line will override
