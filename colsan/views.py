@@ -208,6 +208,6 @@ page_sequence = [
     WaitPD,
     Pun,
     WaitResults,
-    # Results,
+    Results,
     # FinalResults,
 ]
