@@ -128,7 +128,7 @@ SESSION_CONFIGS = [
     },
     {
         'name': 'colsanoutgroup',
-        'display_name': 'Individual sanctions - Outgroup and Ingroup',
+        'display_name': 'Individual sanctions - Outgroup only',
         'num_demo_participants': 6,
         'app_sequence': ['customwp', 'colsan'],
         'colsan':True,
