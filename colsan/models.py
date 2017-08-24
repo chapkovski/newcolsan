@@ -49,9 +49,9 @@ class Subsession(BaseSubsession):
 class Group(BaseGroup):
     @property
     def subgroups(self):
-        subgroup_dict={}
+        subgroup_dict = {}
         for s in Constants.groupset:
-            subgroup_dict[s]=self.get_subgroup(s)
+            subgroup_dict[s] = self.get_subgroup(s)
         print('SET OF SUBGROUPS:::', subgroup_dict)
         return subgroup_dict
 
@@ -94,12 +94,15 @@ class Player(BasePlayer):
         return self.group.subgroups[self.subgroup]
 
     @property
-    def another_subgroup(self):
+    def another_subgroup_name(self):
         other_subgroups = set(Constants.groupset)
         another_subgroup = other_subgroups - set([self.subgroup])
         assert len(another_subgroup) == 1, 'SOMETHING GONE WRONG'
-        another_subgroup = another_subgroup.pop()
-        return self.group.subgroups[another_subgroup]
+        return another_subgroup.pop()
+
+    @property
+    def another_subgroup(self):
+        return self.group.subgroups[self.another_subgroup_name]
 
     @property
     def my_pair(self):
