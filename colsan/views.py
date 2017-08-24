@@ -13,32 +13,6 @@ from customwp.views import CustomWaitPage, CustomPage
 class MyPage(CustomPage):
     timeout_seconds = 12000
 
-# class FirstWP(CustomWaitPage):
-#     group_by_arrival_time = True
-#     template_name = 'colsan/FirstWP.html'
-#
-#     def is_displayed(self):
-#         return self.round_number == 1
-#
-#     def get_players_for_group(self, waiting_players):
-#         if Constants.debug:
-#             if len(waiting_players) == 1:
-#                 player = waiting_players[0]
-#                 slowpokes = [p.participant for p in self.subsession.get_players()
-#                     if p.participant._index_in_pages < player.participant._index_in_pages]
-#                 if len(slowpokes) + 1 >= Constants.players_per_group:
-#                     others = slowpokes[:Constants.players_per_group-1]
-#                     bots = [ParticipantBot(o) for o in others]
-#                     mybotrunner = MySessionBotRunner(bots)
-#                     t = threading.Thread(target=mybotrunner.play)
-#                     t.daemon = True
-#                     t.start()
-#         if len(waiting_players) == Constants.players_per_group:
-#             return waiting_players
-
-
-# class SecondWP(CustomWaitPage):
-#     def after_all_players_arrive(self):
 
 
 class InstructionsStage1(MyPage):
@@ -144,8 +118,6 @@ class Pun(MyPage):
         random_pair = [p
                        for p in self.player.get_others_in_group()
                        if p.pair == self.player.random_id]
-        # print('MY RANDOM ID IS:: ', self.player.random_id)
-        # print('MY RANDOM PAIR::::', random_pair)
         random_pair_A  = [p
                           for p in random_pair
                           if p.subgroup == self.player.subgroup][0]

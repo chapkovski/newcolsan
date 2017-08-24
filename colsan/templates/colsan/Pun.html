@@ -1,85 +1,111 @@
 {% extends "global/Page.html" %}
 {% load otree_tags staticfiles %}
 {% block title %}
-Stage 2. Decision. Round {{view.round_number}} of {{Constants.num_rounds}}
+    Stage 2. Decision. Round {{ view.round_number }} of {{ Constants.num_rounds }}
 {% endblock %}
 
 
 {% block content %}
 <div class="alert alert-info" role="alert">
-  You receive <b>{{Constants.punishment_endowment}}</b> extra points which you can use to send deduction tokens to other participants.
+    You receive <b>{{ Constants.punishment_endowment }}</b> extra points which you can use to send deduction tokens to
+    other participants.
 </div>
+
+
 <table class="table table-hover table-striped table-bordered">
 
     <thead>
-      <th ></th>
-      <th>Participant A <br> (Your group)</th>
-      <th>Participant B <br> (Another group)</th>
+    <th></th>
+    <th>Participant A <br> (Your group)</th>
+    <th>Participant B <br> (Another group)</th>
     </thead>
 
     <tbody>
-      <tr>
+    <tr>
         <td>Their decisions:</td>
-        <td><span class="{{random_pair_A.pd_decision|yesno:"red, blue"}}">{{random_pair_A.pd_decision|yesno:"Red, Blue"}}</span></td>
-        <td><span class="{{random_pair_B.pd_decision|yesno:"red, blue"}}">{{random_pair_B.pd_decision|yesno:"Red, Blue"}}</span></td>
-      </tr>
-      <tr>
+        <td><span
+                class="{{ random_pair_A.pd_decision|yesno:"red, blue" }}">{{ random_pair_A.pd_decision|yesno:"Red, Blue" }}</span>
+        </td>
+        <td><span
+                class="{{ random_pair_B.pd_decision|yesno:"red, blue" }}">{{ random_pair_B.pd_decision|yesno:"Red, Blue" }}</span>
+        </td>
+    </tr>
+    <tr>
         <td>Their payoffs:</td>
-        <td>{{random_pair_A.pd_payoff}}</td>
-        <td>{{random_pair_B.pd_payoff}}</td>
-      </tr>
-      <tr>
-        <td rowspan=2>Send a deduction token</td>
-        <td><label class="radio-inline" for="id_ingroup_punishment_1">
-          <input class='pun_choice' type="radio" id="id_ingroup_punishment_1" value="True" name="ingroup_punishment" required>
-          Yes
-        </label>
-        </td>
-        <td>
-          <label class="radio-inline" for="id_outgroup_punishment_1">
-            <input class='pun_choice' type="radio" id="id_outgroup_punishment_1" value="True" name="outgroup_punishment" required>
-            Yes
-          </label>
-          </td>
-      </tr>
-      <tr>
+        <td>{{ random_pair_A.pd_payoff }}</td>
+        <td>{{ random_pair_B.pd_payoff }}</td>
+    </tr>
 
-        <td><label class="radio-inline" for="id_ingroup_punishment_2">
-          <input  class='pun_choice' type="radio" id="id_ingroup_punishment_2" value="False" name="ingroup_punishment" required>
-          No
-        </label>
-      </td>
-        <td>
-          <label class="radio-inline" for="id_outgroup_punishment_2">
-            <input  class='pun_choice' type="radio" id="id_outgroup_punishment_2" value="False" name="outgroup_punishment" required>
-            No
-          </label>
-        </td>
-      </tr>
-      <tr>
+
+    <tr>
+        <td rowspan=2>Send a deduction token</td>
+        {% if session.config.ingroup %}
+            <td><label class="radio-inline" for="id_ingroup_punishment_1">
+                <input class='pun_choice' type="radio" id="id_ingroup_punishment_1" value="True"
+                       name="ingroup_punishment" required>
+                Yes
+            </label>
+            </td>
+             {% else %}
+            <td></td>
+        {% endif %}
+        {% if session.config.outgroup %}
+            <td>
+                <label class="radio-inline" for="id_outgroup_punishment_1">
+                    <input class='pun_choice' type="radio" id="id_outgroup_punishment_1" value="True"
+                           name="outgroup_punishment" required>
+                    Yes
+                </label>
+            </td>
+               {% else %}
+            <td></td>
+        {% endif %}
+    </tr>
+
+
+    <tr>
+        {% if session.config.ingroup %}
+            <td><label class="radio-inline" for="id_ingroup_punishment_2">
+                <input class='pun_choice' type="radio" id="id_ingroup_punishment_2" value="False"
+                       name="ingroup_punishment" required>
+                No
+            </label>
+            </td>
+               {% else %}
+            <td></td>
+        {% endif %}
+        {% if session.config.outgroup %}
+            <td>
+                <label class="radio-inline" for="id_outgroup_punishment_2">
+                    <input class='pun_choice' type="radio" id="id_outgroup_punishment_2" value="False"
+                           name="outgroup_punishment" required>
+                    No
+                </label>
+            </td>
+               {% else %}
+            <td></td>
+        {% endif %}
+    </tr>
+
+    <tr>
         <td>Their payoffs are decreased by:</td>
         <td id='ingroup_punishment'></td>
-        <td id='outgroup_punishment'> </td>
-      </tr>
+        <td id='outgroup_punishment'></td>
+    </tr>
     </tbody>
-  </table>
+</table>
 
-      {% if session.config.colsan  and  session.config.outgroup%}
-      <div class="alert alert-warning alert-dismissable">
+{% if session.config.colsan  and  session.config.outgroup %}
+    <div class="alert alert-warning alert-dismissable">
         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-        If you send the deduction tokens to a Participant B, an income of a <b>random</b> participant from group B will be decreased.
-      </div>
+        If you send the deduction tokens to a Participant B, an income of a <b>random</b> participant from group B will
+        be decreased.
+    </div>
 
 
-      {% endif %}
+{% endif %}
 
 {% next_button %}
-
-
-
-
-
-
 
 
 {% include Constants.instructions_stage2_wrapper %}
@@ -87,21 +113,21 @@ Stage 2. Decision. Round {{view.round_number}} of {{Constants.num_rounds}}
 
 {% endblock %}
 {% block styles %}
-<style>
-.table>tbody>tr>td {
-  vertical-align: middle!important;
-}
-</style>
+    <style>
+        .table > tbody > tr > td {
+            vertical-align: middle !important;
+        }
+    </style>
 {% endblock %}
 {% block scripts %}
-<script type="text/javascript">
-  $( "input.pun_choice" ).change(function(){
-    var name = $(this).attr("name");
-    curval = $('input[name='+name+']:checked').val();
+    <script type="text/javascript">
+        $("input.pun_choice").change(function () {
+            var name = $(this).attr("name");
+            curval = $('input[name=' + name + ']:checked').val();
 
-    $('td#'+name).html(curval=='True'?{{Constants.punishment_factor}}:0);
+            $('td#' + name).html(curval == 'True' ? {{Constants.punishment_factor}} : 0);
 
-  });
+        });
 
-</script>
+    </script>
 {% endblock %}
