@@ -8,7 +8,7 @@ from random import shuffle
 
 
 class MyPage(CustomPage):
-    timeout_seconds = 1000
+    timeout_seconds = 100000
 
 
 class FirstWaitPD(CustomWaitPage):

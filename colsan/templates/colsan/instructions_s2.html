@@ -3,8 +3,8 @@
   <h2>Stage 2:</h2>
           <p>
             In Stage 2 you see the decisions of <b>another</b> pair:
-            one <b>random</b> member of your own group (Participant A) and a person from group
-             B with whom he or she was matched (Participant B).
+            one <b>random</b> member of your own group (Participant {{ player.subgroup }}) and a person from group
+             B with whom he or she was matched (Participant {{ player.another_subgroup_name }}).
 
 
 
@@ -16,37 +16,37 @@
              {% if session.config.ingroup %}
                incomes of other participants.
              {% else %}
-               an income of a participant from Group B.
+               an income of a participant from Group {{ player.another_subgroup_name }}.
              {% endif%}
              {% if session.config.ingroup %}</p>
              <p>
 
 
              For example if you send <b>1</b>
-                deduction token to a participant from your own group (Participant A), your endowment will be
-                decreased by <b>1</b>&nbsp;point, but a payoff of this specific Participant A will be
+                deduction token to a participant from your own group (Participant {{ player.subgroup }}), your endowment will be
+                decreased by <b>1</b>&nbsp;point, but a payoff of this specific Participant {{ player.subgroup }} will be
                  decreased by <b>{{Constants.punishment_factor}}</b>&nbsp;points.
              {% endif%}
               {% if session.config.colsan %} </p><p>
-                If you send <b>1</b> deduction point to a Participant B, we will choose <i><b>randomly</b></i> one
-                member of a group B and we will decrease his or her income by
+                If you send <b>1</b> deduction point to a Participant {{ player.another_subgroup_name }}, we will choose <i><b>randomly</b></i> one
+                member of a group {{ player.another_subgroup_name }} and we will decrease his or her income by
                 <b>{{Constants.punishment_factor}}</b> points.
-                It is not known who exactly from a group B will be
+                It is not known who exactly from a group {{ player.another_subgroup_name }} will be
                 picked to have his or her income diminished by your deduction
                 tokens.
 
               {% else %}
-            If you send <b>1</b>
-               deduction point to a Participant B (a member of group B who
-               was matched with Participant A), your endowment will be
-               decreased by <b>1</b> point, but a payoff of Participant B will
+             If you send <b>1</b>
+               deduction point to a Participant {{ player.another_subgroup_name }} (a member of group {{ player.another_subgroup_name }} who
+               was matched with Participant {{ player.subgroup }}), your endowment will be
+               decreased by <b>1</b> point, but a payoff of Participant {{ player.another_subgroup_name }} will
                be decreased by <b>{{Constants.punishment_factor}}</b> points.
                {% endif%}
           </p>
           <p>
             Other members of your group can make the same decisions.</p>
             <p> The
-            members of group B also make the same decisions about sending
+            members of group {{ player.another_subgroup_name }} also make the same decisions about sending
             deduction tokens to
               {% if session.config.colsan %}
               a <i><b>random</b></i> member of your group{% else %}

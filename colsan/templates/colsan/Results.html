@@ -17,7 +17,7 @@ Round {{view.round_number}} of {{Constants.num_rounds}}: Results.
 
             </tr>
             <tr>
-              <th class='leftjust'>Your partner from group B decision in Stage 1:</th>
+              <th class='leftjust'>Your partner from group {{ player.another_subgroup_name }}  decision in Stage 1:</th>
               <td><span class="{{partner_decision|yesno:"red, blue"}}">{{partner_decision|yesno:"Red, Blue"}}</span></td>
             </tr>
             <tr>
