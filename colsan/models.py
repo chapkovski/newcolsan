@@ -9,7 +9,7 @@ from otree.common import safe_json
 doc = """
 new collective sanctions experiment based on Stoff's paper
 """
-
+# let's do some work on supergroup management
 
 class Constants(BaseConstants):
     name_in_url = 'colsan'
