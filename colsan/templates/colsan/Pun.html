@@ -1,11 +1,11 @@
-{% extends "global/Page.html" %}
+{% extends "global/PageExt.html" %}
 {% load otree_tags staticfiles %}
 {% block title %}
     Stage 2. Decision. Round {{ view.round_number }} of {{ Constants.num_rounds }}
 {% endblock %}
 
 
-{% block content %}
+{% block inner_content %}
 <div class="alert alert-info" role="alert">
     You receive <b>{{ Constants.punishment_endowment }}</b> extra points which you can use to send deduction tokens to
     other participants.

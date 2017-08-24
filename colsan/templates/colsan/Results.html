@@ -1,11 +1,11 @@
-{% extends "global/Page.html" %}
+{% extends "global/PageExt.html" %}
 {% load otree_tags staticfiles %}
 {% block title %}
-Stage 1. Results. Round {{view.round_number}} of {{Constants.num_rounds}}
+Round {{view.round_number}} of {{Constants.num_rounds}}: Results.
 {% endblock %}
 
 
-{% block content %}
+{% block inner_content %}
 
 
   <table class="table table-hover table-striped table-bordered">

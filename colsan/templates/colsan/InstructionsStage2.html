@@ -1,9 +1,9 @@
-{% extends "global/Page.html" %}
+{% extends "global/PageExt.html" %}
 {% load otree_tags staticfiles %}
 {% block title %}
   Instructions - page 2/2
 {% endblock %}
-{% block content %}
+{% block inner_content %}
   {% include 'colsan/instructions_s2.html' %}
   {% if session.config.outgroup %}
   <h5>These instructions remain available to you at the later stages of the experiment.</h5>
