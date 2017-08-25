@@ -62,7 +62,7 @@
                 </div>
             </div>
         </div>
-    {% block footer %}{% endblock %}
+    {% block footer %}{%  include 'global/footer.html' %}{% endblock %}
         {% if view.is_debug %}
             {% include 'otree/includes/debug_info.html' %}
         {% endif %}
