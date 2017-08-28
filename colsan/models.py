@@ -4,6 +4,8 @@ from otree.api import (
 )
 import random
 
+
+
 doc = """
 new collective sanctions experiment based on Stoff's paper
 """
@@ -27,8 +29,12 @@ class Constants(BaseConstants):
         '01': noyes_payoff,
         '10': yesno_payoff,
     }
+    # by how much will be the sending money increased:
+    pgg_factor = 2
+    # by how much will 1 deduction token sent affect the payoff of the punishee (the recipient of punishment):
     punishment_factor = 3
-    punishment_endowment = 2
+    # how many punishment tokens will be received for distributing the punishment
+    punishment_endowment = 10
     groupset = ['A', 'B', ]
     punishment_choices = [0, 1]
     threesome = list(range(1, 4))
