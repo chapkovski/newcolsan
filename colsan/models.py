@@ -19,16 +19,8 @@ class Constants(BaseConstants):
     num_rounds = 10
     A_group_size = players_per_group / 2 - 1
     B_group_size = players_per_group / 2
-    yesyes_payoff = 6
-    nono_payoff = 3
-    noyes_payoff = 9
-    yesno_payoff = 0
-    pd_pintayoff_dict = {
-        '11': yesyes_payoff,
-        '00': nono_payoff,
-        '01': noyes_payoff,
-        '10': yesno_payoff,
-    }
+    # how much money can be invested into public good project
+    endowment = 10
     # by how much will be the sending money increased:
     pgg_factor = 2
     # by how much will 1 deduction token sent affect the payoff of the punishee (the recipient of punishment):
