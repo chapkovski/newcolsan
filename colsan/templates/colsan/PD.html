@@ -1,48 +1,20 @@
 {% extends "global/PageExt.html" %}
 {% load otree_tags staticfiles %}
 {% block title %}
-Round {{view.round_number}} of {{Constants.num_rounds}}: Stage 1. Decision
+    Round {{ view.round_number }} of {{ Constants.num_rounds }}: Stage 1. Decision
 {% endblock %}
 
 {% block inner_content %}
 
 
+    {% formfield player.pd_decision with label='Tick the amount of money you want to transfer to the other participant' %}
+    <div class="alert alert-info pd_info">
 
-<table class="table" id='tableSelect'>
-  <thead>
-    <tr>
-      <th></th>
-        <th></th>
-      <th>Red</th>
-      <th>Blue</th>
 
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th colspan=2>Your decision</th>
-      <td>
-        <input type="radio" id="id_pd_decision_1" value="False" name="pd_decision" required="" class='red' >
-      </td>
-      <td>
-        <input type="radio" id="id_pd_decision_2" value="True" name="pd_decision" required="" class='blue'>
-      </td>
-    </tr>
-    <tr>
-      <td rowspan=2>Your payoff <br>if another person chooses:</td>
-      <td>Red</td>
-      <td class='red radio1'>{{Constants.yesyes_payoff}}</td>
-      <td class='blue radio1'>{{Constants.noyes_payoff}}</td>
-    </tr>
-    <tr>
-      <td>Blue</td>
-      <td class='red radio1'>{{Constants.yesno_payoff}}</td>
-      <td class='blue radio1'>{{Constants.nono_payoff}}</td>
-    </tr>
-  </tbody>
-</table>
-{% next_button %}
-{% include Constants.instructions_stage1_wrapper %}
+    </div>
+
+    {% next_button %}
+    {% include Constants.instructions_stage1_wrapper %}
 
 
 {% endblock %}
@@ -51,19 +23,17 @@ Round {{view.round_number}} of {{Constants.num_rounds}}: Stage 1. Decision
     <link href="{% static "colsan/colsan.css" %}" rel="stylesheet">
 
     <style>
-    .table>tbody>tr>td {
-      vertical-align: middle!important;
-    }
-    .bold { font-weight: bold; }
+
     </style>
 
 {% endblock %}
 
 {% block scripts %}
     <script>
-    $('td input[type=radio]').click(function() {
-      $('.radio1').css("font-weight","normal");
-    $('.'+$(this).prop('class')).css("font-weight","Bold");
-});
+        $('input[name=pd_decision]').click(function () {
+            var received_val = ($(this).val()) * {{ Constants.pd_factor }};
+            var $string = "The other participant from  group {{ player.another_subgroup_name }} will receive <b>" + received_val + "</b> points.";
+            $('.pd_info').html($string);
+        });
     </script>
 {% endblock %}

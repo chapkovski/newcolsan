@@ -4,8 +4,6 @@ from otree.api import (
 )
 import random
 
-
-
 doc = """
 new collective sanctions experiment based on Stoff's paper
 """
@@ -14,6 +12,7 @@ new collective sanctions experiment based on Stoff's paper
 # let's do some work on supergroup management
 
 class Constants(BaseConstants):
+    currency_name = 'point'
     name_in_url = 'colsan'
     players_per_group = 6
     num_rounds = 10
@@ -22,7 +21,7 @@ class Constants(BaseConstants):
     # how much money can be invested into public good project
     endowment = 10
     # by how much will be the sending money increased:
-    pgg_factor = 2
+    pd_factor = 2
     # by how much will 1 deduction token sent affect the payoff of the punishee (the recipient of punishment):
     punishment_factor = 3
     # how many punishment tokens will be received for distributing the punishment
@@ -42,6 +41,8 @@ class Subsession(BaseSubsession):
     def before_session_starts(self):
         if self.session.config['ingroup']:
             assert self.session.config['outgroup'], "You can't create ingroup treatment without outgroup"
+        for p in self.get_players():
+            p.punishment_endowment = Constants.punishment_endowment
 
 
 class Group(BaseGroup):
@@ -68,22 +69,34 @@ class Group(BaseGroup):
                                                    if _.subgroup != p.subgroup])
             else:
                 outgroup_punishee = [_ for _ in chosen if _.subgroup != p.subgroup][0]
-            if p.ingroup_punishment:
-                ingroup_punishee.punishment_received_in += 1
-                ingroup_punishee.punishment_received += 1
-            if p.outgroup_punishment:
-                outgroup_punishee.punishment_received_out += 1
-                outgroup_punishee.punishment_received += 1
+
+            ingroup_punishee.punishment_received_in += (p.ingroup_punishment or 0)
+            ingroup_punishee.punishment_received += (p.ingroup_punishment or 0)
+            outgroup_punishee.punishment_received_out += (p.outgroup_punishment or 0)
+            outgroup_punishee.punishment_received += (p.outgroup_punishment or 0)
         for p in self.get_players():
             assert p.punishment_received_out + p.punishment_received_in == \
                    p.punishment_received, 'Miscalculation in punishment received'
+            assert p.punishment_sent <= p.punishment_endowment, """Amount of punishment sent cannot exceed 
+                                                                   punishment endowment"""
+            p.pun_r_out_mult = p.punishment_received_out * Constants.punishment_factor
+            p.pun_r_in_mult = p.punishment_received_in * Constants.punishment_factor
+
             p.set_pd_payoff()
             p.punishment_sent = (p.ingroup_punishment or 0) + \
                                 (p.outgroup_punishment or 0)
-            p.payoff = p.payoff_correct + p.pd_payoff + \
-                       Constants.punishment_endowment - \
-                       p.punishment_sent - \
-                       p.punishment_received * Constants.punishment_factor
+            p.payoff_stage2 = p.punishment_endowment - \
+                              p.punishment_sent - \
+                              p.punishment_received * Constants.punishment_factor
+            p.payoff = p.pd_payoff + p.payoff_stage2
+
+
+def gamechoices(n):
+    result = []
+    for i in range(n + 1):
+        currency = Constants.currency_name if i == 1 else Constants.currency_name + 's'
+        result.append((i, '{} {}'.format(i, currency)))
+    return result
 
 
 class Player(BasePlayer):
@@ -109,13 +122,22 @@ class Player(BasePlayer):
         assert len(my_pair) == 1, 'Something is wrong'
         return my_pair.pop()
 
+    @property
+    def random_pair(self):
+        assert self.random_id != self.pair, 'the player pair cannot be the same as the random pair shown to him!'
+        random_pair = [p for p in self.get_others_in_group() if p.pair == self.random_id]
+        ingroup_member = [p for p in random_pair if p.subgroup == self.subgroup][0]
+        outgroup_member = [p for p in random_pair if p.subgroup != self.subgroup][0]
+        return {'ingroup_member': ingroup_member,
+                'outgroup_member': outgroup_member, }
+
     def set_pd_payoff(self):
-        self.pd_payoff = \
-            Constants.pd_pintayoff_dict[(str(int(self.pd_decision)) \
-                                         + str(int(self.my_pair.pd_decision)))]
+        self.pd_received_mult = self.my_pair.pd_decision * Constants.pd_factor
+        self.pd_payoff = self.pd_received_mult + Constants.endowment - self.pd_decision
 
     # next field defines which pair will be shown at the punishment stage
     random_id = models.IntegerField(choices=Constants.threesome)
+    punishment_endowment = models.IntegerField()
     punishment_sent = models.IntegerField(initial=0)
     # total amount of punishment received
     punishment_received = models.IntegerField(initial=0)
@@ -125,19 +147,28 @@ class Player(BasePlayer):
     punishment_received_out = models.IntegerField(initial=0)
     # to which pair (out of 3) a player belongs:
     pair = models.IntegerField()
+
+    # set of vars for results
+    # Stage 1 (PD) payoff received by the pair and multiplied by PD factor
+    pd_received_mult = models.IntegerField()
+    pun_r_in_mult = models.IntegerField()
+    pun_r_out_mult = models.IntegerField()
     # to which subgroup (A or B) the player belongs:
     subgroup = models.CharField()
-    pd_decision = models.BooleanField(verbose_name='Your decision',
-                                      choices=[(False, 'Reject'),
-                                               (True, 'Accept')], )
+    pd_decision = models.IntegerField(verbose_name='Your sending decision',
+                                      choices=gamechoices(Constants.endowment),
+                                      widget=widgets.RadioSelectHorizontal())
     pd_payoff = models.IntegerField(initial=0)
-    ingroup_punishment = models.BooleanField(verbose_name=
-                                             'Punishing your group member',
-                                             widget=widgets.RadioSelectHorizontal(),
+    payoff_stage2 = models.IntegerField(initial=0)
+    ingroup_punishment = models.IntegerField(verbose_name=
+                                             'Sending deduction tokens to your group member',
+                                             min=0,
+                                             max=Constants.punishment_endowment,
                                              )
-    outgroup_punishment = models.BooleanField(verbose_name=
-                                              'Punishing another group member',
-                                              widget=widgets.RadioSelectHorizontal()
+    outgroup_punishment = models.IntegerField(verbose_name=
+                                              'Sending deduction tokens to another group member',
+                                              min=0,
+                                              max=Constants.punishment_endowment,
                                               )
 
     # control questions
@@ -166,16 +197,4 @@ class Player(BasePlayer):
         verbose_name="As a result whose income will be decreased?",
         choices=Constants.q6_choices,
         widget=widgets.RadioSelectHorizontal(),
-    )  # import itertools as it
-    # filename='colsan/questions.txt'
-    # qstart = '=='
-    # with open(filename,'r') as f:
-    #     i = 0
-    #     for key,group in it.groupby(f,lambda line: line.startswith(qstart)):
-    #         if not key:
-    #             i += 1
-    #             group = list(group)
-    #             print('CHOICES:::: ', group[1:])
-    #             Player.add_to_class("survey_q{}".format(i),
-    #                     models.CharField(verbose_name=group[0],
-    #                                     choices=group[1:]))
+    )

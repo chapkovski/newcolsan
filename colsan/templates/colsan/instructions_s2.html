@@ -11,7 +11,7 @@
 {% if session.config.outgroup %}
           <p>
             At the beginning of Stage 2 all participants receive an additional
-             endowment of <b>{{Constants.punishment_endowment}}</b> points.
+             endowment of <b>{{player.punishment_endowment}}</b> points.
              By transferring points from this endowment you can decrease
              {% if session.config.ingroup %}
                incomes of other participants.
@@ -43,6 +43,8 @@
                be decreased by <b>{{Constants.punishment_factor}}</b> points.
                {% endif%}
           </p>
+    <p>You can not send more than <b>{{ player.punishment_endowment }} points</b> to {% if session.config.ingroup and session.config.outgroup%}  both participants in total{% else %}a participant
+        from another group{% endif %}.</p>
           <p>
             Other members of your group can make the same decisions.</p>
             <p> The

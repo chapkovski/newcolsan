@@ -7,6 +7,14 @@ from itertools import cycle
 from random import shuffle
 
 
+def vars_for_all_templates(self):
+    max_pd = Constants.endowment * Constants.pd_factor
+    egoistic_pd = max_pd + Constants.endowment
+    return {'max_pd': max_pd,
+            'egoistic_pd': egoistic_pd,
+            }
+
+
 class MyPage(CustomPage):
     timeout_seconds = 100000
 
@@ -24,7 +32,6 @@ class FirstWaitPD(CustomWaitPage):
                 p.subgroup = next(sg)
             else:
                 p.subgroup = p.in_round(1).subgroup
-        print('CURSUBGROUPS:::', self.group.subgroups)
         for k, v in self.group.subgroups.items():
             pairs = Constants.threesome
             shuffle(pairs)
@@ -127,7 +134,7 @@ class PD(MyPage):
     timeout_submission = {}
 
     def __init__(self, *args, **kwargs):
-        self.timeout_submission = {'pd_decision': random.choice([True, False])}
+        self.timeout_submission = {'pd_decision': random.randint(0, Constants.endowment)}
         super(PD, self).__init__(*args, **kwargs)
 
 
@@ -154,13 +161,20 @@ class Pun(MyPage):
 
     def get_form_fields(self):
         fields = []
+        tot_pun = random.randint(0, Constants.punishment_endowment)
+        ingroup_pun = random.randint(0, tot_pun)
+        outgroup_pun = tot_pun - ingroup_pun
         if self.session.config['ingroup']:
             fields.append('ingroup_punishment')
-            self.timeout_submission['ingroup_punishment'] = random.choice([True, False])
+            self.timeout_submission['ingroup_punishment'] = ingroup_pun
         if self.session.config['outgroup']:
             fields.append('outgroup_punishment')
-            self.timeout_submission['outgroup_punishment'] = random.choice([True, False])
+            self.timeout_submission['outgroup_punishment'] = outgroup_pun
         return fields
+
+    def error_message(self, values):
+        if values.get('ingroup_punishment', 0) +values.get('outgroup_punishment', 0) > Constants.punishment_endowment:
+            return 'Total amount of deduction points should not be more than {}'.format(Constants.punishment_endowment)
 
 
 class WaitResults(CustomWaitPage):
@@ -194,16 +208,12 @@ class Survey(MyPage):
 
 
 page_sequence = [
-    # Survey,
-    # FirstWP,
-    # SecondWP,
     FirstWaitPD,
     InstructionsStage1,
     InstructionsStage2,
-    ControlQuestions1,
-    ControlQuestions2,
-    CheckingAnswers,
-
+    # ControlQuestions1,
+    # ControlQuestions2,
+    # CheckingAnswers,
     PD,
     WaitPD,
     Pun,
