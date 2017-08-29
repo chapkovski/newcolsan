@@ -89,12 +89,35 @@
 {% block scripts %}
 
     <script type="text/javascript">
+        var input_array = [
+            {% if session.config.ingroup %} 'ingroup_punishment', {% endif %}
+            {% if session.config.outgroup %} 'outgroup_punishment' {% endif %}
+        ];
         var pun_factor = {{ Constants.punishment_factor }};
         var max_pun = {{ Constants.punishment_endowment }};
+        var err_to_show = 'Total amount of deduction tokens should be less than {{ Constants.punishment_endowment }}!';
         $("input.form-control[type=number]").keyup(function () {
+            var tot_pun = 0;
             var name = $(this).attr("name");
-            console.log(this.value);
+            {#            console.log(this.value);#}
             var $recipient = $('td.' + name);
+            for (i in input_array) {
+                tot_pun += parseInt($("input.form-control[name=" + input_array[i] + ']').val()) || 0;
+            }
+            ;
+            console.log('TOTAL PUN  ' + tot_pun);
+            if (tot_pun > max_pun) {
+                for (i in input_array) {
+                    $("input.form-control[name=" + input_array[i] + ']').tooltip({title: err_to_show});
+                }
+                ;
+                $(this).tooltip('show');
+            } else {
+                for (i in input_array) {
+                    $("input.form-control[name=" + input_array[i] + ']').tooltip('destroy');
+                }
+                ;
+            }
             var $to_show = this.value <= max_pun ? this.value * pun_factor : '<red>!</red>';
             if (this.value == '') {
                 $to_show = ''
