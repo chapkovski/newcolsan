@@ -11,6 +11,10 @@
 
 
 {% block global_styles  %}
+
+   <link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="stylesheet">
+
+
 <link href="{% static "colsan/colsan.css" %}" rel="stylesheet">
 <style>
 .switch {
@@ -72,6 +76,10 @@ input:checked + .slider:before {
 {% endblock %}
 
 {% block global_scripts  %}
+    <script
+  src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"
+  integrity="sha256-T0Vest3yCU7pafRw9r+settMBX6JkKN06dqBnpQ8d30="
+  crossorigin="anonymous"></script>
   <script>
     $('#instr_check').change(function(){
       $('div#instructions').toggle();

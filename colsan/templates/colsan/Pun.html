@@ -6,45 +6,81 @@
 
 
 {% block inner_content %}
-    <div class="alert alert-info" role="alert">
-        You receive <b>{{ player.punishment_endowment }}</b> extra points which you can use to send deduction tokens to
-        other participants.
-    </div>
-    <table class="table table-striped table-hover">
-        <thead>
-        <tr>
-            <th></th>
-            <th>He/she sent to the partner at Stage 1:</th>
-            <th>Deduction tokens you send to him/her:</th>
-            <th>His/her payoff is decreased by:</th>
-        </tr>
 
+
+    <table class="table table-hover table-striped">
+        <thead>
+        <th>Participant from your group:</th>
+        <th>Participant from another group:</th>
         </thead>
         <tbody>
         <tr>
-            <td>A participant from your group (<b>{{ player.subgroup }}</b>)</td>
-            <td>{{ player.random_pair.ingroup_member.pd_decision }}</td>
-            <td class="text-center">
+            <td>Participant A sent to Participant B</td>
+            <td>Participant B sent to Participant A</td>
+        </tr>
+        <tr>
+
+            <td>
+                <div class="sliders" id="pd_ingroup"></div>
+            </td>
+            <td>
+                <div class="sliders" id="pd_outgroup"></div>
+            </td>
+        </tr>
+        <tr>
+            <td>Participant A payoff in Stage 1</td>
+            <td>Participant B payoff in Stage 1</td>
+        </tr>
+
+        <tr>
+            <td>
+                <div class="sliders" id="stage1_in_payoff"></div>
+            </td>
+            <td>
+                <div class="sliders" id="stage1_out_payoff"></div>
+            </td>
+        </tr>
+        <tr>
+            <td>How many deduction tokens you send to Participant A</td>
+            <td>How many deduction tokens you send to Participant B</td>
+        </tr>
+        <tr>
+            <td>
                 {% if session.config.ingroup %}
                     {% formfield player.ingroup_punishment with label='' %}
                 {% endif %}
             </td>
-            <td class="ingroup_punishment pun_results"></td>
-        </tr>
-        <tr>
-            <td>A participant from another group (<b>{{ player.another_subgroup_name }}</b>)</td>
-            <td>{{ player.random_pair.outgroup_member.pd_decision }}</td>
             <td>
                 {% if  session.config.outgroup %}
                     {% formfield player.outgroup_punishment with label='' %}
                 {% endif %}
             </td>
-            <td class="outgroup_punishment pun_results"></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <div id="inputslider"></div>
+            </td>
+        </tr>
+        <tr>
+            <td>Participant A's payoff after that:</td>
+            <td>Participant B's payoff after that:</td>
+        </tr>
+        <tr>
+            <td>
+                <div class="sliders" id="payoff_in_after"></div>
+            </td>
+            <td>
+                <div class="sliders" id="payoff_out_after"></div>
+            </td>
         </tr>
         </tbody>
     </table>
 
 
+    <div class="alert alert-info" role="alert">
+        You receive <b>{{ player.punishment_endowment }}</b> extra points which you can use to send deduction tokens to
+        other participants.
+    </div>
 
 
     {% if session.config.colsan  and  session.config.outgroup %}
@@ -66,6 +102,11 @@
 
 {% endblock %}
 {% block styles %}
+    <link href="{% static "colsan/colsan.css" %}" rel="stylesheet">
+
+    <link href="{% static "noUiSlider/nouislider.css" %}" rel="stylesheet">
+
+
     <style>
         .table > tbody > tr > td {
             vertical-align: middle !important;
@@ -84,48 +125,168 @@
             font-weight: bold;
             color: red;
         }
+
+        .sliders, #inputslider {
+            margin-top: 0px;
+            margin-bottom: 40px;
+            padding-right: 10px;
+        }
+
+        .sliders .noUi-handle {
+        {#            display: none;#}
+        }
+
+        #inputslider {
+            margin-top: 40px;
+        }
+
+        .sliders .noUi-tooltip {
+
+            bottom: -11%;
+        }
+
+        .sliders .noUi-marker {
+        {#        background:none;#}
+        }
+
+        .noUi-marker-normal {
+            display: none;
+        }
+
+        .sliders .noUi-handle {
+            border: 0px;
+            background: none;
+            /* cursor: default; */
+            box-shadow: none;
+        }
+
+        .sliders .noUi-handle::after {
+            display: none;
+        }
+
+        .c-1-color {
+            background: red;
+        }
+
+        .c-2-color {
+            background: blue;
+        }
+
     </style>
 {% endblock %}
 {% block scripts %}
+    <script src="{% static "noUiSlider/wNumb.js" %}"></script>
+    <script src="{% static "noUiSlider/nouislider.js" %}"></script>
+    <script>
+        function filter500(value, type) {
+            return value % 5 ? 0 : 2;
+        };
 
-    <script type="text/javascript">
-        var input_array = [
-            {% if session.config.ingroup %} 'ingroup_punishment', {% endif %}
-            {% if session.config.outgroup %} 'outgroup_punishment' {% endif %}
-        ];
-        var pun_factor = {{ Constants.punishment_factor }};
-        var max_pun = {{ Constants.punishment_endowment }};
-        var err_to_show = 'Total amount of deduction tokens should be less than {{ Constants.punishment_endowment }}!';
-        $("input.form-control[type=number]").keyup(function () {
-            var tot_pun = 0;
-            var name = $(this).attr("name");
-            {#            console.log(this.value);#}
-            var $recipient = $('td.' + name);
-            for (i in input_array) {
-                tot_pun += parseInt($("input.form-control[name=" + input_array[i] + ']').val()) || 0;
-            }
-            ;
-            console.log('TOTAL PUN  ' + tot_pun);
-            if (tot_pun > max_pun) {
-                for (i in input_array) {
-                    $("input.form-control[name=" + input_array[i] + ']').tooltip({title: err_to_show});
+        function creatingSlider(where, value, max) {
+            noUiSlider.create(where, {
+                start: [value],
+                step: 1,
+                tooltips: [wNumb({decimals: 0})],
+                connect: [true, false],
+                range: {
+                    'min': 0,
+                    'max': max
+                },
+                pips: {
+                    mode: 'values',
+                    values: [0, max],
+                    density: 4
                 }
-                ;
-                $(this).tooltip('show');
-            } else {
-                for (i in input_array) {
-                    $("input.form-control[name=" + input_array[i] + ']').tooltip('destroy');
-                }
-                ;
-            }
-            var $to_show = this.value <= max_pun ? this.value * pun_factor : '<red>!</red>';
-            if (this.value == '') {
-                $to_show = ''
-            }
-            ;
-            $recipient.html($to_show);
+            });
+            where.setAttribute('disabled', true);
+        };
+        var pd_ingroup_slider = {
+            where: document.getElementById('pd_ingroup'),
+            value: {{ player.random_pair.ingroup_member.pd_decision }},
+            max: {{ Constants.endowment }}
+        };
+        var pd_outgroup_slider = {
+            where: document.getElementById('pd_outgroup'),
+            value: {{ player.random_pair.outgroup_member.pd_decision }},
+            max: {{ Constants.endowment }}
+        };
+        var stage1_in_payoff_slider = {
+            where: document.getElementById('stage1_in_payoff'),
+            value: {{ player.random_pair.ingroup_member.pd_payoff }},
+            max: {{ egoistic_pd }}
+        };
+        var stage1_out_payoff_slider = {
+            where: document.getElementById('stage1_out_payoff'),
+            value: {{ player.random_pair.outgroup_member.pd_payoff }},
+            max: {{ egoistic_pd }}
+        };
+        var payoff_in_after = {
+            where: document.getElementById('payoff_in_after'),
+            value: {{ player.random_pair.ingroup_member.pd_payoff }},
+            max: {{ egoistic_pd }}
+        };
+        var payoff_out_after = {
+            where: document.getElementById('payoff_out_after'),
+            value: {{ player.random_pair.outgroup_member.pd_payoff }},
+            max: {{ egoistic_pd }}
+        };
 
+        sliders = [pd_ingroup_slider,
+            pd_outgroup_slider,
+            stage1_in_payoff_slider,
+            stage1_out_payoff_slider,
+            payoff_in_after,
+            payoff_out_after
+        ]
+
+        for (var i = 0; i < sliders.length; i++) {
+            creatingSlider(sliders[i].where, sliders[i].value, sliders[i].max);
+        }
+        ;
+        var inputslider = document.getElementById('inputslider');
+        noUiSlider.create(inputslider, {
+            start: [6, 8],
+            step: 1,
+            tooltips: [wNumb({decimals: 0}), wNumb({decimals: 0})],
+            connect: [true, true, false],
+            range: {
+                'min': 0,
+                'max': {{Constants.endowment}}
+            },
+            pips: {
+                mode: 'steps',
+                values: [4, 6],
+                filter: filter500
+            }
+        });
+        inputslider.setAttribute('disabled', true);
+        var connect = inputslider.querySelectorAll('.noUi-connect');
+        var classes = ['c-1-color', 'c-2-color'];
+
+        for (var i = 0; i < connect.length; i++) {
+            connect[i].classList.add(classes[i]);
+        }
+        var tooltips = inputslider.querySelectorAll('.noUi-tooltip');
+        ingroup_punishment_input = document.getElementById('id_ingroup_punishment');
+        outgroup_punishment_input = document.getElementById('id_outgroup_punishment');
+        {#        $('input[name=ingroup_punishment]');#}
+        ingroup_punishment_input.addEventListener('change', function () {
+            var outgroup_val = outgroup_punishment_input.value;
+            var rightval = parseInt(this.value) + parseInt(outgroup_val);
+            inputslider.noUiSlider.set([this.value, rightval]);
+            tooltips[0].innerText = this.value;
+            tooltips[1].innerText = outgroup_val;
+        });
+        outgroup_punishment_input.addEventListener('change', function () {
+            var ingroup_val = ingroup_punishment_input.value;
+            var leftval = parseInt(ingroup_val);
+            var newval = (parseInt(this.value) + parseInt(leftval));
+            inputslider.noUiSlider.set([null, newval]);
+            tooltips[1].innerText = this.value;
         });
 
+        {#        slider.noUiSlider.reset();#}
     </script>
+
+
 {% endblock %}
