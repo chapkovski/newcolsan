@@ -1,0 +1,20 @@
+{% load humanize %}
+<div class="bs-callout bs-callout-info">
+    <h4>Important info</h4>
+
+    {% if showing_at_intro %}
+        <p>
+            After reading the Informed Consent Form at the next page, you will be redirected to the waiting
+            page. There you will wait for {{ Constants.num_others_per_group|apnumber }} other mTurk participants who
+            will participate in this study with you.
+        </p>
+    {% endif %}
+    <p>On average the waiting time for other participants is less than 30 seconds. </p>
+    <p>If you don’t want to wait, you can quit the waiting page immediately, but you will NOT receive the participation
+        fee.</p>
+    <p>If you choose to wait and other participants will not be here in {{ OOG_time_minutes }}
+        minute{{ OOG_time_minutes|pluralize }},
+        you <b>WILL BE ABLE</b> to receive the participation fee of {{ session.config.participation_fee }}.</p>
+    <p>
+    </p>
+</div>

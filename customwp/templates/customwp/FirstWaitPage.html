@@ -2,6 +2,7 @@
 {% load staticfiles otree_tags %}
 {% block title %}Please wait!{% endblock %}
 {% block styles %}
+    <link href="{% static "global/bs-callout.css" %}" rel="stylesheet">
     <style>
         #left_to_wait {
             font-weight: bold;
@@ -9,8 +10,9 @@
     </style>
 {% endblock %}
 {% block content %}
-    <br>
-    {{ block.super }}
+    <h3>Please wait, other participants are connecting...</h3>
+
+    {% include 'global/OutOfGameReminder.html' %}
     {% if subsession.not_enough_players %}
 
         <div id="not_enough_players" class="alert alert-danger" role="alert">
@@ -25,7 +27,7 @@
         </div>
     {% else %}
         <div id="otree-timeout" class="alert alert-warning" style="display:block;">
-            <p>You can finish the study if nobody arrives in: <span id="otree-timeout"></span>
+            <p>You can finish the study if other participants do not arrive in: <span id="otree-timeout"></span>
 
 
             </p>
@@ -45,6 +47,7 @@
         </div>
         <br>
     </form>
+     {{ block.super }}
 {% endblock %}
 
 {% block scripts %}

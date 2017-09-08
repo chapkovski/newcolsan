@@ -63,7 +63,8 @@ USE_POINTS = True
 LANGUAGE_CODE = 'en'
 
 # if an app is included in SESSION_CONFIGS, you don't need to list it here
-INSTALLED_APPS = ['otree']
+INSTALLED_APPS = ['otree',
+                  'django.contrib.humanize',]
 
 # SENTRY_DSN = ''
 
@@ -100,8 +101,8 @@ mturk_hit_settings = {
 # e.g. self.session.config['participation_fee']
 
 SESSION_CONFIG_DEFAULTS = {
-    'real_world_currency_per_point': 0.000,
-    'participation_fee': 0.00,
+    'real_world_currency_per_point': 0.001,
+    'participation_fee': 1.00,
     'doc': "",
     'mturk_hit_settings': mturk_hit_settings,
 }
@@ -109,41 +110,50 @@ SESSION_CONFIG_DEFAULTS = {
 
 SESSION_CONFIGS = [
     {
-        'name': 'nocolsan',
-        'display_name': 'Individual sanctions - Outgroup and Ingroup',
+        'name': 'colsan_small',
+        'display_name': 'Stage 1 version for mTurk',
         'num_demo_participants': 6,
-        'app_sequence': ['customwp', 'colsan'],
-        'colsan':False,
-        'ingroup': True,
-        'outgroup': True,
-    },
-    {
-        'name': 'colsan',
-        'display_name': 'Collective sanctions - Outgroup and Ingroup',
-        'num_demo_participants': 6,
-        'app_sequence': ['customwp', 'colsan'],
-        'colsan':True,
-        'ingroup': True,
-        'outgroup': True,
-    },
-    {
-        'name': 'colsanoutgroup',
-        'display_name': 'Individual sanctions - Outgroup only',
-        'num_demo_participants': 6,
-        'app_sequence': ['customwp', 'colsan'],
-        'colsan':False,
+        'app_sequence': ['consent', 'customwp', 'colsan_small'],
+        'colsan': False,
         'ingroup': False,
         'outgroup': True,
     },
-    {
-        'name': 'indsanoutgroup',
-        'display_name': 'Collective sanctions - Outgroup only',
-        'num_demo_participants': 6,
-        'app_sequence': ['customwp', 'colsan'],
-        'colsan': True,
-        'ingroup': False,
-        'outgroup': True,
-    },
+    # {
+    #     'name': 'nocolsan',
+    #     'display_name': 'Individual sanctions - Outgroup and Ingroup',
+    #     'num_demo_participants': 6,
+    #     'app_sequence': ['customwp', 'colsan'],
+    #     'colsan':False,
+    #     'ingroup': True,
+    #     'outgroup': True,
+    # },
+    # {
+    #     'name': 'colsan',
+    #     'display_name': 'Collective sanctions - Outgroup and Ingroup',
+    #     'num_demo_participants': 6,
+    #     'app_sequence': ['customwp', 'colsan'],
+    #     'colsan':True,
+    #     'ingroup': True,
+    #     'outgroup': True,
+    # },
+    # {
+    #     'name': 'colsanoutgroup',
+    #     'display_name': 'Individual sanctions - Outgroup only',
+    #     'num_demo_participants': 6,
+    #     'app_sequence': ['customwp', 'colsan'],
+    #     'colsan':False,
+    #     'ingroup': False,
+    #     'outgroup': True,
+    # },
+    # {
+    #     'name': 'indsanoutgroup',
+    #     'display_name': 'Collective sanctions - Outgroup only',
+    #     'num_demo_participants': 6,
+    #     'app_sequence': ['customwp', 'colsan'],
+    #     'colsan': True,
+    #     'ingroup': False,
+    #     'outgroup': True,
+    # },
 
 ]
 

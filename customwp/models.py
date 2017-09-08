@@ -3,9 +3,11 @@ from otree.api import (
     Currency as c, currency_range
 )
 import random
-from colsan.models import Constants as colsanConstants
+from colsan_small.models import Constants as pggConstants
+
 # from settings import SESSION_CONFIGS
 
+author = 'Philipp Chapkovski, UZH'
 
 doc = """
 ...testing timer on waiting page
@@ -14,13 +16,13 @@ doc = """
 
 class Constants(BaseConstants):
     name_in_url = 'customwp'
-    players_per_group = colsanConstants.players_per_group
+    players_per_group = pggConstants.players_per_group
     num_rounds = 1
     # the startwp_timer defines how long the player has to wait at the
     # first waiting page
     # before he or she has an option to finish the game without waiting for
     # others
-    startwp_timer = 10
+    startwp_timer = 600
 
 
 class Subsession(BaseSubsession):
@@ -41,3 +43,5 @@ class Player(BasePlayer):
     startwp_timer_set = models.BooleanField(default=False)
     startwp_time = models.PositiveIntegerField()
     outofthegame = models.BooleanField()
+
+    is_dropout = models.BooleanField(default=False)

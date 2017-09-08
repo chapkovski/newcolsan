@@ -10,8 +10,7 @@
 
     <table class="table table-hover table-striped">
         <thead>
-        <th>Participant from your group:</th>
-        <th>Participant from another group:</th>
+
         </thead>
         <tbody>
         <tr>
@@ -21,10 +20,10 @@
         <tr>
 
             <td>
-                <div class="sliders" id="pd_ingroup"></div>
+                <div class="sliders in_sliders" id="pd_ingroup"></div>
             </td>
             <td>
-                <div class="sliders" id="pd_outgroup"></div>
+                <div class="sliders out_sliders" id="pd_outgroup"></div>
             </td>
         </tr>
         <tr>
@@ -34,15 +33,15 @@
 
         <tr>
             <td>
-                <div class="sliders" id="stage1_in_payoff"></div>
+                <div class="sliders in_sliders" id="stage1_in_payoff"></div>
             </td>
             <td>
-                <div class="sliders" id="stage1_out_payoff"></div>
+                <div class="sliders out_sliders" id="stage1_out_payoff"></div>
             </td>
         </tr>
         <tr>
-            <td>How many deduction tokens you send to Participant A</td>
-            <td>How many deduction tokens you send to Participant B</td>
+            <th>How many deduction tokens you send to Participant A</th>
+            <th>How many deduction tokens you send to Participant B</th>
         </tr>
         <tr>
             <td>
@@ -67,10 +66,10 @@
         </tr>
         <tr>
             <td>
-                <div class="sliders" id="payoff_in_after"></div>
+                <div class="sliders in_sliders" id="payoff_in_after"></div>
             </td>
             <td>
-                <div class="sliders" id="payoff_out_after"></div>
+                <div class="sliders out_sliders" id="payoff_out_after"></div>
             </td>
         </tr>
         </tbody>
@@ -200,6 +199,43 @@
             });
             where.setAttribute('disabled', true);
         };
+
+        function updatingPayoffs(updater, updatee, curpayoff) {
+            if (updater.value < 0) {
+                updater.value = 0;
+            }
+            if (updater.value > max_pun) {
+                updater.value = max_pun;
+            }
+            ;
+            pun = pun_coef * updater.value;
+            final_payoff = curpayoff - pun;
+            updateSliderRange(updatee, final_payoff);
+            updatee.noUiSlider.set(final_payoff);
+        }
+
+        function updateSliderRange(what, min) {
+            if (min > 0) {
+                min = 0;
+            }
+            what.noUiSlider.updateOptions({
+                range: {
+                    'min': min,
+                    'max': {{ egoistic_pd }}
+                }
+            });
+        }
+
+        var max_pun = {{ Constants.punishment_endowment }};
+        var ingroup_punishment_input = document.getElementById('id_ingroup_punishment');
+        var outgroup_punishment_input = document.getElementById('id_outgroup_punishment');
+        var payoff_in_after_slider = document.getElementById('payoff_in_after');
+        var payoff_out_after_slider = document.getElementById('payoff_out_after');
+        var pun_coef = {{ Constants.punishment_factor }};
+        var pun_in = pun_coef * parseInt(ingroup_punishment_input.value);
+        var pun_out = pun_coef * parseInt(outgroup_punishment_input.value);
+        var initial_payoff_in_after = {{ player.random_pair.ingroup_member.pd_payoff }} -(pun_in || 0);
+        var initial_payoff_out_after = {{ player.random_pair.outgroup_member.pd_payoff }} -(pun_out || 0);
         var pd_ingroup_slider = {
             where: document.getElementById('pd_ingroup'),
             value: {{ player.random_pair.ingroup_member.pd_decision }},
@@ -222,12 +258,12 @@
         };
         var payoff_in_after = {
             where: document.getElementById('payoff_in_after'),
-            value: {{ player.random_pair.ingroup_member.pd_payoff }},
+            value: initial_payoff_in_after,
             max: {{ egoistic_pd }}
         };
         var payoff_out_after = {
             where: document.getElementById('payoff_out_after'),
-            value: {{ player.random_pair.outgroup_member.pd_payoff }},
+            value: initial_payoff_out_after,
             max: {{ egoistic_pd }}
         };
 
@@ -243,46 +279,13 @@
             creatingSlider(sliders[i].where, sliders[i].value, sliders[i].max);
         }
         ;
-        var inputslider = document.getElementById('inputslider');
-        noUiSlider.create(inputslider, {
-            start: [6, 8],
-            step: 1,
-            tooltips: [wNumb({decimals: 0}), wNumb({decimals: 0})],
-            connect: [true, true, false],
-            range: {
-                'min': 0,
-                'max': {{Constants.endowment}}
-            },
-            pips: {
-                mode: 'steps',
-                values: [4, 6],
-                filter: filter500
-            }
-        });
-        inputslider.setAttribute('disabled', true);
-        var connect = inputslider.querySelectorAll('.noUi-connect');
-        var classes = ['c-1-color', 'c-2-color'];
-
-        for (var i = 0; i < connect.length; i++) {
-            connect[i].classList.add(classes[i]);
-        }
-        var tooltips = inputslider.querySelectorAll('.noUi-tooltip');
-        ingroup_punishment_input = document.getElementById('id_ingroup_punishment');
-        outgroup_punishment_input = document.getElementById('id_outgroup_punishment');
-        {#        $('input[name=ingroup_punishment]');#}
+{#        var in_slider = document.getElementById('slider-color');#}
+{#        var connect = s/lider.querySelectorAll('.noUi-connect');#}
         ingroup_punishment_input.addEventListener('change', function () {
-            var outgroup_val = outgroup_punishment_input.value;
-            var rightval = parseInt(this.value) + parseInt(outgroup_val);
-            inputslider.noUiSlider.set([this.value, rightval]);
-            tooltips[0].innerText = this.value;
-            tooltips[1].innerText = outgroup_val;
+            updatingPayoffs(this, payoff_in_after_slider, {{ player.random_pair.ingroup_member.pd_payoff }});
         });
         outgroup_punishment_input.addEventListener('change', function () {
-            var ingroup_val = ingroup_punishment_input.value;
-            var leftval = parseInt(ingroup_val);
-            var newval = (parseInt(this.value) + parseInt(leftval));
-            inputslider.noUiSlider.set([null, newval]);
-            tooltips[1].innerText = this.value;
+            updatingPayoffs(this, payoff_out_after_slider, {{ player.random_pair.outgroup_member.pd_payoff }});
         });
 
         {#        slider.noUiSlider.reset();#}
