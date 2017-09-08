@@ -12,6 +12,8 @@ def vars_for_all_templates(self):
     egoistic_pd = max_pd + Constants.endowment
     return {'max_pd': max_pd,
             'egoistic_pd': egoistic_pd,
+            'base_points': round(1 / self.session.config['real_world_currency_per_point']),
+            'participant_real_currency_payoff': self.participant.payoff.to_real_world_currency(self.session),
             }
 
 
@@ -54,9 +56,6 @@ class InstructionsStage1(MyPage):
         return self.subsession.round_number == 1
 
 
-
-
-
 def A_or_B(self):
     if self.session.config['ingroup']:
         return 'A'
@@ -74,8 +73,6 @@ class PD(MyPage):
         super(PD, self).__init__(*args, **kwargs)
 
 
-
-
 class WaitResults(CustomWaitPage):
     # template_name = 'colsan/WaitResults.html'
 
@@ -87,15 +84,13 @@ class Results(MyPage):
     def vars_for_template(self):
         partner = [_ for _ in self.player.get_others_in_group()
                    if _.pair == self.player.pair][0]
-        return {'partner_decision': partner.pd_decision}
+        return {'partner_decision': partner.pd_decision,
+                'real_currency_payoff': self.player.payoff.to_real_world_currency(self.session), }
 
 
 class FinalResults(MyPage):
     def extra_is_displayed(self):
         return self.round_number == Constants.num_rounds
-
-
-
 
 
 page_sequence = [
