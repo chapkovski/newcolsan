@@ -1,0 +1,49 @@
+{% extends "global/PageExt.html" %}
+{% load otree_tags staticfiles %}
+{% block title %}
+    Round {{ view.round_number }} of {{ Constants.num_rounds }}: Results.
+{% endblock %}
+
+
+{% block inner_content %}
+
+
+    <table class="table table-hover table-striped table-bordered">
+
+        <tbody>
+
+        <tr>
+            <th class='leftjust'>Endowment:</th>
+            <td class="sign">+</td>
+            <td>{{ Constants.endowment }}</td>
+        </tr>
+        <tr>
+            <th class='leftjust'>You sent to your partner:</th>
+            <td class="sign">-</td>
+            <td><span>{{ player.pd_decision }}</span></td>
+
+        </tr>
+        <tr>
+            <th class='leftjust'>You received from your partner in group {{ player.another_subgroup_name }}:</th>
+            <td class="sign">+</td>
+            <td><span>{{ player.pd_received_mult }}</span></td>
+        </tr>
+        <tr>
+            <th class='leftjust success'>Your payoff in Stage 1:</th>
+            <td class="sign">=</td>
+            <th class="success">{{ player.pd_payoff }}</th>
+        </tr>
+
+
+        <tr class='danger'>
+            <th class='leftjust' colspan="2">Total payoff in this round:</th>
+            <th>{{ player.payoff }}</th>
+        </tr>
+        </tbody>
+    </table>
+
+    {% next_button %}
+{% endblock %}
+{% block styles %}
+    <link href="{% static "colsan_small/colsan.css" %}" rel="stylesheet">
+{% endblock %}

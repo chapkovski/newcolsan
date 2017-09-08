@@ -1,0 +1,9 @@
+{% extends 'otree/WaitPage.html' %}
+{% load staticfiles otree_tags %}
+{% block title %}{{ title_text }}{% endblock %}
+{% block inner_content %}
+    {{ body_text }}
+    <p>
+        My custom content here.
+    </p>
+{% endblock %}
