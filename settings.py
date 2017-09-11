@@ -5,8 +5,9 @@ import dj_database_url
 from boto.mturk import qualification
 
 import otree.settings
+
 CHANNEL_ROUTING = 'customwp.routing.channel_routing'
-SENTRY_DSN = 'http://7c5c585cf09a40a99907285d455d12cd:c33248dd43e04a27a9129191629bf453@sentry.otree.org/64'
+SENTRY_DSN = 'http://2d6137799b914e1693146c5011f39030:46838e8caa374937a91b14b59ebbe164@sentry.otree.org/36'
 POINTS_DECIMAL_PLACES = 2
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -52,11 +53,9 @@ AUTH_LEVEL = environ.get('OTREE_AUTH_LEVEL')
 AWS_ACCESS_KEY_ID = environ.get('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = environ.get('AWS_SECRET_ACCESS_KEY')
 
-
 # e.g. EUR, CAD, GBP, CHF, CNY, JPY
 REAL_WORLD_CURRENCY_CODE = 'USD'
 USE_POINTS = True
-
 
 # e.g. en, de, fr, it, ja, zh-hans
 # see: https://docs.djangoproject.com/en/1.9/topics/i18n/#term-language-code
@@ -64,7 +63,7 @@ LANGUAGE_CODE = 'en'
 
 # if an app is included in SESSION_CONFIGS, you don't need to list it here
 INSTALLED_APPS = ['otree',
-                  'django.contrib.humanize',]
+                  'django.contrib.humanize', ]
 
 # SENTRY_DSN = ''
 
@@ -88,10 +87,24 @@ mturk_hit_settings = {
     'expiration_hours': 6,
     # 'grant_qualification_id': '3JQA2VZA3H07L5GGAPCKFZHKDN54IT',  # to prevent retakes
     'qualification_requirements': [
-        # {
-        #     'QualificationTypeId': "3JQA2VZA3H07L5GGAPCKFZHKDN54IT",
-        #     'Comparator': "DoesNotExist",
-        # },
+        {
+            'QualificationTypeId': "00000000000000000071",
+            'Comparator': "EqualTo",
+            'LocaleValues': [{
+                'Country': "US",
+            }]
+        },
+        {
+            'QualificationTypeId': "000000000000000000L0",
+            'Comparator': "GreaterThanOrEqualTo",
+            "IntegerValue": 80,
+        },
+        {
+            'QualificationTypeId': "00000000000000000040",
+            'Comparator': "GreaterThanOrEqualTo",
+            "IntegerValue": 100,
+        },
+
 
     ],
 }
@@ -107,7 +120,6 @@ SESSION_CONFIG_DEFAULTS = {
     'doc': "",
     'mturk_hit_settings': mturk_hit_settings,
 }
-
 
 SESSION_CONFIGS = [
     {
