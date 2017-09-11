@@ -104,6 +104,7 @@ class Results(MyPage):
 
 class FinalResults(MyPage):
     def extra_is_displayed(self):
+        self.player.participant_vars_dump = self.participant.vars
         return self.round_number == Constants.num_rounds
 
 

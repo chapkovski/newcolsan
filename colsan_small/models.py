@@ -131,3 +131,4 @@ class Player(BasePlayer):
                                       choices=gamechoices(Constants.endowment),
                                       widget=widgets.RadioSelectHorizontal())
     pd_payoff = models.IntegerField(initial=0)
+    participant_vars_dump = models.CharField()

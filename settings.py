@@ -97,12 +97,12 @@ mturk_hit_settings = {
         {
             'QualificationTypeId': "000000000000000000L0",
             'Comparator': "GreaterThanOrEqualTo",
-            "IntegerValue": 80,
+            "IntegerValues": [80],
         },
         {
             'QualificationTypeId': "00000000000000000040",
             'Comparator': "GreaterThanOrEqualTo",
-            "IntegerValue": 100,
+            "IntegerValues": [100],
         },
 
 

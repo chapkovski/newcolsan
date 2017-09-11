@@ -9,7 +9,7 @@ from functions import debug_session
 
 
 class Consent(Page):
-    timeout_seconds = 300
+    timeout_seconds = 600
     form_model = models.Player
     form_fields = ['consent']
     timeout_submission = {'consent': False}
