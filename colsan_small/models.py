@@ -44,12 +44,21 @@ class Subsession(BaseSubsession):
 
 
 class Group(BaseGroup):
+    no_dropouts = models.BooleanField()
+
+    @property
+    def dropout_exists(self):
+        dropouts = [p for p in self.get_players() if p.participant.vars.get('dropout', False)]
+
+        if len(dropouts) > 0:
+            return True
+        return False
+
     @property
     def subgroups(self):
         subgroup_dict = {}
         for s in Constants.groupset:
             subgroup_dict[s] = self.get_subgroup(s)
-        print('SET OF SUBGROUPS:::', subgroup_dict)
         return subgroup_dict
 
     def get_subgroup(self, name):
@@ -103,18 +112,19 @@ class Player(BasePlayer):
 
     def set_pd_payoff(self):
         self.pd_received_mult = self.my_pair.pd_decision * Constants.pd_factor
-        self.pd_payoff = self.pd_received_mult + Constants.endowment - self.pd_decision
+        self.endowment_remain = Constants.endowment - self.pd_decision
+        self.pd_payoff = self.pd_received_mult + self.endowment_remain
 
     # next field defines which pair will be shown at the punishment stage
     random_id = models.IntegerField(choices=Constants.threesome)
-
+    is_dropout = models.BooleanField(default=False)
     # to which pair (out of 3) a player belongs:
     pair = models.IntegerField()
 
     # set of vars for results
     # Stage 1 (PD) payoff received by the pair and multiplied by PD factor
     pd_received_mult = models.IntegerField()
-
+    endowment_remain = models.IntegerField()
     # to which subgroup (A or B) the player belongs:
     subgroup = models.CharField()
     pd_decision = models.IntegerField(verbose_name='Your sending decision',

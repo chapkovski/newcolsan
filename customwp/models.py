@@ -44,4 +44,3 @@ class Player(BasePlayer):
     startwp_time = models.PositiveIntegerField()
     outofthegame = models.BooleanField()
 
-    is_dropout = models.BooleanField(default=False)

@@ -17,11 +17,28 @@ def vars_for_all_templates(self):
             }
 
 
+class FirstRoundWP(CustomWaitPage):
+    group_by_arrival_time = True
+
+    def extra_is_displayed(self):
+        return self.subsession.round_number == 1
+
+
 class MyPage(CustomPage):
-    timeout_seconds = 100000
+    timeout_seconds = 90
+
+    def is_displayed(self):
+        dropouts_not_shown = super().is_displayed()
+        return self.extra_is_displayed() and not self.group.dropout_exists and dropouts_not_shown
+
+    def extra_is_displayed(self):
+        return True
 
 
 class FirstWaitPD(CustomWaitPage):
+    def extra_is_displayed(self):
+        return not self.group.dropout_exists
+
     def after_all_players_arrive(self):
         allplayers = self.group.get_players()
         random.shuffle(allplayers)
@@ -39,28 +56,11 @@ class FirstWaitPD(CustomWaitPage):
                 p.pair = pairs[i]
 
 
-class WaitPD(CustomWaitPage):
-    # template_name = 'colsan/WaitPD.html'
-
-    def after_all_players_arrive(self):
-        allplayers = self.group.get_players()
-        for p in allplayers:
-            # we define the which random pair will be shown to the participants
-            p.random_id = random.choice([_ for _ in
-                                         Constants.threesome if _ != p.pair])
-            p.set_pd_payoff()
-
-
 class InstructionsStage1(MyPage):
+    timeout_seconds = 180
     def extra_is_displayed(self):
         return self.subsession.round_number == 1
 
-
-def A_or_B(self):
-    if self.session.config['ingroup']:
-        return 'A'
-    else:
-        return 'B'
 
 
 class PD(MyPage):
@@ -72,15 +72,24 @@ class PD(MyPage):
         self.timeout_submission = {'pd_decision': random.randint(0, Constants.endowment)}
         super(PD, self).__init__(*args, **kwargs)
 
+    def before_next_page(self):
+        if self.timeout_happened:
+            self.player.is_dropout = True
+            self.player.participant.vars['dropout'] = True
+
 
 class WaitResults(CustomWaitPage):
     # template_name = 'colsan/WaitResults.html'
+    def extra_is_displayed(self):
+        return not self.group.dropout_exists
 
     def after_all_players_arrive(self):
+        self.group.no_dropouts = True
         self.group.set_payoffs()
 
 
 class Results(MyPage):
+    timeout_seconds = 180
     def vars_for_template(self):
         partner = [_ for _ in self.player.get_others_in_group()
                    if _.pair == self.player.pair][0]
@@ -93,12 +102,38 @@ class FinalResults(MyPage):
         return self.round_number == Constants.num_rounds
 
 
+class DropOutFinal(Page):
+    timeout_seconds = 900
+
+    def is_displayed(self):
+        return self.group.dropout_exists and self.round_number == Constants.num_rounds
+
+    def vars_for_template(self):
+
+        early_dropouts = [p for p in self.group.in_round(1).get_players() if p.is_dropout]
+        if len(early_dropouts) > 0:
+            early_dropout = True
+        else:
+            early_dropout = False
+        if self.player.participant.vars.get('consent_dropout', False):
+            early_dropout = True
+            no_participation_fee = True
+        else:
+            no_participation_fee = False
+        others_dropouts = (not self.player.participant.vars.get('dropout', False)) and self.group.dropout_exists
+        return {'early_dropout': early_dropout,
+                'itself_dropout': self.player.participant.vars.get('dropout', False),
+                'others_dropouts': others_dropouts,
+                'no_participation_fee': no_participation_fee}
+
+
 page_sequence = [
+    FirstRoundWP,
     FirstWaitPD,
     InstructionsStage1,
     PD,
-    WaitPD,
     WaitResults,
     Results,
+    DropOutFinal,
     FinalResults,
 ]

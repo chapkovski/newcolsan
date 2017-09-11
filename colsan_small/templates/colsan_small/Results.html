@@ -23,16 +23,26 @@
             <td><span>{{ player.pd_decision }}</span></td>
 
         </tr>
+          <tr>
+            <th class='leftjust success'>You have left out of your initial endowment:</th>
+            <td class="sign">=</td>
+            <th class="success">{{ player.endowment_remain }}</th>
+        </tr>
         <tr>
-            <th class='leftjust'>You received from your partner in group {{ player.another_subgroup_name }}:</th>
+            <th class='leftjust' colspan="2">Your partner from group {{ player.another_subgroup_name }} sent to you:</th>
+
+            <td><span>{{ player.my_pair.pd_decision }}</span></td>
+        </tr>
+        <tr>
+            <th class='text-center' colspan="3">This amount has been multiplied by <b>{{ Constants.pd_factor }}</b></th>
+
+        </tr>
+        <tr>
+            <th class='leftjust'>So you received from your partner in group {{ player.another_subgroup_name }}:</th>
             <td class="sign">+</td>
             <td><span>{{ player.pd_received_mult }}</span></td>
         </tr>
-        <tr>
-            <th class='leftjust success'>Your payoff in Stage 1:</th>
-            <td class="sign">=</td>
-            <th class="success">{{ player.pd_payoff }}</th>
-        </tr>
+
 
 
         <tr class='danger'>

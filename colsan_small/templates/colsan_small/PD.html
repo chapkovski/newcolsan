@@ -5,12 +5,43 @@
 {% endblock %}
 
 {% block inner_content %}
-
-
+       {% include 'colsan_small/time_reminder.html' %}
+    <div class="list-group">
+        <a href="" class="list-group-item ">
+            <h4 class="list-group-item-heading">Your endowment</h4>
+            <p class="list-group-item-text">You have <b>{{ Constants.endowment }} point{{ Constants.endowment|pluralize }}</b>
+                at the beginning of this round. </p>
+        </a>
+        <a href="" class="list-group-item">
+            <h4 class="list-group-item-heading">Sending points to another participant</h4>
+            <p class="list-group-item-text">You can send from 0 to {{ Constants.endowment }}
+                point{{ Constants.endowment|pluralize }} to another participant from
+                group {{ player.another_subgroup_name }},
+                with whom you are matched in this round.
+            </p>
+        </a>
+        <a href="" class="list-group-item">
+            <h4 class="list-group-item-heading">Receiving points from another participant</h4>
+            <p class="list-group-item-text">At the same time another participant with whom you are matched <b>will also
+                take the decision</b> about sending points to you.</p>
+        </a>
+        <a href="" class="list-group-item">
+            <h4 class="list-group-item-heading">Multiplication of points</h4>
+            <p class="list-group-item-text">
+                Each point you send to another participant is multiplied by <b>{{ Constants.pd_factor }}</b>. So if you send
+                him or her 1 point, the participant will receive {{ Constants.pd_factor }} points.
+            </p>
+            <p>
+                Each point another participant sends to you is multiplied by <b>{{ Constants.pd_factor }}</b>. So if he or she
+                sends
+                you 1 point, you will receive {{ Constants.pd_factor }} points.
+            </p>
+        </a>
+    </div>
     {% formfield player.pd_decision with label='Tick the amount of money you want to transfer to the other participant' %}
-    <div class="alert alert-info pd_info">
-
-
+    <div class="alert alert-info pd_info">Make the choice to see how many points another participant will receive...
+    </div>
+    <div class="alert alert-warning remain_info">Make the choice to see how many points of your endowment has left...
     </div>
 
     {% next_button %}
@@ -31,9 +62,13 @@
 {% block scripts %}
     <script>
         $('input[name=pd_decision]').click(function () {
-            var received_val = ($(this).val()) * {{ Constants.pd_factor }};
-            var $string = "The other participant from  group {{ player.another_subgroup_name }} will receive <b>" + received_val + "</b> points.";
-            $('.pd_info').html($string);
+            var received_val = $(this).val() * {{ Constants.pd_factor }};
+            var remain_val = {{ Constants.endowment }} -$(this).val();
+            var string = "The other participant from  group {{ player.another_subgroup_name }} will receive <b>" + received_val + "</b> points.";
+            var points = remain_val == 1 ? 'point' : 'points';
+            var stringrem = "You will have <b>" + remain_val + "</b> " + points + "  left out of your initial endowment.";
+            $('.pd_info').html(string);
+            $('.remain_info').html(stringrem);
         });
     </script>
 {% endblock %}

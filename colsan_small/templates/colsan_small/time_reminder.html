@@ -1,0 +1,13 @@
+<div class="bs-callout bs-callout-danger">
+    <h4>Attention! Be on time!</h4>
+    <p>
+        In order not make other participants wait for too long please make your decision
+        about the contribution to the group project on time.
+    </p>
+    <p>
+        <b>To make this decision you have {{ view.get_timeout_seconds|default:Constants.time_to_decide }} seconds.</b>
+    </p>
+    <p>
+        If you fail to take the decision on time you may not be eligible for the full bonus payment.
+    </p>
+</div>

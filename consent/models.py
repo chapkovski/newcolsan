@@ -34,3 +34,5 @@ class Player(BasePlayer):
     consent = models.BooleanField(widget=djforms.CheckboxInput,
                                   initial=False
                                   )
+
+    is_dropout = models.BooleanField(default=False)

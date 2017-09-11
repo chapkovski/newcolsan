@@ -79,20 +79,21 @@ oTree games
 # https://boto.readthedocs.org/en/latest/ref/mturk.html?highlight=mturk#module-boto.mturk.qualification
 
 mturk_hit_settings = {
-    'keywords': ['easy', 'bonus', 'choice', 'study'],
-    'title': 'Title for your experiment',
-    'description': 'Description for your experiment',
-    'frame_height': 500,
+    'keywords': ['bonus', 'choice', 'study', 'academic'],
+    'title': 'Academic study on collective decision making (with $2-5 bonus payments)',
+    'description': '20 min long study. Participants have to work in groups of 6 mTurkers. If you have any issues please write as immediately at chapkovskii@soziologie.uzh.ch',
+    'frame_height': 800,
     'preview_template': 'global/MTurkPreview.html',
     'minutes_allotted_per_assignment': 60,
-    'expiration_hours': 7*24,  # 7 days
-    # 'grant_qualification_id': 'YOUR_QUALIFICATION_ID_HERE',# to prevent retakes
+    'expiration_hours': 6,
+    # 'grant_qualification_id': '3JQA2VZA3H07L5GGAPCKFZHKDN54IT',  # to prevent retakes
     'qualification_requirements': [
-        # qualification.LocaleRequirement("EqualTo", "US"),
-        # qualification.PercentAssignmentsApprovedRequirement("GreaterThanOrEqualTo", 50),
-        # qualification.NumberHitsApprovedRequirement("GreaterThanOrEqualTo", 5),
-        # qualification.Requirement('YOUR_QUALIFICATION_ID_HERE', 'DoesNotExist')
-    ]
+        # {
+        #     'QualificationTypeId': "3JQA2VZA3H07L5GGAPCKFZHKDN54IT",
+        #     'Comparator': "DoesNotExist",
+        # },
+
+    ],
 }
 
 # if you set a property in SESSION_CONFIG_DEFAULTS, it will be inherited by all configs
@@ -102,7 +103,7 @@ mturk_hit_settings = {
 
 SESSION_CONFIG_DEFAULTS = {
     'real_world_currency_per_point': 0.01,
-    'participation_fee': 1.00,
+    'participation_fee': 0.50,
     'doc': "",
     'mturk_hit_settings': mturk_hit_settings,
 }
@@ -117,6 +118,7 @@ SESSION_CONFIGS = [
         'colsan': False,
         'ingroup': False,
         'outgroup': True,
+        # 'debug': True
     },
     # {
     #     'name': 'nocolsan',

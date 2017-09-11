@@ -8,14 +8,17 @@ from colsan_small.models import Constants as pggConstants
 import math
 
 
+def stay_with(page):
+    is_dropout = page.player.participant.vars.get('dropout', False)
+    is_out_of_game = page.player.participant.vars.get('outofthegame', False)
+    return not is_dropout and not is_out_of_game
+
+
 class CustomWaitPage(WaitPage):
     template_name = 'customwp/CustomWaitPage.html'
 
     def is_displayed(self):
-        is_dropout = self.player.participant.vars.get('dropout', False)
-        if 'outofthegame' in self.player.participant.vars:
-            return not self.player.participant.vars['outofthegame'] and self.extra_is_displayed()
-        return self.extra_is_displayed() and not is_dropout
+        return self.extra_is_displayed() and stay_with(self)
 
     def extra_is_displayed(self):
         return True
@@ -23,12 +26,8 @@ class CustomWaitPage(WaitPage):
 
 class CustomPage(Page):
     timeout_seconds = 60
-
     def is_displayed(self):
-        is_dropout = self.player.participant.vars.get('dropout', False)
-        if 'outofthegame' in self.player.participant.vars:
-            return not self.player.participant.vars['outofthegame'] and self.extra_is_displayed()
-        return self.extra_is_displayed() and not is_dropout
+        return self.extra_is_displayed() and stay_with(self)
 
     def extra_is_displayed(self):
         return True
@@ -37,9 +36,6 @@ class CustomPage(Page):
 class StartWP(CustomWaitPage):
     group_by_arrival_time = True
     template_name = 'customwp/FirstWaitPage.html'
-
-    # def extra_is_displayed(self):
-    #     return self.subsession.round_number == 1
 
     def vars_for_template(self):
         now = time.time()

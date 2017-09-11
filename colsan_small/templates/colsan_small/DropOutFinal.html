@@ -1,0 +1,31 @@
+{% extends "global/PageExt.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+    End of study
+{% endblock %}
+
+{% block inner_content %}
+
+    {% if itself_dropout %}
+        <p>Unfortunately you were not able to make the decision in time.</p>
+        <p>That means that you were dropped out of this study.</p>
+    {% endif %}
+    {% if others_dropouts %}
+        <p>Unfortunately one of other mTurkers with whom you were matched, was not able to make the decision in
+            time.</p>
+
+        <p>That means that you and your group will not be able to proceed further with this study. However <strong>you will get
+            all the payoffs earned till now.</strong></p>
+
+    {% endif %}
+    {% if early_dropout and not no_participation_fee %}
+        <p>You are still eligible for the participation fee!</p>
+    {% endif %}
+    {% if not early_dropout and not no_participation_fee %}
+        {% include 'colsan_small/finalresultstable.html' %}
+    {% endif %}
+    <p> If you have any issues regarding the study, please contact us immediately at
+    <a href="mailto:chapkovskii@soziologie.uzh.ch">chapkovskii@soziologie.uzh.ch</a>.
+    {% next_button %}
+{% endblock %}
