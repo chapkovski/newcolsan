@@ -6,3 +6,8 @@ staticfiles
 *~
 *.sqlite3
 _coverage_results/
+/latest.dump.1
+/latest.dump
+__pycache__/
+
+latest.dump.1

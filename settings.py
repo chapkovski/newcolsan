@@ -97,7 +97,7 @@ mturk_hit_settings = {
         {
             'QualificationTypeId': "000000000000000000L0",
             'Comparator': "GreaterThanOrEqualTo",
-            "IntegerValues": [80],
+            "IntegerValues": [90],
         },
         {
             'QualificationTypeId': "00000000000000000040",
@@ -116,7 +116,7 @@ mturk_hit_settings = {
 
 SESSION_CONFIG_DEFAULTS = {
     'real_world_currency_per_point': 0.01,
-    'participation_fee': 0.50,
+    'participation_fee': 1,
     'doc': "",
     'mturk_hit_settings': mturk_hit_settings,
 }
@@ -126,11 +126,17 @@ SESSION_CONFIGS = [
         'name': 'colsan_small',
         'display_name': 'Stage 1 version for mTurk',
         'num_demo_participants': 6,
-        'app_sequence': ['consent', 'customwp', 'colsan_small'],
+        'app_sequence': ['consent', 'customwp', 'colsan_small', 'survey'],
         'colsan': False,
         'ingroup': False,
         'outgroup': True,
         # 'debug': True
+    },
+    {
+        'name': 'survey',
+        'display_name': 'survey test',
+        'num_demo_participants': 1,
+        'app_sequence': ['survey'],
     },
     # {
     #     'name': 'nocolsan',

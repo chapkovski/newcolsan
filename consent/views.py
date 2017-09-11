@@ -27,6 +27,7 @@ class Consent(Page):
             self.player.consent = False
             self.player.is_dropout = True
             self.player.participant.vars['dropout'] = True
+            self.player.participant.vars['consent_dropout'] = True
             return
         if self.timeout_happened and debug_session(self):
             self.player.consent = True
