@@ -1,7 +1,7 @@
 {% extends "global/PageExt.html" %}
 {% load otree_tags staticfiles %}
 {% block title %}
-    Round {{ view.round_number }} of {{ Constants.num_rounds }}: Stage 1. Decision
+    Round {{ view.round_number }} of {{ Constants.num_rounds }}: Decision
 {% endblock %}
 
 {% block inner_content %}
@@ -38,7 +38,7 @@
             </p>
         </a>
     </div>
-    {% formfield player.pd_decision with label='Tick the amount of money you want to transfer to the other participant' %}
+    {% formfield player.pd_decision with label='Tick the amount of points you want to transfer to the other participant' %}
     <div class="alert alert-info pd_info">Make the choice to see how many points another participant will receive...
     </div>
     <div class="alert alert-warning remain_info">Make the choice to see how many points of your endowment has left...

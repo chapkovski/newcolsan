@@ -1,11 +1,16 @@
 {% load otree_tags staticfiles %}
 <div class="instructions well well-lg">
+    <h2>General Rules</h2>
     <p>
-        Each participant is randomly assigned to a group of three.
-        There are two groups: <b>A</b> and <b>B</b>, with three participants
-        in each group. </p>
-    <p>We call a participant from the group A: <b>Participant A</b>,
-        and a participant from the group B: <b>Participant B</b>.</p>
+        In this game there are six participants. Each participant is randomly assigned to a group of three. There are
+        two
+        groups: A and B, with three participants in each group.
+    </p>
+    <p>
+        In each round every participant from the group A is matched with a random participant from the group B. They
+        then play a game, in which both of them should take a decision that is described below.
+    </p>
+
     <div class="panel panel-default">
         <div class="panel-body">
             You have been assigned to the <strong> group {{ player.subgroup }}.</strong>
@@ -13,55 +18,51 @@
     </div>
     <div class="panel panel-default">
         <div class="panel-body">
-            In each round you are matched with one participant from
+            In each round you are matched with one <b>random</b> participant from
             <strong>group {{ player.another_subgroup_name }}</strong>.
         </div>
     </div>
 
     <p>
-        The experiment consists of <strong>{{ Constants.num_rounds }}</strong> rounds.
-        In each round you have to take the following decision:
+        The experiment consists of <strong>{{ Constants.num_rounds }}</strong> identical rounds.
+
     </p>
     <h2>Decision:</h2>
 
-    <p>In each round you are given <b>{{ Constants.endowment }} points</b> and you have to decide how much, if any, to
-        transfer to the
-        other
-        participant.
-
-        The amount of money you decide to transfer will be multiplied by <b>{{ Constants.pd_factor }}</b> and earned by
-        the
-        other
-        participant.
-
-        The other participant will be given the same choice.</p>
-
     <p>
+        In each round you are given <b>{{ Constants.endowment }} points</b> and you have an option to transfer some of
+        these
+        points or all of them to the
+        other participant, with whom you are matched, or leave all the points to yourself. The amount of points you
+        decide
+        to transfer to the other participant will be multiplied by <b>{{ Constants.pd_factor }}</b>  and earned by the
+        other
+        participant. Simultaneously the
+        other participant will be given exactly the same choice.
+    </p>
+
+       <p>
         For instance:
     <ul>
         <li>
-            If you both transfer everything, you both get {{ max_pd }} points and are better off than if
-            you both keep
-            everything.
+            If you both transfer all the points you get, each of you will get {{ max_pd }} points.
         </li>
         <li>
-            If you transfer everything and the other person keeps everything, then you earn nothing
-            in this stage.
+            If you transfer everything and the other participant keeps everything, then you will earn nothing and the
+            other
+            participant will earn {{ egoistic_pd }}.
+
         </li>
         <li>
-            If you keep
-            everything and the other participant transfers everything, then you get {{ egoistic_pd }} points and
-            your partner will earn nothing.
+            If you keep everything and the other participant transfers everything, then you will get {{ egoistic_pd }}
+            points and your
+            partner will earn nothing.
         </li>
     </ul>
 
     </p>
 
 
-    <p>
-        Your partner from group {{ player.another_subgroup_name }}
-        has the same incentives as you. You and your partner will make your decisions simultaneously.
-    </p>
     <div class="panel panel-info">
         <div class="panel-heading">Payoffs</div>
         <div class="panel-body">

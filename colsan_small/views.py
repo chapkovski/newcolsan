@@ -25,7 +25,7 @@ class FirstRoundWP(CustomWaitPage):
 
 
 class MyPage(CustomPage):
-    timeout_seconds = 90
+    timeout_seconds = Constants.time_to_decide
 
     def is_displayed(self):
         dropouts_not_shown = super().is_displayed()
@@ -57,7 +57,7 @@ class FirstWaitPD(CustomWaitPage):
 
 
 class InstructionsStage1(MyPage):
-    timeout_seconds = 180
+    timeout_seconds = 240
     def extra_is_displayed(self):
         return self.subsession.round_number == 1
 
@@ -76,6 +76,11 @@ class PD(MyPage):
         if self.timeout_happened:
             self.player.is_dropout = True
             self.player.participant.vars['dropout'] = True
+
+    def get_timeout_seconds(self):
+        if self.round_number > 1:
+            return Constants.time_to_decide
+        return Constants.time_to_decide + 30
 
 
 class WaitResults(CustomWaitPage):
