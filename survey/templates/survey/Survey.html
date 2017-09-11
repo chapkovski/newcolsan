@@ -1,0 +1,12 @@
+{% extends "global/PageExt.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+    Survey
+{% endblock %}
+
+{% block inner_content %}
+    {%  formfield player.comment %}
+    {% next_button %}
+
+{% endblock %}
