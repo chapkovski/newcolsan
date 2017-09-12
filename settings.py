@@ -105,7 +105,6 @@ mturk_hit_settings = {
             "IntegerValues": [100],
         },
 
-
     ],
 }
 
@@ -137,6 +136,7 @@ SESSION_CONFIGS = [
         'display_name': 'survey test',
         'num_demo_participants': 1,
         'app_sequence': ['survey'],
+        'participation_fee': 0.5,
     },
     # {
     #     'name': 'nocolsan',
