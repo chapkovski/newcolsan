@@ -172,7 +172,9 @@ class Results(MyPage):
     def vars_for_template(self):
         partner = [_ for _ in self.player.get_others_in_group()
                    if _.pair == self.player.pair][0]
+        tot_game_payoff = self.participant.payoff - (self.player.payoff_minutes_waited or 0)
         return {'partner_decision': partner.pd_decision,
+                'participant_real_currency_payoff': tot_game_payoff.to_real_world_currency(self.session),
                 'real_currency_payoff': self.player.payoff.to_real_world_currency(self.session), }
 
 
