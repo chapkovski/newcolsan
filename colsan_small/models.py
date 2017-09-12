@@ -171,8 +171,7 @@ class Player(BasePlayer):
     # to which subgroup (A or B) the player belongs:
     subgroup = models.CharField()
     pd_decision = models.IntegerField(verbose_name='Your sending decision', min=0, max=Constants.endowment,
-                                      widget=forms.NumberInput(attrs={'class': 'form-control', 'autofocus': 'autofocus',
-                                                                      'required': True}), )
+                                       )
     pd_payoff = models.IntegerField(initial=0)
     payoff_stage2 = models.IntegerField(initial=0)
     ingroup_punishment = models.IntegerField(verbose_name=
