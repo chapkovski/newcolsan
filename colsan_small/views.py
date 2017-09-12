@@ -217,11 +217,7 @@ class DropOutFinal(Page):
 
     def vars_for_template(self):
 
-        early_dropouts = [p for p in self.group.in_round(1).get_players() if p.is_dropout]
-        if len(early_dropouts) > 0:
-            early_dropout = True
-        else:
-            early_dropout = False
+        early_dropout = False
         if self.player.participant.vars.get('consent_dropout', False):
             early_dropout = True
             no_participation_fee = True
@@ -230,6 +226,7 @@ class DropOutFinal(Page):
         tot_game_payoff = self.participant.payoff - self.player.payoff_minutes_waited
         others_dropouts = (not self.player.participant.vars.get('dropout', False)) and self.group.dropout_exists
         return {'early_dropout': early_dropout,
+                'tot_game_payoff':tot_game_payoff,
                 'itself_dropout': self.player.participant.vars.get('dropout', False),
                 'others_dropouts': others_dropouts,
                 'no_participation_fee': no_participation_fee,

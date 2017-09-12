@@ -12,6 +12,8 @@
             <p class="list-group-item-text">You receive <b>{{ player.punishment_endowment }}</b> extra points which you
                 can use to send deduction tokens to
                 other participants or to keep for yourself. </p>
+            <p class="list-group-item-text">You can send to each of the two participants from 0
+                to {{ player.punishment_endowment }} points (so that sum of these two amounts is less or equal {{ player.punishment_endowment }}) </p>
         </a>
         <a href="" class="list-group-item">
             <h4 class="list-group-item-heading">You have been assigned to the <strong>
@@ -131,9 +133,10 @@
 
 
     <style>
-    .otree-btn-next{
-        margin-top:20px;
-    }
+        .otree-btn-next {
+            margin-top: 20px;
+        }
+
         .table > tbody > tr > td {
             vertical-align: middle !important;
         }
@@ -204,12 +207,12 @@
     <script src="{% static "noUiSlider/wNumb.js" %}"></script>
     <script src="{% static "noUiSlider/nouislider.js" %}"></script>
     <script>
-    $(window).keydown(function(event){
-    if(event.keyCode == 13) {
-      event.preventDefault();
-      return false;
-    }
-  });
+        $(window).keydown(function (event) {
+            if (event.keyCode == 13) {
+                event.preventDefault();
+                return false;
+            }
+        });
     </script>
     <script>
         function filter500(value, type) {
