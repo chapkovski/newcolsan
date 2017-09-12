@@ -108,6 +108,21 @@ mturk_hit_settings = {
     ],
 }
 
+
+noreq_mturk_hit_settings = {
+    'keywords': ['bonus', 'choice', 'study', 'academic'],
+    'title': 'test only',
+    'description': 'test only',
+    'frame_height': 800,
+    'preview_template': 'global/MTurkPreview.html',
+    'minutes_allotted_per_assignment': 1,
+    'expiration_hours': 0.3,
+
+    'qualification_requirements': [
+
+    ],
+}
+
 # if you set a property in SESSION_CONFIG_DEFAULTS, it will be inherited by all configs
 # in SESSION_CONFIGS, except those that explicitly override it.
 # the session config can be accessed from methods in your apps as self.session.config,
@@ -137,6 +152,7 @@ SESSION_CONFIGS = [
         'num_demo_participants': 1,
         'app_sequence': ['survey'],
         'participation_fee': 0.5,
+        'mturk_hit_settings': noreq_mturk_hit_settings,
     },
     # {
     #     'name': 'nocolsan',
