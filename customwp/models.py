@@ -22,7 +22,7 @@ class Constants(BaseConstants):
     # first waiting page
     # before he or she has an option to finish the game without waiting for
     # others
-    startwp_timer = 600
+    startwp_timer = 300
 
 
 class Subsession(BaseSubsession):

@@ -18,7 +18,8 @@ class Constants(BaseConstants):
     players_per_group = None
     num_others_per_group = pggConstants.num_others_per_group
     num_rounds = 1
-    time_to_decide = pggConstants.time_to_decide
+    consent_timeout = 300
+
     startwp_timer = CWPConstants.startwp_timer
 
 

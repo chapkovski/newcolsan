@@ -6,14 +6,16 @@ import math
 from functions import debug_session
 
 
-
-
 class Consent(Page):
-    timeout_seconds = 600
+    timeout_seconds = Constants.consent_timeout
     form_model = models.Player
     form_fields = ['consent']
     timeout_submission = {'consent': False}
 
+    def vars_for_template(self):
+        if self.session.config.get('name') == 'survey':
+            self.template_name = 'consent/AltConsent.html'
+        return {'consent_timeout_min': math.ceil(self.timeout_seconds / 60)}
 
     def is_displayed(self):
         return self.round_number == 1
@@ -33,6 +35,12 @@ class Consent(Page):
             self.player.consent = True
 
 
+class BlockDropouts(Page):
+    def is_displayed(self):
+        return self.round_number == 1 and self.player.participant.vars.get('consent_dropout', False)
+
+
 page_sequence = [
     Consent,
+    BlockDropouts,
 ]

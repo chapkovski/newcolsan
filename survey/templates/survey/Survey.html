@@ -6,7 +6,23 @@
 {% endblock %}
 
 {% block inner_content %}
-    {%  formfield player.comment %}
+
+    {% if session.config.name == 'survey' %}
+        <div class="panel panel-info">
+            <div class="panel-heading">Interactive experiments</div>
+            <div class="panel-body">
+                <p>Below we will ask you about your experience and expectations regarding interacrive experiments in Amazon mTurk.</p>
+                <p><b>Interactive experiments or studies</b> are the studies where participants have to take decisions that affect other participants payoffs.</p>
+                <p>For example these can be the games where people simultaneously take the decisions to invest to the mutual investment project.</p>
+                <p>That is why people have to wait for decisions of others while taking part in interactive experiments.</p>
+            </div>
+        </div>
+    {% endif %}
+
+
+    {% for f in form %}
+        {% formfield f %}
+    {% endfor %}
     {% next_button %}
 
 {% endblock %}

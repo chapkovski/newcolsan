@@ -119,6 +119,23 @@ noreq_mturk_hit_settings = {
     'expiration_hours': 0.3,
 
     'qualification_requirements': [
+        {
+            'QualificationTypeId': "00000000000000000071",
+            'Comparator': "EqualTo",
+            'LocaleValues': [{
+                'Country': "US",
+            }]
+        },
+        {
+            'QualificationTypeId': "000000000000000000L0",
+            'Comparator': "GreaterThanOrEqualTo",
+            "IntegerValues": [80],
+        },
+        {
+            'QualificationTypeId': "00000000000000000040",
+            'Comparator': "GreaterThanOrEqualTo",
+            "IntegerValues": [100],
+        },
 
     ],
 }
@@ -150,7 +167,7 @@ SESSION_CONFIGS = [
         'name': 'survey',
         'display_name': 'survey test',
         'num_demo_participants': 1,
-        'app_sequence': ['survey'],
+        'app_sequence': ['consent','survey'],
         'participation_fee': 0.5,
         'mturk_hit_settings': noreq_mturk_hit_settings,
     },
