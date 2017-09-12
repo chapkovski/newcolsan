@@ -111,12 +111,12 @@ mturk_hit_settings = {
 
 noreq_mturk_hit_settings = {
     'keywords': ['bonus', 'choice', 'study', 'academic'],
-    'title': 'test only',
-    'description': 'test only',
+    'title': '5 min survey about your experience in interactive experiments in mTurk',
+    'description': 'A brief questionnaire about interactive experiments in mTurk',
     'frame_height': 800,
-    'preview_template': 'global/MTurkPreview.html',
-    'minutes_allotted_per_assignment': 1,
-    'expiration_hours': 0.3,
+     'preview_template': 'global/MTurkPreviewSinglePlayer.html',
+    'minutes_allotted_per_assignment': 20,
+    'expiration_hours': 1,
 
     'qualification_requirements': [
         {
@@ -170,7 +170,7 @@ SESSION_CONFIGS = [
         'app_sequence': ['consent','survey'],
         'participation_fee': 0.5,
         'mturk_hit_settings': noreq_mturk_hit_settings,
-        'preview_template': 'global/MTurkPreviewSinglePlayer.html',
+
     },
     # {
     #     'name': 'nocolsan',
