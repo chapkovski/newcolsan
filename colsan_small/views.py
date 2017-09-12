@@ -5,6 +5,7 @@ import random
 from customwp.views import CustomWaitPage, CustomPage
 from itertools import cycle
 from random import shuffle
+from functions import debug_session
 
 
 def vars_for_all_templates(self):
@@ -58,29 +59,99 @@ class FirstWaitPD(CustomWaitPage):
 
 class InstructionsStage1(MyPage):
     timeout_seconds = 240
+
     def extra_is_displayed(self):
         return self.subsession.round_number == 1
 
+
+class InstructionsStage2(MyPage):
+    timeout_seconds = 240
+
+    def extra_is_displayed(self):
+        return self.subsession.round_number == 1
 
 
 class PD(MyPage):
     form_model = models.Player
     form_fields = ['pd_decision']
-    timeout_submission = {}
-
-    def __init__(self, *args, **kwargs):
-        self.timeout_submission = {'pd_decision': random.randint(0, Constants.endowment)}
-        super(PD, self).__init__(*args, **kwargs)
 
     def before_next_page(self):
+        if debug_session(self) and self.timeout_happened:
+            return
         if self.timeout_happened:
             self.player.is_dropout = True
             self.player.participant.vars['dropout'] = True
 
     def get_timeout_seconds(self):
+        if debug_session(self):
+            return 30000
         if self.round_number > 1:
             return Constants.time_to_decide
         return Constants.time_to_decide + 30
+
+
+class WaitPD(CustomWaitPage):
+    def after_all_players_arrive(self):
+        allplayers = self.group.get_players()
+        for p in allplayers:
+            # we define the which random pair will be shown to the participants
+            p.random_id = random.choice([_ for _ in
+                                         Constants.threesome if _ != p.pair])
+            p.set_pd_payoff()
+
+
+class Pun(MyPage):
+    form_model = models.Player
+
+    def vars_for_template(self):
+        random_pair = [p
+                       for p in self.player.get_others_in_group()
+                       if p.pair == self.player.random_id]
+        random_pair_A = [p
+                         for p in random_pair
+                         if p.subgroup == self.player.subgroup][0]
+        random_pair_B = [p
+                         for p in random_pair
+                         if p.subgroup != self.player.subgroup][0]
+
+        return {
+            'random_pair_A': random_pair_A,
+            'random_pair_B': random_pair_B,
+
+        }
+
+    def get_form_fields(self):
+        fields = []
+        if self.session.config['ingroup']:
+            fields.append('ingroup_punishment')
+        if self.session.config['outgroup']:
+            fields.append('outgroup_punishment')
+        return fields
+
+    def error_message(self, values):
+        if values.get('ingroup_punishment', 0) + values.get('outgroup_punishment', 0) > Constants.punishment_endowment:
+            return 'Total amount of deduction points should not be more than {}'.format(Constants.punishment_endowment)
+
+    def before_next_page(self):
+        if debug_session(self) and self.timeout_happened:
+            return
+        if self.timeout_happened:
+            self.player.is_dropout = True
+            self.player.participant.vars['dropout'] = True
+
+    def get_timeout_seconds(self):
+        if debug_session(self):
+            return 30000
+        if self.round_number > 1:
+            return Constants.time_to_decide
+        return Constants.time_to_decide + 30
+
+
+class WaitResults(CustomWaitPage):
+    # template_name = 'colsan/WaitResults.html'
+
+    def after_all_players_arrive(self):
+        self.group.set_payoffs()
 
 
 class WaitResults(CustomWaitPage):
@@ -95,6 +166,13 @@ class WaitResults(CustomWaitPage):
 
 class Results(MyPage):
     timeout_seconds = 180
+
+    def get_timeout_seconds(self):
+        if debug_session(self):
+            return 30000
+        reutnr
+        self.timeout_seconds
+
     def vars_for_template(self):
         partner = [_ for _ in self.player.get_others_in_group()
                    if _.pair == self.player.pair][0]
@@ -137,7 +215,10 @@ page_sequence = [
     FirstRoundWP,
     FirstWaitPD,
     InstructionsStage1,
+    InstructionsStage2,
     PD,
+    WaitPD,
+    Pun,
     WaitResults,
     Results,
     DropOutFinal,

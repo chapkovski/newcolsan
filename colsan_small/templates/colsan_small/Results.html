@@ -6,7 +6,7 @@
 
 
 {% block inner_content %}
-
+    <h3>Stage 1:</h3>
 
     <table class="table table-hover table-striped table-bordered">
 
@@ -14,7 +14,7 @@
 
         <tr>
             <th class='leftjust'>Endowment:</th>
-            <td class="sign">+</td>
+            <td class="sign"></td>
             <td>{{ Constants.endowment }}</td>
         </tr>
         <tr>
@@ -23,13 +23,14 @@
             <td><span>{{ player.pd_decision }}</span></td>
 
         </tr>
-          <tr>
-            <th class='leftjust success'>You have left out of your initial endowment:</th>
-            <td class="sign">=</td>
-            <th class="success">{{ player.endowment_remain }}</th>
+        <tr>
+            <th class='leftjust '>You have left out of your initial endowment:</th>
+            <td class="sign">+</td>
+            <th class="">{{ player.endowment_remain }}</th>
         </tr>
         <tr>
-            <th class='leftjust' colspan="2">Your partner from group {{ player.another_subgroup_name }} sent to you:</th>
+            <th class='leftjust' colspan="2">Your partner from group {{ player.another_subgroup_name }} sent to you:
+            </th>
 
             <td><span>{{ player.my_pair.pd_decision }}</span></td>
         </tr>
@@ -42,9 +43,61 @@
             <td class="sign">+</td>
             <td><span>{{ player.pd_received_mult }}</span></td>
         </tr>
+        <tr class='danger'>
+            <th class='leftjust' colspan="2">Stage 1 payoff :</th>
+            <th>{{ player.pd_payoff }}</th>
+        </tr>
+        </tbody>
+    </table>
+    <h3>Stage 2:</h3>
+    <table class="table table-hover table-striped table-bordered">
 
+        <tbody>
+        {% if session.config.outgroup %}
+            <tr>
+                <th colspan=3>Stage 2:</th>
+            </tr>
+            <tr>
+                <th class='leftjust'>Endowment:</th>
+                <td class="sign">+</td>
+                <td>{{ player.punishment_endowment }}</td>
+            </tr>
+            <tr>
+                <th class='leftjust'>Deduction tokens you sent:</th>
+                <td class="sign">-</td>
+                <td>{{ player.punishment_sent }}</td>
+            </tr>
+            <tr>
+                <th class='leftjust'>Deduction tokens you received from another group
+                    <small>(multiplied by <b>{{ Constants.punishment_factor }})</small>
+                    :
+                </th>
+                <td class="sign">-</td>
+                <td> {{ player.pun_r_out_mult }}</td>
+            </tr>
+            {% if session.config.ingroup %}
+                <tr>
+                    <th class='leftjust'>Deduction tokens you received from your group
+                        <small>(multiplied by <b>{{ Constants.punishment_factor }})</small>
+                        :
+                    </th>
+                    <td class="sign">-</td>
+                    <td>{{ player.pun_r_in_mult }} </td>
+                </tr>
+            {% endif %}
+            <tr>
+                <th class='leftjust success'>Your payoff in Stage 2:</th>
+                <td class="sign">=</td>
+                <th class="success payoff">{{ player.payoff_stage2 }}</th>
+            </tr>
+        {% endif %}
 
+        </tbody>
+    </table>
+    <h3>Payoffs</h3>
+    <table class="table table-hover table-striped table-bordered">
 
+        <tbody>
         <tr class='danger'>
             <th class='leftjust' colspan="2">Total payoff in this round:</th>
             <th>{{ player.payoff }}</th>

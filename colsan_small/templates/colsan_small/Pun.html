@@ -1,0 +1,319 @@
+{% extends "global/PageExt.html" %}
+{% load otree_tags staticfiles %}
+{% block title %}
+    Stage 2. Decision. Round {{ view.round_number }} of {{ Constants.num_rounds }}
+{% endblock %}
+
+
+{% block inner_content %}
+    <div class="list-group">
+        <a href="" class="list-group-item ">
+            <h4 class="list-group-item-heading">Your endowment in Stage 2</h4>
+            <p class="list-group-item-text">You receive <b>{{ player.punishment_endowment }}</b> extra points which you
+                can use to send deduction tokens to
+                other participants or to keep for yourself. </p>
+        </a>
+        <a href="" class="list-group-item">
+            <h4 class="list-group-item-heading">You have been assigned to the <strong>
+                group {{ player.subgroup }}.</strong></h4>
+            <p class="list-group-item-text">We now show you the decisions of a <b>randomly</b> chosen pair: one
+                participant from your group ({{ player.subgroup }}) who was
+                matched with one participant from another group ({{ player.another_subgroup_name }}).
+            </p>
+        </a>
+
+        <a href="" class="list-group-item">
+            <h4 class="list-group-item-heading">Multiplication of deduction points</h4>
+            <p class="list-group-item-text">
+                If you send <b>1</b>
+                deduction token to a participant , your endowment will be
+                decreased by <b>1</b>&nbsp;point, but a payoff of this specific Participant will be
+                decreased by <b>{{ Constants.punishment_factor }}</b>&nbsp;points.
+            </p>
+
+        </a>
+    </div>
+
+
+    <table class="table table-hover table-striped">
+        <thead>
+
+        </thead>
+        <tbody>
+        <tr>
+            <td>Participant {{ player.subgroup }} sent to Participant {{ player.another_subgroup_name }}</td>
+            <td>Participant {{ player.another_subgroup_name }} sent to Participant {{ player.subgroup }}</td>
+        </tr>
+        <tr>
+
+            <td>
+                <div class="sliders in_sliders" id="pd_ingroup"></div>
+            </td>
+            <td>
+                <div class="sliders out_sliders" id="pd_outgroup"></div>
+            </td>
+        </tr>
+        <tr>
+            <td>Participant {{ player.subgroup }} payoff in Stage 1</td>
+            <td>Participant {{ player.another_subgroup_name }} payoff in Stage 1</td>
+        </tr>
+
+        <tr>
+            <td>
+                <div class="sliders in_sliders" id="stage1_in_payoff"></div>
+            </td>
+            <td>
+                <div class="sliders out_sliders" id="stage1_out_payoff"></div>
+            </td>
+        </tr>
+        <tr>
+            <th>How many deduction tokens you send to Participant {{ player.subgroup }}</th>
+            <th>How many deduction tokens you send to Participant {{ player.another_subgroup_name }}</th>
+        </tr>
+        <tr>
+            <td>
+                {% if session.config.ingroup %}
+                    {% formfield player.ingroup_punishment with label='' %}
+                {% endif %}
+            </td>
+            <td>
+                {% if  session.config.outgroup %}
+                    {% formfield player.outgroup_punishment with label='' %}
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <div id="inputslider"></div>
+            </td>
+        </tr>
+        <tr>
+            <td>Participant {{ player.subgroup }}'s payoff after that:</td>
+            <td>Participant {{ player.another_subgroup_name }}'s payoff after that:</td>
+        </tr>
+        <tr>
+            <td>
+                <div class="sliders in_sliders" id="payoff_in_after"></div>
+            </td>
+            <td>
+                <div class="sliders out_sliders" id="payoff_out_after"></div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+
+
+
+    {% if session.config.colsan  and  session.config.outgroup %}
+        <div class="alert alert-warning alert-dismissable">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            If you send the deduction tokens to a Participant {{ player.another_subgroup_name }}, an income of a <b>random</b>
+            participant from group {{ player.another_subgroup_name }}
+            will
+            be decreased.
+        </div>
+
+
+    {% endif %}
+
+    {% next_button %}
+
+
+    {% include Constants.instructions_stage2_wrapper %}
+
+
+{% endblock %}
+{% block styles %}
+    <link href="{% static "colsan/colsan.css" %}" rel="stylesheet">
+
+    <link href="{% static "noUiSlider/nouislider.css" %}" rel="stylesheet">
+
+
+    <style>
+        .table > tbody > tr > td {
+            vertical-align: middle !important;
+        }
+
+        input.form-control {
+            display: inline-block;
+            text-align: center;
+        }
+
+        div.form-group {
+            margin-bottom: 0px;
+        }
+
+        red {
+            font-weight: bold;
+            color: red;
+        }
+
+        .sliders, #inputslider {
+            margin-top: 0px;
+            margin-bottom: 40px;
+            padding-right: 10px;
+        }
+
+        .sliders .noUi-handle {
+        {#            display: none;#}
+        }
+
+        #inputslider {
+            margin-top: 40px;
+        }
+
+        .sliders .noUi-tooltip {
+
+            bottom: -11%;
+        }
+
+        .sliders .noUi-marker {
+        {#        background:none;#}
+        }
+
+        .noUi-marker-normal {
+            display: none;
+        }
+
+        .sliders .noUi-handle {
+            border: 0px;
+            background: none;
+            /* cursor: default; */
+            box-shadow: none;
+        }
+
+        .sliders .noUi-handle::after {
+            display: none;
+        }
+
+        .c-1-color {
+            background: red;
+        }
+
+        .c-2-color {
+            background: blue;
+        }
+
+    </style>
+{% endblock %}
+{% block scripts %}
+    <script src="{% static "noUiSlider/wNumb.js" %}"></script>
+    <script src="{% static "noUiSlider/nouislider.js" %}"></script>
+    <script>
+        function filter500(value, type) {
+            return value % 5 ? 0 : 2;
+        };
+
+        function creatingSlider(where, value, max) {
+            noUiSlider.create(where, {
+                start: [value],
+                step: 1,
+                tooltips: [wNumb({decimals: 0})],
+                connect: [true, false],
+                range: {
+                    'min': 0,
+                    'max': max
+                },
+                pips: {
+                    mode: 'values',
+                    values: [0, max],
+                    density: 4
+                }
+            });
+            where.setAttribute('disabled', true);
+        };
+
+        function updatingPayoffs(updater, updatee, curpayoff) {
+            if (updater.value < 0) {
+                updater.value = 0;
+            }
+            if (updater.value > max_pun) {
+                updater.value = max_pun;
+            }
+            ;
+            pun = pun_coef * updater.value;
+            final_payoff = curpayoff - pun;
+            updateSliderRange(updatee, final_payoff);
+            updatee.noUiSlider.set(final_payoff);
+        }
+
+        function updateSliderRange(what, min) {
+            if (min > 0) {
+                min = 0;
+            }
+            what.noUiSlider.updateOptions({
+                range: {
+                    'min': min,
+                    'max': {{ egoistic_pd }}
+                }
+            });
+        }
+
+        var max_pun = {{ Constants.punishment_endowment }};
+        var ingroup_punishment_input = document.getElementById('id_ingroup_punishment');
+        var outgroup_punishment_input = document.getElementById('id_outgroup_punishment');
+        var payoff_in_after_slider = document.getElementById('payoff_in_after');
+        var payoff_out_after_slider = document.getElementById('payoff_out_after');
+        var pun_coef = {{ Constants.punishment_factor }};
+        var pun_in = pun_coef * parseInt(ingroup_punishment_input.value);
+        var pun_out = pun_coef * parseInt(outgroup_punishment_input.value);
+        var initial_payoff_in_after = {{ player.random_pair.ingroup_member.pd_payoff }} -(pun_in || 0);
+        var initial_payoff_out_after = {{ player.random_pair.outgroup_member.pd_payoff }} -(pun_out || 0);
+        var pd_ingroup_slider = {
+            where: document.getElementById('pd_ingroup'),
+            value: {{ player.random_pair.ingroup_member.pd_decision }},
+            max: {{ Constants.endowment }}
+        };
+        var pd_outgroup_slider = {
+            where: document.getElementById('pd_outgroup'),
+            value: {{ player.random_pair.outgroup_member.pd_decision }},
+            max: {{ Constants.endowment }}
+        };
+        var stage1_in_payoff_slider = {
+            where: document.getElementById('stage1_in_payoff'),
+            value: {{ player.random_pair.ingroup_member.pd_payoff }},
+            max: {{ egoistic_pd }}
+        };
+        var stage1_out_payoff_slider = {
+            where: document.getElementById('stage1_out_payoff'),
+            value: {{ player.random_pair.outgroup_member.pd_payoff }},
+            max: {{ egoistic_pd }}
+        };
+        var payoff_in_after = {
+            where: document.getElementById('payoff_in_after'),
+            value: initial_payoff_in_after,
+            max: {{ egoistic_pd }}
+        };
+        var payoff_out_after = {
+            where: document.getElementById('payoff_out_after'),
+            value: initial_payoff_out_after,
+            max: {{ egoistic_pd }}
+        };
+
+        sliders = [pd_ingroup_slider,
+            pd_outgroup_slider,
+            stage1_in_payoff_slider,
+            stage1_out_payoff_slider,
+            payoff_in_after,
+            payoff_out_after
+        ]
+
+        for (var i = 0; i < sliders.length; i++) {
+            creatingSlider(sliders[i].where, sliders[i].value, sliders[i].max);
+        }
+        ;
+        {#        var in_slider = document.getElementById('slider-color');#}
+        {#        var connect = s/lider.querySelectorAll('.noUi-connect');#}
+        ingroup_punishment_input.addEventListener('change', function () {
+            updatingPayoffs(this, payoff_in_after_slider, {{ player.random_pair.ingroup_member.pd_payoff }});
+        });
+        outgroup_punishment_input.addEventListener('change', function () {
+            updatingPayoffs(this, payoff_out_after_slider, {{ player.random_pair.outgroup_member.pd_payoff }});
+        });
+
+        {#        slider.noUiSlider.reset();#}
+    </script>
+
+
+{% endblock %}

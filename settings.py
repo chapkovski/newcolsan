@@ -159,9 +159,9 @@ SESSION_CONFIGS = [
         'num_demo_participants': 6,
         'app_sequence': ['consent', 'customwp', 'colsan_small',],
         'colsan': False,
-        'ingroup': False,
+        'ingroup': True,
         'outgroup': True,
-        # 'debug': True
+        'debug': True
     },
     {
         'name': 'survey',

@@ -3,6 +3,7 @@ from otree.api import (
     Currency as c, currency_range
 )
 import random
+from django import forms
 
 doc = """
 new collective sanctions experiment based on Stoff's paper
@@ -35,12 +36,16 @@ class Constants(BaseConstants):
     correct_answer_payoff = 0.5
     # set of constants to include instructions to other pages:
     instructions_stage1_wrapper = 'colsan_small/ins_s1_wrapper.html'
+    instructions_stage2_wrapper = 'colsan_small/ins_s2_wrapper.html'
     q6_choices = ['My own', 'A random member of my group']
 
 
 class Subsession(BaseSubsession):
     def before_session_starts(self):
-        ...
+        if self.session.config['ingroup']:
+            assert self.session.config['outgroup'], "You can't create ingroup treatment without outgroup"
+        for p in self.get_players():
+            p.punishment_endowment = Constants.punishment_endowment
 
 
 class Group(BaseGroup):
@@ -64,10 +69,39 @@ class Group(BaseGroup):
     def get_subgroup(self, name):
         return [p for p in self.get_players() if p.subgroup == name]
 
+
     def set_payoffs(self):
         for p in self.get_players():
+            chosen = [o for o in p.get_others_in_group()
+                      if o.pair == p.random_id]
+            assert len(chosen) == 2, 'Too few chosen!'
+            ingroup_punishee = [_ for _ in chosen if _.subgroup == p.subgroup][0]
+            if self.session.config['colsan']:
+                outgroup_punishee = random.choice([_ for _ in
+                                                   p.get_others_in_group()
+                                                   if _.subgroup != p.subgroup])
+            else:
+                outgroup_punishee = [_ for _ in chosen if _.subgroup != p.subgroup][0]
+
+            ingroup_punishee.punishment_received_in += (p.ingroup_punishment or 0)
+            ingroup_punishee.punishment_received += (p.ingroup_punishment or 0)
+            outgroup_punishee.punishment_received_out += (p.outgroup_punishment or 0)
+            outgroup_punishee.punishment_received += (p.outgroup_punishment or 0)
+        for p in self.get_players():
+            assert p.punishment_received_out + p.punishment_received_in == \
+                   p.punishment_received, 'Miscalculation in punishment received'
+            assert p.punishment_sent <= p.punishment_endowment, """Amount of punishment sent cannot exceed 
+                                                                   punishment endowment"""
+            p.pun_r_out_mult = p.punishment_received_out * Constants.punishment_factor
+            p.pun_r_in_mult = p.punishment_received_in * Constants.punishment_factor
+
             p.set_pd_payoff()
-            p.payoff = p.pd_payoff
+            p.punishment_sent = (p.ingroup_punishment or 0) + \
+                                (p.outgroup_punishment or 0)
+            p.payoff_stage2 = p.punishment_endowment - \
+                              p.punishment_sent - \
+                              p.punishment_received * Constants.punishment_factor
+            p.payoff = p.pd_payoff + p.payoff_stage2
 
 
 def gamechoices(n):
@@ -115,9 +149,15 @@ class Player(BasePlayer):
         self.endowment_remain = Constants.endowment - self.pd_decision
         self.pd_payoff = self.pd_received_mult + self.endowment_remain
 
-    # next field defines which pair will be shown at the punishment stage
     random_id = models.IntegerField(choices=Constants.threesome)
-    is_dropout = models.BooleanField(default=False)
+    punishment_endowment = models.IntegerField()
+    punishment_sent = models.IntegerField(initial=0)
+    # total amount of punishment received
+    punishment_received = models.IntegerField(initial=0)
+    # separately: punishment received by ingroup members
+    punishment_received_in = models.IntegerField(initial=0)
+    # separately: punishment received by outgroup memebers
+    punishment_received_out = models.IntegerField(initial=0)
     # to which pair (out of 3) a player belongs:
     pair = models.IntegerField()
 
@@ -125,10 +165,23 @@ class Player(BasePlayer):
     # Stage 1 (PD) payoff received by the pair and multiplied by PD factor
     pd_received_mult = models.IntegerField()
     endowment_remain = models.IntegerField()
+    pun_r_in_mult = models.IntegerField()
+    pun_r_out_mult = models.IntegerField()
     # to which subgroup (A or B) the player belongs:
     subgroup = models.CharField()
-    pd_decision = models.IntegerField(verbose_name='Your sending decision',
-                                      choices=gamechoices(Constants.endowment),
-                                      widget=widgets.RadioSelectHorizontal())
+    pd_decision = models.IntegerField(verbose_name='Your sending decision', min=0, max=Constants.endowment,
+                                      widget=forms.NumberInput(attrs={'class': 'form-control', 'autofocus': 'autofocus',
+                                                                      'required': True}), )
     pd_payoff = models.IntegerField(initial=0)
+    payoff_stage2 = models.IntegerField(initial=0)
+    ingroup_punishment = models.IntegerField(verbose_name=
+                                             'Sending deduction tokens to your group member',
+                                             min=0,
+                                             max=Constants.punishment_endowment,
+                                             )
+    outgroup_punishment = models.IntegerField(verbose_name=
+                                              'Sending deduction tokens to another group member',
+                                              min=0,
+                                              max=Constants.punishment_endowment,
+                                              )
     participant_vars_dump = models.CharField()

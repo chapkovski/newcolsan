@@ -3,6 +3,7 @@ from otree.api import (
     Currency as c, currency_range
 )
 import random
+from os import environ
 from colsan_small.models import Constants as pggConstants
 
 # from settings import SESSION_CONFIGS
@@ -22,7 +23,7 @@ class Constants(BaseConstants):
     # first waiting page
     # before he or she has an option to finish the game without waiting for
     # others
-    startwp_timer = 300
+    startwp_timer = int(environ.get('STARTWP_TIMEOUT', 300))
 
 
 class Subsession(BaseSubsession):
