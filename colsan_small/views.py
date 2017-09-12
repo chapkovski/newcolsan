@@ -227,7 +227,7 @@ class DropOutFinal(Page):
             no_participation_fee = True
         else:
             no_participation_fee = False
-
+        tot_game_payoff = self.participant.payoff - self.player.payoff_minutes_waited
         others_dropouts = (not self.player.participant.vars.get('dropout', False)) and self.group.dropout_exists
         return {'early_dropout': early_dropout,
                 'itself_dropout': self.player.participant.vars.get('dropout', False),
