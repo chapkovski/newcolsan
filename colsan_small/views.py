@@ -6,8 +6,8 @@ from customwp.views import CustomWaitPage, CustomPage
 from itertools import cycle
 from random import shuffle
 from functions import debug_session
-import math
 from otree.api import Currency as c
+from otree.models_concrete import PageCompletion
 
 
 def vars_for_all_templates(self):
@@ -169,12 +169,6 @@ class WaitResults(CustomWaitPage):
 class Results(MyPage):
     timeout_seconds = 240
 
-    # def get_timeout_seconds(self):
-    #     if debug_session(self):
-    #         return 30000
-    #     reutnr
-    #     self.timeout_seconds
-
     def vars_for_template(self):
         partner = [_ for _ in self.player.get_others_in_group()
                    if _.pair == self.player.pair][0]
@@ -184,8 +178,24 @@ class Results(MyPage):
 
 class FinalResults(MyPage):
     timeout_seconds = 900
+
     def extra_is_displayed(self):
-        from otree.models_concrete import PageCompletion
+        self.player.participant_vars_dump = self.participant.vars
+        return self.round_number == Constants.num_rounds
+
+    def vars_for_template(self):
+        tot_game_payoff = self.participant.payoff - self.player.payoff_minutes_waited
+        return {'last_round_payoff': self.player.payoff - self.player.payoff_minutes_waited,
+                'tot_game_payoff': tot_game_payoff,
+                'payoff_waiting': c(self.player.payoff_minutes_waited).to_real_world_currency(self.session),
+                'participant_real_currency_payoff': tot_game_payoff.to_real_world_currency(self.session),
+                }
+
+
+class DropOutFinal(Page):
+    timeout_seconds = 900
+
+    def is_displayed(self):
         if self.round_number == Constants.num_rounds:
             waiting_pages = ['StartWP',
                              'FirstRoundWP',
@@ -203,23 +213,6 @@ class FinalResults(MyPage):
             if not self.player.payoff_min_added:
                 self.player.payoff_min_added = True
                 self.player.payoff += self.player.payoff_minutes_waited
-
-        self.player.participant_vars_dump = self.participant.vars
-        return self.round_number == Constants.num_rounds
-
-    def vars_for_template(self):
-        tot_game_payoff=self.participant.payoff-self.player.payoff_minutes_waited
-        return {'last_round_payoff': self.player.payoff - self.player.payoff_minutes_waited,
-                'tot_game_payoff': tot_game_payoff,
-                'payoff_waiting': c(self.player.payoff_minutes_waited).to_real_world_currency(self.session),
-                'participant_real_currency_payoff': tot_game_payoff.to_real_world_currency(self.session),
-                }
-
-
-class DropOutFinal(Page):
-    timeout_seconds = 900
-
-    def is_displayed(self):
         return self.group.dropout_exists and self.round_number == Constants.num_rounds
 
     def vars_for_template(self):
