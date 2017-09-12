@@ -18,7 +18,7 @@ class Constants(BaseConstants):
     players_per_group = 6
     num_others_per_group = players_per_group - 1
     time_to_decide = 120
-    num_rounds = 20
+    num_rounds = 2
     A_group_size = players_per_group / 2 - 1
     B_group_size = players_per_group / 2
     # how much money can be invested into public good project
@@ -38,6 +38,7 @@ class Constants(BaseConstants):
     instructions_stage1_wrapper = 'colsan_small/ins_s1_wrapper.html'
     instructions_stage2_wrapper = 'colsan_small/ins_s2_wrapper.html'
     q6_choices = ['My own', 'A random member of my group']
+    payment_per_minute = c(10)
 
 
 class Subsession(BaseSubsession):
@@ -69,7 +70,6 @@ class Group(BaseGroup):
     def get_subgroup(self, name):
         return [p for p in self.get_players() if p.subgroup == name]
 
-
     def set_payoffs(self):
         for p in self.get_players():
             chosen = [o for o in p.get_others_in_group()
@@ -98,8 +98,8 @@ class Group(BaseGroup):
             p.set_pd_payoff()
             p.punishment_sent = (p.ingroup_punishment or 0) + \
                                 (p.outgroup_punishment or 0)
-            p.payoff_stage2 = p.punishment_endowment - \
-                              p.punishment_sent - \
+            p.punishment_endowment_remain = p.punishment_endowment - p.punishment_sent
+            p.payoff_stage2 = p.punishment_endowment_remain - \
                               p.punishment_received * Constants.punishment_factor
             p.payoff = p.pd_payoff + p.payoff_stage2
 
@@ -165,6 +165,7 @@ class Player(BasePlayer):
     # Stage 1 (PD) payoff received by the pair and multiplied by PD factor
     pd_received_mult = models.IntegerField()
     endowment_remain = models.IntegerField()
+    punishment_endowment_remain = models.IntegerField()
     pun_r_in_mult = models.IntegerField()
     pun_r_out_mult = models.IntegerField()
     # to which subgroup (A or B) the player belongs:
@@ -185,3 +186,6 @@ class Player(BasePlayer):
                                               max=Constants.punishment_endowment,
                                               )
     participant_vars_dump = models.CharField()
+    tot_minutes_waited = models.IntegerField()
+    payoff_minutes_waited = models.FloatField()
+    payoff_min_added = models.BooleanField()

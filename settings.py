@@ -81,10 +81,10 @@ mturk_hit_settings = {
     'keywords': ['bonus', 'choice', 'study', 'academic'],
     'title': 'Academic study on collective decision making (with $2-5 bonus payments)',
     'description': '20 min long study. Participants have to work in groups of 6 mTurkers. If you have any issues please write as immediately at chapkovskii@soziologie.uzh.ch',
-    'frame_height': 800,
+    'frame_height': 1000,
     'preview_template': 'global/MTurkPreview.html',
     'minutes_allotted_per_assignment': 60,
-    'expiration_hours': 6,
+    'expiration_hours': 2,
     # 'grant_qualification_id': '3JQA2VZA3H07L5GGAPCKFZHKDN54IT',  # to prevent retakes
     'qualification_requirements': [
         {

@@ -6,6 +6,8 @@ from customwp.views import CustomWaitPage, CustomPage
 from itertools import cycle
 from random import shuffle
 from functions import debug_session
+import math
+from otree.api import Currency as c
 
 
 def vars_for_all_templates(self):
@@ -14,7 +16,7 @@ def vars_for_all_templates(self):
     return {'max_pd': max_pd,
             'egoistic_pd': egoistic_pd,
             'base_points': round(1 / self.session.config['real_world_currency_per_point']),
-            'participant_real_currency_payoff': self.participant.payoff.to_real_world_currency(self.session),
+            'payment_per_minute_in_usd': Constants.payment_per_minute.to_real_world_currency(self.session),
             }
 
 
@@ -182,8 +184,35 @@ class Results(MyPage):
 
 class FinalResults(MyPage):
     def extra_is_displayed(self):
+        from otree.models_concrete import PageCompletion
+        if self.round_number == Constants.num_rounds:
+            waiting_pages = ['StartWP',
+                             'FirstRoundWP',
+                             'FirstWaitPD',
+                             'WaitPD',
+                             'WaitResults',
+                             ]
+
+            wp_sec_in_min = sum(PageCompletion.objects.filter(participant=self.player.participant,
+                                                              page_name__in=waiting_pages).values_list(
+                'seconds_on_page',
+                flat=True)) / 60
+            self.player.tot_minutes_waited = round(wp_sec_in_min, 2)
+            self.player.payoff_minutes_waited = round(wp_sec_in_min * Constants.payment_per_minute, 2)
+            if not self.player.payoff_min_added:
+                self.player.payoff_min_added = True
+                self.player.payoff += self.player.payoff_minutes_waited
+
         self.player.participant_vars_dump = self.participant.vars
         return self.round_number == Constants.num_rounds
+
+    def vars_for_template(self):
+        tot_game_payoff=self.participant.payoff-self.player.payoff_minutes_waited
+        return {'last_round_payoff': self.player.payoff - self.player.payoff_minutes_waited,
+                'tot_game_payoff': tot_game_payoff,
+                'payoff_waiting': c(self.player.payoff_minutes_waited).to_real_world_currency(self.session),
+                'participant_real_currency_payoff': tot_game_payoff.to_real_world_currency(self.session),
+                }
 
 
 class DropOutFinal(Page):
@@ -204,11 +233,16 @@ class DropOutFinal(Page):
             no_participation_fee = True
         else:
             no_participation_fee = False
+
         others_dropouts = (not self.player.participant.vars.get('dropout', False)) and self.group.dropout_exists
         return {'early_dropout': early_dropout,
                 'itself_dropout': self.player.participant.vars.get('dropout', False),
                 'others_dropouts': others_dropouts,
-                'no_participation_fee': no_participation_fee}
+                'no_participation_fee': no_participation_fee,
+                'last_round_payoff': self.player.payoff - self.player.payoff_minutes_waited,
+                'payoff_waiting': c(self.player.payoff_minutes_waited).to_real_world_currency(self.session),
+                'participant_real_currency_payoff': tot_game_payoff.to_real_world_currency(self.session),
+                }
 
 
 page_sequence = [

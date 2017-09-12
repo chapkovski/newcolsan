@@ -10,9 +10,21 @@
     </style>
 {% endblock %}
 {% block content %}
-    <h3>Please wait, other participants are connecting...</h3>
+    {{ block.super }}
 
-    {% include 'global/OutOfGameReminder.html' %}
+
+<div class="bs-callout bs-callout-info">
+    <h4>Leaving the study:</h4>
+    <p>On average the waiting time is less than 1 minute. </p>
+    <p>If you don’t want to wait, you can quit the waiting page immediately, and <b>RETURN THIS HIT</b>.</p>
+    <p>If you choose to wait and other participants will not be here in <b>{{ OOG_time_minutes }}
+        minute{{ OOG_time_minutes|pluralize }}</b>,
+        you will be able to <b>finish this study</b> and receive the participation fee of {{ session.config.participation_fee }}
+        plus everything you have earned by waiting.</p>
+    <p id="waiting_profit_counter">
+    </p>
+</div>
+
     {% if subsession.not_enough_players %}
 
         <div id="not_enough_players" class="alert alert-danger" role="alert">
@@ -47,7 +59,7 @@
         </div>
         <br>
     </form>
-     {{ block.super }}
+
 {% endblock %}
 
 {% block scripts %}

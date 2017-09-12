@@ -8,6 +8,10 @@ from colsan_small.models import Constants as pggConstants
 import math
 
 
+def vars_for_all_templates(self):
+    return {'payment_per_minute_in_usd': Constants.payment_per_minute.to_real_world_currency(self.session), }
+
+
 def stay_with(page):
     is_dropout = page.player.participant.vars.get('dropout', False)
     is_out_of_game = page.player.participant.vars.get('outofthegame', False)
@@ -26,6 +30,7 @@ class CustomWaitPage(WaitPage):
 
 class CustomPage(Page):
     timeout_seconds = 60
+
     def is_displayed(self):
         return self.extra_is_displayed() and stay_with(self)
 
@@ -70,6 +75,7 @@ class StartWP(CustomWaitPage):
         if len(slowpokes) + len(waiting_players) < pggConstants.players_per_group:
             self.subsession.not_enough_players = True
         if endofgame:
+
             curplayer = [p for p in waiting_players if p.pk == int(endofgame)][0]
             curplayer.participant.vars['outofthegame'] = True
             curplayer.outofthegame = True

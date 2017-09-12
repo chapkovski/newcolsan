@@ -24,8 +24,8 @@
 
         </tr>
         <tr>
-            <th class='leftjust '>You have left out of your initial endowment:</th>
-            <td class="sign">+</td>
+            <th class='leftjust '>You have left out of your endowment in Stage 1:</th>
+            <td class="sign"></td>
             <th class="">{{ player.endowment_remain }}</th>
         </tr>
         <tr>
@@ -59,7 +59,7 @@
             </tr>
             <tr>
                 <th class='leftjust'>Endowment:</th>
-                <td class="sign">+</td>
+                <td class="sign"></td>
                 <td>{{ player.punishment_endowment }}</td>
             </tr>
             <tr>
@@ -68,18 +68,20 @@
                 <td>{{ player.punishment_sent }}</td>
             </tr>
             <tr>
-                <th class='leftjust'>Deduction tokens you received from another group
-                    <small>(multiplied by <b>{{ Constants.punishment_factor }})</small>
-                    :
+                <th class='leftjust '>You have left out of your endowment in Stage 2:</th>
+                <td class="sign"></td>
+                <th class="">{{ player.punishment_endowment_remain }}</th>
+            </tr>
+
+            <tr>
+                <th class='leftjust'>Your payoff was decreased by the members of another group by:
                 </th>
                 <td class="sign">-</td>
                 <td> {{ player.pun_r_out_mult }}</td>
             </tr>
             {% if session.config.ingroup %}
                 <tr>
-                    <th class='leftjust'>Deduction tokens you received from your group
-                        <small>(multiplied by <b>{{ Constants.punishment_factor }})</small>
-                        :
+                    <th class='leftjust'>Your payoff was decreased by the members of your group by:
                     </th>
                     <td class="sign">-</td>
                     <td>{{ player.pun_r_in_mult }} </td>
