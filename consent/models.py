@@ -1,3 +1,4 @@
+from os import environ
 from otree.api import (
     models, widgets, BaseConstants, BaseSubsession, BaseGroup, BasePlayer,
     Currency as c, currency_range
@@ -18,7 +19,7 @@ class Constants(BaseConstants):
     players_per_group = None
     num_others_per_group = pggConstants.num_others_per_group
     num_rounds = 1
-    consent_timeout = 300
+    consent_timeout = int(environ.get('CONSENT_TIMEOUT', 300))
 
     startwp_timer = CWPConstants.startwp_timer
 
