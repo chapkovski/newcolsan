@@ -167,13 +167,13 @@ class WaitResults(CustomWaitPage):
 
 
 class Results(MyPage):
-    timeout_seconds = 180
+    timeout_seconds = 240
 
-    def get_timeout_seconds(self):
-        if debug_session(self):
-            return 30000
-        reutnr
-        self.timeout_seconds
+    # def get_timeout_seconds(self):
+    #     if debug_session(self):
+    #         return 30000
+    #     reutnr
+    #     self.timeout_seconds
 
     def vars_for_template(self):
         partner = [_ for _ in self.player.get_others_in_group()
@@ -183,6 +183,7 @@ class Results(MyPage):
 
 
 class FinalResults(MyPage):
+    timeout_seconds = 900
     def extra_is_displayed(self):
         from otree.models_concrete import PageCompletion
         if self.round_number == Constants.num_rounds:
