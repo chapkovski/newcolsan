@@ -157,7 +157,7 @@ SESSION_CONFIGS = [
         'name': 'colsan_small',
         'display_name': 'Stage 1 version for mTurk',
         'num_demo_participants': 6,
-        'app_sequence': ['consent', 'customwp', 'colsan_small', 'survey'],
+        'app_sequence': ['consent', 'customwp', 'colsan_small',],
         'colsan': False,
         'ingroup': False,
         'outgroup': True,
