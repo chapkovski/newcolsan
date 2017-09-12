@@ -188,3 +188,4 @@ class Player(BasePlayer):
     tot_minutes_waited = models.IntegerField()
     payoff_minutes_waited = models.FloatField()
     payoff_min_added = models.BooleanField()
+    is_dropout = models.BooleanField(default=False)
