@@ -170,6 +170,7 @@ SESSION_CONFIGS = [
         'app_sequence': ['consent','survey'],
         'participation_fee': 0.5,
         'mturk_hit_settings': noreq_mturk_hit_settings,
+        'preview_template': 'global/MTurkPreviewSinglePlayer.html',
     },
     # {
     #     'name': 'nocolsan',
