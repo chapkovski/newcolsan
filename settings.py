@@ -161,7 +161,7 @@ SESSION_CONFIGS = [
         'colsan': False,
         'ingroup': True,
         'outgroup': True,
-        'debug': True
+        'debug': False
     },
     {
         'name': 'survey',
