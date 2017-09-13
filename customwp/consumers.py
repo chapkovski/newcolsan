@@ -23,10 +23,9 @@ def send_message(message, session_code, index_in_pages, participant_code, player
     url = curparticipant._url_i_should_be_on()
     Page = get_view_from_url(url)
     app_name = Page.__module__.split('.')[0]
-    print('AAAAPPPPNAME ', app_name)
     models_module = get_models_module(app_name)
-    print('MMMMMODLLLUS MODLUE  ', models_module)
     if app_name!='otree':
+        # CHECK IF WE CAN FIND THIS PLAYER. IF NOT, DO NOTHING!!!!!!
         curplayer = models_module.Player.objects.get(pk=player_pk)
         subsession = curplayer.subsession
         those_with_us = []
