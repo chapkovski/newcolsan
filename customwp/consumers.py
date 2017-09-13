@@ -73,4 +73,4 @@ def ws_message(message, subsession, index_in_pages, player_pk):
 def ws_disconnect(message, session_code, index_in_pages, participant_code, player_pk, group_pk):
     print('somebody disconnected...')
     Group(get_group_name(session_code, index_in_pages, group_pk)).discard(message.reply_channel)
-    send_message(message, session_code, index_in_pages, participant_code, player_pk, group_pk)
+    # send_message(message, session_code, index_in_pages, participant_code, player_pk, group_pk)
