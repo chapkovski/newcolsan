@@ -190,8 +190,7 @@ class Pun(MyPage):
                 g.save()
 
     def get_timeout_seconds(self):
-        if debug_session(self):
-            return 30000
+        return 240
         if self.round_number > 1:
             return Constants.time_to_decide
         return Constants.time_to_decide + 30
