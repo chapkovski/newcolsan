@@ -122,6 +122,7 @@ class PD(MyPage):
                 g.save()
 
     def get_timeout_seconds(self):
+        return 240
         if debug_session(self):
             return 30000
         if self.round_number > 1:
