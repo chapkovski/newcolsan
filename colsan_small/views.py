@@ -1,6 +1,6 @@
 from . import models
 from ._builtin import Page, WaitPage
-from .models import Constants, Player
+from .models import Constants, Player, Group
 import random
 from customwp.views import CustomWaitPage, CustomPage
 from itertools import cycle
@@ -8,6 +8,12 @@ from random import shuffle
 from functions import debug_session
 from otree.api import Currency as c
 from otree.models_concrete import PageCompletion
+import time
+
+
+# class WP(WaitPage):
+#     def after_all_players_arrive(self):
+
 
 
 def vars_for_all_templates(self):
@@ -31,32 +37,53 @@ class MyPage(CustomPage):
     timeout_seconds = Constants.time_to_decide
 
     def is_displayed(self):
-        dropouts_not_shown = super().is_displayed()
-        return self.extra_is_displayed() and not self.group.dropout_exists and dropouts_not_shown
+        out_of_game = self.participant.vars.get('outofthegame', False)
+        return self.extra_is_displayed() and not self.group.has_dropout and not out_of_game
 
     def extra_is_displayed(self):
         return True
 
 
 class FirstWaitPD(CustomWaitPage):
-    def extra_is_displayed(self):
-        return not self.group.dropout_exists
+    # def is_displayed(self):
+    #     return True
+
+    def is_displayed(self):
+        if self.round_number > 1:
+            self.group.has_dropout = self.group.in_round(self.round_number - 1).has_dropout
+            if self.group.has_dropout:
+                groups_in_all_rounds = Group.objects.filter(session=self.session,
+                                                            id_in_subsession=self.group.id_in_subsession)
+                for g in groups_in_all_rounds:
+                    g.has_dropout = self.group.has_dropout
+                    g.save()
+        out_of_game = self.participant.vars.get('outofthegame', False)
+        return not self.group.has_dropout and not out_of_game
 
     def after_all_players_arrive(self):
-        allplayers = self.group.get_players()
-        random.shuffle(allplayers)
-        sg = cycle(Constants.groupset)
+        if self.round_number > 1:
+            self.group.has_dropout = self.group.in_round(self.round_number - 1).has_dropout
+            if self.group.has_dropout:
+                groups_in_all_rounds = Group.objects.filter(session=self.session,
+                                                            id_in_subsession=self.group.id_in_subsession)
+                for g in groups_in_all_rounds:
+                    g.has_dropout = self.group.has_dropout
+                    g.save()
+        if not self.group.has_dropout:
+            allplayers = self.group.get_players()
+            random.shuffle(allplayers)
+            sg = cycle(Constants.groupset)
 
-        for i, p in enumerate(allplayers):
-            if self.round_number == 1:
-                p.subgroup = next(sg)
-            else:
-                p.subgroup = p.in_round(1).subgroup
-        for k, v in self.group.subgroups.items():
-            pairs = Constants.threesome
-            shuffle(pairs)
-            for i, p in enumerate(v):
-                p.pair = pairs[i]
+            for i, p in enumerate(allplayers):
+                if self.round_number == 1:
+                    p.subgroup = next(sg)
+                else:
+                    p.subgroup = p.in_round(1).subgroup
+            for k, v in self.group.subgroups.items():
+                pairs = Constants.threesome
+                shuffle(pairs)
+                for i, p in enumerate(v):
+                    p.pair = pairs[i]
 
 
 class InstructionsStage1(MyPage):
@@ -74,15 +101,25 @@ class InstructionsStage2(MyPage):
 
 
 class PD(MyPage):
+    def is_displayed(self):
+        self.player.refresh_from_db()
+        self.group.refresh_from_db()
+        has_dropout = any([g.has_dropout for g in self.group.in_all_rounds()])
+        out_of_game = self.participant.vars.get('outofthegame', False)
+        return not has_dropout and not out_of_game
+
     form_model = models.Player
     form_fields = ['pd_decision']
 
     def before_next_page(self):
-        if debug_session(self) and self.timeout_happened:
-            return
         if self.timeout_happened:
-            self.player.is_dropout = True
-            self.player.participant.vars['dropout'] = True
+            self.group.has_dropout = True
+            self.group.save()
+            groups_in_all_rounds = Group.objects.filter(session=self.session,
+                                                        id_in_subsession=self.group.id_in_subsession)
+            for g in groups_in_all_rounds:
+                g.has_dropout = self.group.has_dropout
+                g.save()
 
     def get_timeout_seconds(self):
         if debug_session(self):
@@ -93,13 +130,21 @@ class PD(MyPage):
 
 
 class WaitPD(CustomWaitPage):
+    def is_displayed(self):
+        out_of_game = self.participant.vars.get('outofthegame', False)
+        has_dropout = any([g.has_dropout for g in self.group.in_all_rounds()])
+        return not has_dropout and not out_of_game
+
     def after_all_players_arrive(self):
-        allplayers = self.group.get_players()
-        for p in allplayers:
-            # we define the which random pair will be shown to the participants
-            p.random_id = random.choice([_ for _ in
-                                         Constants.threesome if _ != p.pair])
-            p.set_pd_payoff()
+        has_dropout = any([g.has_dropout for g in self.group.in_all_rounds()])
+        if not has_dropout:
+            allplayers = self.group.get_players()
+            for p in allplayers:
+                # we define the which random pair will be shown to the participants
+                p.random_id = random.choice([_ for _ in
+                                             Constants.threesome if _ != p.pair])
+                if not p.group.has_dropout:
+                    p.set_pd_payoff()
 
 
 class Pun(MyPage):
@@ -135,11 +180,14 @@ class Pun(MyPage):
             return 'Total amount of deduction points should not be more than {}'.format(Constants.punishment_endowment)
 
     def before_next_page(self):
-        if debug_session(self) and self.timeout_happened:
-            return
         if self.timeout_happened:
-            self.player.is_dropout = True
-            self.player.participant.vars['dropout'] = True
+            self.group.has_dropout = True
+            self.group.save()
+            groups_in_all_rounds = Group.objects.filter(session=self.session,
+                                                        id_in_subsession=self.group.id_in_subsession)
+            for g in groups_in_all_rounds:
+                g.has_dropout = self.group.has_dropout
+                g.save()
 
     def get_timeout_seconds(self):
         if debug_session(self):
@@ -151,19 +199,13 @@ class Pun(MyPage):
 
 class WaitResults(CustomWaitPage):
     # template_name = 'colsan/WaitResults.html'
-
-    def after_all_players_arrive(self):
-        self.group.set_payoffs()
-
-
-class WaitResults(CustomWaitPage):
-    # template_name = 'colsan/WaitResults.html'
     def extra_is_displayed(self):
-        return not self.group.dropout_exists
+        out_of_game = self.participant.vars.get('outofthegame', False)
+        return not self.group.has_dropout and not out_of_game
 
     def after_all_players_arrive(self):
-        self.group.no_dropouts = True
-        self.group.set_payoffs()
+        if not self.group.has_dropout:
+            self.group.set_payoffs()
 
 
 class Results(MyPage):
@@ -215,7 +257,7 @@ class DropOutFinal(Page):
             if not self.player.payoff_min_added:
                 self.player.payoff_min_added = True
                 self.player.payoff += self.player.payoff_minutes_waited
-        return self.group.dropout_exists and self.round_number == Constants.num_rounds
+        return self.group.has_dropout and self.round_number == Constants.num_rounds
 
     def vars_for_template(self):
 
@@ -228,7 +270,7 @@ class DropOutFinal(Page):
         tot_game_payoff = self.participant.payoff - self.player.payoff_minutes_waited
         others_dropouts = (not self.player.participant.vars.get('dropout', False)) and self.group.dropout_exists
         return {'early_dropout': early_dropout,
-                'tot_game_payoff':tot_game_payoff,
+                'tot_game_payoff': tot_game_payoff,
                 'itself_dropout': self.player.participant.vars.get('dropout', False),
                 'others_dropouts': others_dropouts,
                 'no_participation_fee': no_participation_fee,

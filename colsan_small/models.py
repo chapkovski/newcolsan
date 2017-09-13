@@ -50,12 +50,11 @@ class Subsession(BaseSubsession):
 
 
 class Group(BaseGroup):
-    no_dropouts = models.BooleanField()
+    has_dropout = models.BooleanField(initial=False)
 
     @property
     def dropout_exists(self):
         dropouts = [p for p in self.get_players() if p.participant.vars.get('dropout', False)]
-
         if len(dropouts) > 0:
             return True
         return False
@@ -145,7 +144,7 @@ class Player(BasePlayer):
                 'outgroup_member': outgroup_member, }
 
     def set_pd_payoff(self):
-        self.pd_received_mult = self.my_pair.pd_decision * Constants.pd_factor
+        self.pd_received_mult = (self.my_pair.pd_decision or 0) * Constants.pd_factor
         self.endowment_remain = Constants.endowment - self.pd_decision
         self.pd_payoff = self.pd_received_mult + self.endowment_remain
 
@@ -171,7 +170,7 @@ class Player(BasePlayer):
     # to which subgroup (A or B) the player belongs:
     subgroup = models.CharField()
     pd_decision = models.IntegerField(verbose_name='Your sending decision', min=0, max=Constants.endowment,
-                                       )
+                                      )
     pd_payoff = models.IntegerField(initial=0)
     payoff_stage2 = models.IntegerField(initial=0)
     ingroup_punishment = models.IntegerField(verbose_name=

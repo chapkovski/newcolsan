@@ -108,13 +108,12 @@ mturk_hit_settings = {
     ],
 }
 
-
 noreq_mturk_hit_settings = {
     'keywords': ['bonus', 'choice', 'study', 'academic'],
     'title': '5 min survey about your experience in interactive experiments in mTurk',
     'description': 'A brief questionnaire about interactive experiments in mTurk',
     'frame_height': 800,
-     'preview_template': 'global/MTurkPreviewSinglePlayer.html',
+    'preview_template': 'global/MTurkPreviewSinglePlayer.html',
     'minutes_allotted_per_assignment': 20,
     'expiration_hours': 1,
 
@@ -157,17 +156,18 @@ SESSION_CONFIGS = [
         'name': 'colsan_small',
         'display_name': 'Stage 1 version for mTurk',
         'num_demo_participants': 6,
-        'app_sequence': ['consent', 'customwp', 'colsan_small',],
+        'app_sequence': ['consent', 'customwp', 'colsan_small', ],
         'colsan': False,
         'ingroup': True,
         'outgroup': True,
-        'debug': False
+        'debug': False,
+
     },
     {
         'name': 'survey',
         'display_name': 'survey test',
         'num_demo_participants': 1,
-        'app_sequence': ['consent','survey'],
+        'app_sequence': ['consent', 'survey'],
         'participation_fee': 0.5,
         'mturk_hit_settings': noreq_mturk_hit_settings,
 

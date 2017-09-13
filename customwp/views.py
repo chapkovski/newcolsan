@@ -13,9 +13,8 @@ def vars_for_all_templates(self):
 
 
 def stay_with(page):
-    is_dropout = page.player.participant.vars.get('dropout', False)
     is_out_of_game = page.player.participant.vars.get('outofthegame', False)
-    return not is_dropout and not is_out_of_game
+    return not is_out_of_game
 
 
 class CustomWaitPage(WaitPage):
