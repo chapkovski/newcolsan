@@ -83,10 +83,18 @@ mturk_hit_settings = {
     'description': '20 min long study. Participants have to work in groups of 6 mTurkers. If you have any issues please write as immediately at chapkovskii@soziologie.uzh.ch',
     'frame_height': 1000,
     'preview_template': 'global/MTurkPreview.html',
-    'minutes_allotted_per_assignment': 60,
-    'expiration_hours': 2,
-    # 'grant_qualification_id': '3JQA2VZA3H07L5GGAPCKFZHKDN54IT',  # to prevent retakes
+    'minutes_allotted_per_assignment': 70,
+    'expiration_hours': 3,
+    'grant_qualification_id': '3OY1URRDRY4R2QV6PQDSN7TCTMNTIF',  # to prevent retakes
     'qualification_requirements': [
+        {
+            'QualificationTypeId': "3BH2VZXPB8PDRPCZKDE5783ZRKC7CF",
+            'Comparator': "DoesNotExist",
+        },
+        {
+            'QualificationTypeId': "3OY1URRDRY4R2QV6PQDSN7TCTMNTIF",
+            'Comparator': "DoesNotExist",
+        },
         {
             'QualificationTypeId': "00000000000000000071",
             'Comparator': "EqualTo",
@@ -104,7 +112,7 @@ mturk_hit_settings = {
             'Comparator': "GreaterThanOrEqualTo",
             "IntegerValues": [100],
         },
-
+# 3BH2VZXPB8PDRPCZKDE5783ZRKC7CF
     ],
 }
 
@@ -163,7 +171,7 @@ SESSION_CONFIGS = [
         'debug': False,
 
     },
-       {
+    {
         'name': 'colsan',
         'display_name': 'Collective sanctions treatment',
         'num_demo_participants': 6,
