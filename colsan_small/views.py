@@ -87,14 +87,14 @@ class FirstWaitPD(CustomWaitPage):
 
 
 class InstructionsStage1(MyPage):
-    timeout_seconds = 240
+    timeout_seconds = 300
 
     def extra_is_displayed(self):
         return self.subsession.round_number == 1
 
 
 class InstructionsStage2(MyPage):
-    timeout_seconds = 240
+    timeout_seconds = 300
 
     def extra_is_displayed(self):
         return self.subsession.round_number == 1
@@ -103,7 +103,7 @@ class InstructionsStage2(MyPage):
 
         if debug_session(self):
             return 30000
-        return 240
+        return 300
 
 
 class PD(MyPage):

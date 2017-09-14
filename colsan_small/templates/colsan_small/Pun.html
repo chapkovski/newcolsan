@@ -17,7 +17,7 @@
                 equal {{ player.punishment_endowment }}) </p>
         </a>
         <a href="" class="list-group-item">
-            <h4 class="list-group-item-heading ">You have been assigned to the <span class="text-danger"><strong>
+            <h4 class="list-group-item-heading ">You belong to the <span class="text-danger"><strong>
                 group {{ player.subgroup }}.</strong></span></h4>
             <p class="list-group-item-text">We now show you the decisions of a <b>randomly</b> chosen pair: one
                 participant from your group ({{ player.subgroup }}) who was
@@ -48,9 +48,10 @@
         </thead>
         <tbody>
         <tr class="warning">
-            <td>Your group member ({{ player.subgroup }}) sent to a group {{ player.another_subgroup_name }} member:</td>
+            <td>Your group member ({{ player.subgroup }}) sent to a group {{ player.another_subgroup_name }} member:
+            </td>
             <td>A group {{ player.another_subgroup_name }} member sent to your group member ({{ player.subgroup }}):
-                </td>
+            </td>
         </tr>
         <tr>
 
@@ -63,7 +64,7 @@
         </tr>
         <tr class="warning">
             <td>Your group member ({{ player.subgroup }}) payoff in Stage 1</td>
-            <td>A group {{ player.another_subgroup_name }} member  payoff in Stage 1</td>
+            <td>A group {{ player.another_subgroup_name }} member payoff in Stage 1</td>
         </tr>
 
         <tr>
@@ -76,8 +77,9 @@
         </tr>
         <tr>
             <th>How many deduction points you send to your group member ({{ player.subgroup }}):</th>
-            <th>How many deduction points you send to a {% if session.config.colsan%}random{% endif %}
-                group {{ player.another_subgroup_name }} member:</th>
+            <th>How many deduction points you send to a {% if session.config.colsan %}random{% endif %}
+                group {{ player.another_subgroup_name }} member:
+            </th>
         </tr>
         <tr>
             <td>
@@ -115,10 +117,15 @@
     {% if session.config.colsan  and  session.config.outgroup %}
         <div class="alert alert-warning alert-dismissable">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-            If you send deduction points to a Participant of another group ({{ player.another_subgroup_name }}), an income of a <b>random</b>
-            participant from group {{ player.another_subgroup_name }}
-            will
-            be decreased.
+            <p>If you send deduction points to a Participant of another group ({{ player.another_subgroup_name }}), an
+                income of a <b>random</b>
+                participant from group {{ player.another_subgroup_name }}
+                will
+                be decreased.</p>
+            <p>
+                <strong>Remember that deduction points you send, are multiplied by 3, i.e. if you send 2 deduction points, the
+                income of the other participant will be decreased by 6 points</strong>
+            </p>
         </div>
 
 
