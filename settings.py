@@ -95,6 +95,11 @@ mturk_hit_settings = {
             }]
         },
         {
+            'QualificationTypeId': "00000000000000000000",
+            'Comparator': "GreaterThanOrEqualTo",
+            "IntegerValues": [80],
+        },
+        {
             'QualificationTypeId': "000000000000000000L0",
             'Comparator': "GreaterThanOrEqualTo",
             "IntegerValues": [90],
@@ -163,7 +168,7 @@ SESSION_CONFIGS = [
         'debug': False,
 
     },
-       {
+    {
         'name': 'colsan',
         'display_name': 'Collective sanctions treatment',
         'num_demo_participants': 6,
