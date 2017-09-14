@@ -18,7 +18,7 @@ doc = """
 class Constants(BaseConstants):
     name_in_url = 'customwp'
     players_per_group = pggConstants.players_per_group
-    num_rounds = 20
+    num_rounds = 1
     # the startwp_timer defines how long the player has to wait at the
     # first waiting page
     # before he or she has an option to finish the game without waiting for
