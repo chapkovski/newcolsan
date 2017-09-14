@@ -92,6 +92,10 @@ mturk_hit_settings = {
             'Comparator': "DoesNotExist",
         },
         {
+            'QualificationTypeId': "3OY1URRDRY4R2QV6PQDSN7TCTMNTIF",
+            'Comparator': "DoesNotExist",
+        },
+        {
             'QualificationTypeId': "00000000000000000071",
             'Comparator': "EqualTo",
             'LocaleValues': [{
