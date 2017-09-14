@@ -14,16 +14,23 @@
                 at the beginning of this round. </p>
         </a>
         <a href="" class="list-group-item">
+            <h4 class="list-group-item-heading ">You have been assigned to the <span class="text-danger"><strong>
+                group {{ player.subgroup }}.</strong></span></h4>
+            <p class="list-group-item-text">
+                You are matched with a random participant from group {{ player.another_subgroup_name }}.
+            </p>
+        </a>
+        <a href="" class="list-group-item">
             <h4 class="list-group-item-heading">Sending points to another participant</h4>
             <p class="list-group-item-text">You can send from 0 to {{ Constants.endowment }}
-                point{{ Constants.endowment|pluralize }} to another participant from
+                point{{ Constants.endowment|pluralize }} to the participant of
                 group {{ player.another_subgroup_name }},
                 with whom you are matched in this round.
             </p>
         </a>
         <a href="" class="list-group-item">
             <h4 class="list-group-item-heading">Receiving points from another participant</h4>
-            <p class="list-group-item-text">At the same time another participant with whom you are matched <b>will also
+            <p class="list-group-item-text">At the same time participant with whom you are matched <b>will also
                 take the decision</b> about sending points to you.</p>
         </a>
         <a href="" class="list-group-item">
