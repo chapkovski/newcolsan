@@ -38,7 +38,7 @@ class Constants(BaseConstants):
     instructions_stage1_wrapper = 'colsan_small/ins_s1_wrapper.html'
     instructions_stage2_wrapper = 'colsan_small/ins_s2_wrapper.html'
     q6_choices = ['My own', 'A random member of my group']
-    payment_per_minute = c(15)
+    payment_per_minute = c(20)
 
 
 class Subsession(BaseSubsession):

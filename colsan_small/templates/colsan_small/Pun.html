@@ -13,27 +13,32 @@
                 can use to send deduction tokens to
                 other participants or to keep for yourself. </p>
             <p class="list-group-item-text">You can send to each of the two participants from 0
-                to {{ player.punishment_endowment }} points (so that sum of these two amounts is less or equal {{ player.punishment_endowment }}) </p>
+                to {{ player.punishment_endowment }} points (so that sum of these two amounts is less or
+                equal {{ player.punishment_endowment }}) </p>
         </a>
         <a href="" class="list-group-item">
-            <h4 class="list-group-item-heading">You have been assigned to the <strong>
-                group {{ player.subgroup }}.</strong></h4>
+            <h4 class="list-group-item-heading ">You have been assigned to the <span class="text-danger"><strong>
+                group {{ player.subgroup }}.</strong></span></h4>
             <p class="list-group-item-text">We now show you the decisions of a <b>randomly</b> chosen pair: one
                 participant from your group ({{ player.subgroup }}) who was
-                matched with one participant from another group ({{ player.another_subgroup_name }}).
+                matched with one participant from the other group ({{ player.another_subgroup_name }}).
             </p>
         </a>
+        {% if  session.config.colsan %}
+            <div class="bs-callout bs-callout-danger">
+                <p>
+                    If you decide to send 1 deduction point to a member of the other group, the income of a
+                    <b>randomly</b>
+                    chosen
+                    member of the other group will be decreased by 3 points. If you decide to send 1 deduction point to
+                    a
+                    member of your own group, the income of the participant, <b>whose decision you see</b>, will be
+                    decreased by 3 points.
 
-        <a href="" class="list-group-item">
-            <h4 class="list-group-item-heading">Multiplication of deduction points</h4>
-            <p class="list-group-item-text">
-                If you send <b>1</b>
-                deduction token to a participant , your endowment will be
-                decreased by <b>1</b>&nbsp;point, but a payoff of this specific Participant will be
-                decreased by <b>{{ Constants.punishment_factor }}</b>&nbsp;points.
-            </p>
+                </p>
+            </div>
+        {% endif %}
 
-        </a>
     </div>
 
 
@@ -42,9 +47,10 @@
 
         </thead>
         <tbody>
-        <tr>
-            <td>Participant {{ player.subgroup }} sent to Participant {{ player.another_subgroup_name }}</td>
-            <td>Participant {{ player.another_subgroup_name }} sent to Participant {{ player.subgroup }}</td>
+        <tr class="warning">
+            <td>Your group member ({{ player.subgroup }}) sent to a group {{ player.another_subgroup_name }} member:</td>
+            <td>A group {{ player.another_subgroup_name }} member sent to your group member ({{ player.subgroup }}):
+                </td>
         </tr>
         <tr>
 
@@ -55,9 +61,9 @@
                 <div class="sliders out_sliders" id="pd_outgroup"></div>
             </td>
         </tr>
-        <tr>
-            <td>Participant {{ player.subgroup }} payoff in Stage 1</td>
-            <td>Participant {{ player.another_subgroup_name }} payoff in Stage 1</td>
+        <tr class="warning">
+            <td>Your group member ({{ player.subgroup }}) payoff in Stage 1</td>
+            <td>A group {{ player.another_subgroup_name }} member  payoff in Stage 1</td>
         </tr>
 
         <tr>
@@ -69,8 +75,9 @@
             </td>
         </tr>
         <tr>
-            <th>How many deduction tokens you send to Participant {{ player.subgroup }}</th>
-            <th>How many deduction tokens you send to Participant {{ player.another_subgroup_name }}</th>
+            <th>How many deduction points you send to your group member ({{ player.subgroup }}):</th>
+            <th>How many deduction points you send to a {% if session.config.colsan%}random{% endif %}
+                group {{ player.another_subgroup_name }} member:</th>
         </tr>
         <tr>
             <td>
@@ -84,23 +91,21 @@
                 {% endif %}
             </td>
         </tr>
-        <tr>
-            <td colspan="2">
-                <div id="inputslider"></div>
-            </td>
-        </tr>
-        <tr>
-            <td>Participant {{ player.subgroup }}'s payoff after that:</td>
-            <td>Participant {{ player.another_subgroup_name }}'s payoff after that:</td>
-        </tr>
-        <tr>
-            <td>
-                <div class="sliders in_sliders" id="payoff_in_after"></div>
-            </td>
-            <td>
-                <div class="sliders out_sliders" id="payoff_out_after"></div>
-            </td>
-        </tr>
+        {% if not  session.config.colsan %}
+            <tr class="warning">
+                <td>Participant {{ player.subgroup }}'s payoff after that:</td>
+                <td>Participant {{ player.another_subgroup_name }}'s payoff after that:</td>
+            </tr>
+
+            <tr>
+                <td>
+                    <div class="sliders in_sliders" id="payoff_in_after"></div>
+                </td>
+                <td>
+                    <div class="sliders out_sliders" id="payoff_out_after"></div>
+                </td>
+            </tr>
+        {% endif %}
         </tbody>
     </table>
 
@@ -110,7 +115,7 @@
     {% if session.config.colsan  and  session.config.outgroup %}
         <div class="alert alert-warning alert-dismissable">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-            If you send the deduction tokens to a Participant {{ player.another_subgroup_name }}, an income of a <b>random</b>
+            If you send deduction points to a Participant of another group ({{ player.another_subgroup_name }}), an income of a <b>random</b>
             participant from group {{ player.another_subgroup_name }}
             will
             be decreased.

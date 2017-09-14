@@ -163,13 +163,15 @@ SESSION_CONFIGS = [
         'debug': False,
 
     },
-    {
-        'name': 'survey',
-        'display_name': 'survey test',
-        'num_demo_participants': 1,
-        'app_sequence': ['consent', 'survey'],
-        'participation_fee': 0.5,
-        'mturk_hit_settings': noreq_mturk_hit_settings,
+       {
+        'name': 'colsan',
+        'display_name': 'Collective sanctions treatment',
+        'num_demo_participants': 6,
+        'app_sequence': ['consent', 'customwp', 'colsan_small', ],
+        'colsan': True,
+        'ingroup': True,
+        'outgroup': True,
+        'debug': False,
 
     },
     # {

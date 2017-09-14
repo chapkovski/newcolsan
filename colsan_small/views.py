@@ -99,6 +99,12 @@ class InstructionsStage2(MyPage):
     def extra_is_displayed(self):
         return self.subsession.round_number == 1
 
+    def get_timeout_seconds(self):
+
+        if debug_session(self):
+            return 30000
+        return 240
+
 
 class PD(MyPage):
     def is_displayed(self):
@@ -113,6 +119,7 @@ class PD(MyPage):
 
     def before_next_page(self):
         if self.timeout_happened:
+            self.player.participant.vars['dropout'] = True
             self.group.has_dropout = True
             self.group.save()
             groups_in_all_rounds = Group.objects.filter(session=self.session,
@@ -122,9 +129,9 @@ class PD(MyPage):
                 g.save()
 
     def get_timeout_seconds(self):
-        return 240
         if debug_session(self):
             return 30000
+        return 240
         if self.round_number > 1:
             return Constants.time_to_decide
         return Constants.time_to_decide + 30
@@ -182,6 +189,7 @@ class Pun(MyPage):
 
     def before_next_page(self):
         if self.timeout_happened:
+            self.player.participant.vars['dropout']=True
             self.group.has_dropout = True
             self.group.save()
             groups_in_all_rounds = Group.objects.filter(session=self.session,
@@ -191,6 +199,8 @@ class Pun(MyPage):
                 g.save()
 
     def get_timeout_seconds(self):
+        if debug_session(self):
+            return 30000
         return 240
         if self.round_number > 1:
             return Constants.time_to_decide
