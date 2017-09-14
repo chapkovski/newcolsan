@@ -25,14 +25,26 @@
     </p>
 </div>
 
+    {% if subsession.not_enough_players %}
 
+        <div id="not_enough_players" class="alert alert-danger" role="alert">
+            Unfortunately, one of the other partipants has left. Now
+            there is no enough participants left to complete the study.
+            <br>
+            Please, click 'Finish the study'.
+            <br>
+            <b>You still will receive your participant fee!</b>
+            <br>
+            We apologise for the inconvenience.
+        </div>
+    {% else %}
         <div id="otree-timeout" class="alert alert-warning" style="display:block;">
             <p>You can finish the study if other participants do not arrive in: <span id="otree-timeout"></span>
 
 
             </p>
         </div>
-
+    {% endif %}
     <div id="part_fee_info" class="alert alert-danger" role="alert" style='display:none;'>
         <b>If you click 'Finish the study' you still will receive your participant fee!</b>
     </div>

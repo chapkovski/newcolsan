@@ -79,7 +79,7 @@ oTree games
 
 mturk_hit_settings = {
     'keywords': ['bonus', 'choice', 'study', 'academic'],
-    'title': 'Academic study on collective decision making (3-4 dollars of bonus depending on performance)',
+    'title': 'Academic study on collective decision making (min. 8$/hour)',
     'description': '20 min long study. Participants have to work in groups of 6 mTurkers. If you have any issues please write as immediately at chapkovskii@soziologie.uzh.ch',
     'frame_height': 1000,
     'preview_template': 'global/MTurkPreview.html',

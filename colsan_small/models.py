@@ -18,7 +18,7 @@ class Constants(BaseConstants):
     players_per_group = 6
     num_others_per_group = players_per_group - 1
     time_to_decide = 120
-    num_rounds = 1
+    num_rounds = 20
     A_group_size = players_per_group / 2 - 1
     B_group_size = players_per_group / 2
     # how much money can be invested into public good project
