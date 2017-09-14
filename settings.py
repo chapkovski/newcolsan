@@ -83,7 +83,7 @@ mturk_hit_settings = {
     'description': '20 min long study. Participants have to work in groups of 6 mTurkers. If you have any issues please write as immediately at chapkovskii@soziologie.uzh.ch',
     'frame_height': 1000,
     'preview_template': 'global/MTurkPreview.html',
-    'minutes_allotted_per_assignment': 60,
+    'minutes_allotted_per_assignment': 90,
     'expiration_hours': 2,
     # 'grant_qualification_id': '3JQA2VZA3H07L5GGAPCKFZHKDN54IT',  # to prevent retakes
     'qualification_requirements': [
@@ -93,11 +93,6 @@ mturk_hit_settings = {
             'LocaleValues': [{
                 'Country': "US",
             }]
-        },
-        {
-            'QualificationTypeId': "00000000000000000000",
-            'Comparator': "GreaterThanOrEqualTo",
-            "IntegerValues": [80],
         },
         {
             'QualificationTypeId': "000000000000000000L0",
