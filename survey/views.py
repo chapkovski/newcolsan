@@ -15,7 +15,7 @@ class Survey(Page):
             return self.form_fields
     def before_next_page(self):
         self.player.last_page=True
-        how_many_passed = len(p for p in self.subsession.get_players() if p.last_page)
+        how_many_passed = len([p for p in self.subsession.get_players() if p.last_page])
         if how_many_passed >= self.session.mturk_num_participants:
             for p in self.subsession.get_players():
                 p.set_payoff()
