@@ -42,6 +42,6 @@ class Player(BasePlayer):
     comment = models.TextField(verbose_name='Please, provide a comment about the current experiment.'
                                             ' If you had any technical issues or questions, any remarks about how the study'
                                             ' was organized, please leave them here. Thank you!')
-
+    last_page = models.BooleanField()
     def set_payoffs(self):
         self.payoff = random.randint(1, 10)
