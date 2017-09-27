@@ -29,6 +29,12 @@ class Survey(Page):
                                      )
                 # Create the queue. This returns an SQS.Queue instance
                 queue = sqs.create_queue(QueueName=self.session.code)
+                # Create a new message
+                response = queue.send_message(MessageBody='world')
+
+                # The response is NOT a resource, but gives you a message ID and MD5
+                print(response.get('MessageId'))
+                print(response.get('MD5OfMessageBody'))
                 # You can now access identifiers and attributes
                 self.subsession.sqs_url = queue.url
                 if self.session.mturk_HITId:
@@ -43,12 +49,22 @@ class Survey(Page):
                             'Transport': 'SQS',
                             'Version': '2006-05-05',
                             'EventTypes': [
-                                'AssignmentReturned',
+                                'AssignmentAccepted', 'AssignmentAbandoned', 'AssignmentReturned',
+                                'AssignmentSubmitted', 'AssignmentRejected', 'AssignmentApproved', 'HITCreated',
+                                'HITExpired', 'HITReviewable', 'HITExtended', 'HITDisposed'
                             ]
                         },
                         Active=True
                     )
                     print('@@@@@@@ ', response)
+                    response = client.send_test_event_notification(
+                        Notification={
+                            'Destination': self.subsession.sqs_url,
+                            'Transport': 'SQS',
+                            'Version': '2006-05-05',
+                        },
+                        TestEventType='AssignmentReturned'
+                    )
 
         return True
 
@@ -65,6 +81,7 @@ class Results(Page):
             # Get the queue
             queue = sqs.get_queue_by_name(QueueName=self.session.code)
             # Process messages by printing out body and optional author name
+            print('AAAAA ', queue.receive_messages())
             for message in queue.receive_messages():
                 print('Hello, {}'.format(message.body, ))
         return True
