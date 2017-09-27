@@ -43,7 +43,7 @@ class Survey(Page):
                     )
                     print('@@@@@@@ ', response)
 
-    return True
+        return True
 
 
 page_sequence = [
