@@ -4,6 +4,8 @@ from ._builtin import Page, WaitPage
 from .models import Constants
 import boto3
 from otree.views.mturk import get_mturk_client
+from django.conf import settings
+
 
 class Survey(Page):
     form_model = models.Player
@@ -50,6 +52,7 @@ class Survey(Page):
 
         return True
 
+
 class Results(Page):
     def is_displayed(self):
         if self.session.mturk_HITId:
@@ -63,8 +66,9 @@ class Results(Page):
             queue = sqs.get_queue_by_name(QueueName=self.session.code)
             # Process messages by printing out body and optional author name
             for message in queue.receive_messages():
-                print('Hello, {}'.format(message.body,))
+                print('Hello, {}'.format(message.body, ))
         return True
+
 
 page_sequence = [
     Survey,
