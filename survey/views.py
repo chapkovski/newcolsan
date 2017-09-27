@@ -8,6 +8,7 @@ from otree.views.mturk import get_mturk_client
 class Survey(Page):
     form_model = models.Player
     form_fields = ['comment']
+    timeout_seconds = 60
 
     def get_form_fields(self):
         if self.session.config.get('name') == 'survey':
@@ -19,7 +20,11 @@ class Survey(Page):
         if self.round_number == 1:
             if not self.subsession.notification_set:
                 self.subsession.notification_set = True
-                sqs = boto3.resource('sqs')
+                sqs = boto3.resource('sqs',
+                                     aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+                                     aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+                                     region_name='us-east-1',
+                                     )
                 # Create the queue. This returns an SQS.Queue instance
                 queue = sqs.create_queue(QueueName=self.session.code)
                 # You can now access identifiers and attributes
@@ -49,9 +54,13 @@ class Results(Page):
     def is_displayed(self):
         if self.session.mturk_HITId:
             # Get the service resource
-            sqs = boto3.resource('sqs')
+            sqs = boto3.resource('sqs',
+                                 aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+                                 aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+                                 region_name='us-east-1',
+                                 )
             # Get the queue
-            queue = sqs.get_queue_by_name(QueueName='test')
+            queue = sqs.get_queue_by_name(QueueName=self.session.code)
             # Process messages by printing out body and optional author name
             for message in queue.receive_messages():
                 print('Hello, {}'.format(message.body,))
