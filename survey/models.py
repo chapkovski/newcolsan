@@ -19,6 +19,9 @@ class Constants(BaseConstants):
 
 class Subsession(BaseSubsession):
     def creating_session(self):
+        print('$$$$$', self.session.mturk_HITId)
+        print('#####', self.session.mturk_use_sandbox)
+
         if self.round_number == 1:
             if self.session.mturk_HITId:
                 if self.session.mturk_use_sandbox:
@@ -36,12 +39,13 @@ class Subsession(BaseSubsession):
                         'Transport': 'Email',
                         'Version': '2006-05-05',
                         'EventTypes': [
-                          'AssignmentReturned',
+                            'AssignmentReturned',
                         ]
                     },
                     Active=True
                 )
-                print(response)
+                print('@@@@@@@ ', response)
+
 
 class Group(BaseGroup):
     pass
