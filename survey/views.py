@@ -50,11 +50,10 @@ class Survey(Page):
                             'Version': '2006-05-05',
                             'EventTypes': [
                                 'AssignmentAccepted', 'AssignmentAbandoned', 'AssignmentReturned',
-                                'AssignmentSubmitted', 'AssignmentRejected', 'AssignmentApproved', 'HITCreated',
-                                'HITExpired', 'HITReviewable', 'HITExtended', 'HITDisposed'
+                                'AssignmentSubmitted', 'HITExpired',
                             ]
                         },
-                        Active=True
+                        Active=True,
                     )
                     print('@@@@@@@ ', response)
                     response = client.send_test_event_notification(
