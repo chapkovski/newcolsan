@@ -13,16 +13,8 @@ class Survey(Page):
             return ['gender', 'q1', 'q2', 'q3', ]
         else:
             return self.form_fields
-    def before_next_page(self):
-        self.player.last_page=True
-        if self.session.mturk_num_participants==-1:
-            numparts= self.session.num_participants
-        else:
-            numparts=self.session.mturk_num_participants
-        how_many_passed = len([p for p in self.subsession.get_players() if p.last_page])
-        if how_many_passed >= numparts:
-            for p in self.subsession.get_players():
-                p.set_payoffs()
+    def is_displayed(self):
+        return True
 
 
 page_sequence = [

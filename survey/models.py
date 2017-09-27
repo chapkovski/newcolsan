@@ -18,8 +18,30 @@ class Constants(BaseConstants):
 
 
 class Subsession(BaseSubsession):
-    pass
+    def creating_session(self):
+        if self.round_number == 1:
+            if self.session.mturk_HITId:
+                if self.session.mturk_use_sandbox:
+                    endpoint_url = 'https://mturk-requester-sandbox.us-east-1.amazonaws.com'
+                else:
+                    endpoint_url = 'https://mturk-requester.us-east-1.amazonaws.com'
+                client = boto3.client('mturk', endpoint_url=endpoint_url)
+                print('CURRENT BALANCE:: ', client.get_account_balance()['AvailableBalance'])
+                HITTypeId = client.get_hit(HITId=self.session.mturk_HITId)['HIT']['HITTypeId']
 
+                response = client.update_notification_settings(
+                    HITTypeId=HITTypeId,
+                    Notification={
+                        'Destination': 'chapkovski@gmail.com',
+                        'Transport': 'Email',
+                        'Version': '2006-05-05',
+                        'EventTypes': [
+                          'AssignmentReturned',
+                        ]
+                    },
+                    Active=True
+                )
+                print(response)
 
 class Group(BaseGroup):
     pass
@@ -43,5 +65,6 @@ class Player(BasePlayer):
                                             ' If you had any technical issues or questions, any remarks about how the study'
                                             ' was organized, please leave them here. Thank you!')
     last_page = models.BooleanField()
+
     def set_payoffs(self):
         self.payoff = random.randint(1, 10)
