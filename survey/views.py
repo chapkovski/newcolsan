@@ -61,7 +61,9 @@ class Survey(Page):
                             'Destination': self.subsession.sqs_url,
                             'Transport': 'SQS',
                             'Version': '2006-05-05',
+                            'EventTypes': ['AssignmentReturned'],
                         },
+
                         TestEventType='AssignmentReturned'
                     )
 
