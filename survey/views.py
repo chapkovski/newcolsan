@@ -3,7 +3,7 @@ from . import models
 from ._builtin import Page, WaitPage
 from .models import Constants
 import boto3
-
+from otree.views.mturk import get_mturk_client
 
 class Survey(Page):
     form_model = models.Player
@@ -22,11 +22,11 @@ class Survey(Page):
             if not self.subsession.notification_set:
                 self.subsession.notification_set = True
                 if self.session.mturk_HITId:
-                    if self.session.mturk_use_sandbox:
-                        endpoint_url = 'https://mturk-requester-sandbox.us-east-1.amazonaws.com'
-                    else:
-                        endpoint_url = 'https://mturk-requester.us-east-1.amazonaws.com'
-                    client = boto3.client('mturk', endpoint_url=endpoint_url)
+                    # if self.session.mturk_use_sandbox:
+                    #     endpoint_url = 'https://mturk-requester-sandbox.us-east-1.amazonaws.com'
+                    # else:
+                    #     endpoint_url = 'https://mturk-requester.us-east-1.amazonaws.com'
+                    client = get_mturk_client(use_sandbox=self.session.mturk_use_sandbox)
                     print('CURRENT BALANCE:: ', client.get_account_balance()['AvailableBalance'])
                     HITTypeId = client.get_hit(HITId=self.session.mturk_HITId)['HIT']['HITTypeId']
 
