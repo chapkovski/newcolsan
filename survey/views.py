@@ -56,16 +56,15 @@ class Survey(Page):
                         Active=True,
                     )
                     print('@@@@@@@ ', response)
-                    response = client.send_test_event_notification(
-                        Notification={
-                            'Destination': self.subsession.sqs_url,
-                            'Transport': 'SQS',
-                            'Version': '2006-05-05',
-                            'EventTypes': ['AssignmentReturned'],
-                        },
-
-                        TestEventType='AssignmentReturned'
-                    )
+                    # response = client.send_test_event_notification(
+                    #     Notification={
+                    #         'Destination': self.subsession.sqs_url,
+                    #         'Transport': 'SQS',
+                    #         'Version': '2006-05-05',
+                    #         'EventTypes': ['AssignmentReturned'],
+                    #     },
+                    #     TestEventType='AssignmentReturned'
+                    # )
 
         return True
 
