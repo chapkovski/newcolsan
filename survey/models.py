@@ -19,6 +19,7 @@ class Constants(BaseConstants):
 
 class Subsession(BaseSubsession):
     notification_set =models.BooleanField()
+    sqs_url = models.CharField()
     def creating_session(self):
         ...
 

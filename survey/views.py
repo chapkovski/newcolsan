@@ -16,16 +16,15 @@ class Survey(Page):
             return self.form_fields
 
     def is_displayed(self):
-        print('$$$$$', self.session.mturk_HITId)
-        print('#####', self.session.mturk_use_sandbox)
         if self.round_number == 1:
             if not self.subsession.notification_set:
                 self.subsession.notification_set = True
+                sqs = boto3.resource('sqs')
+                # Create the queue. This returns an SQS.Queue instance
+                queue = sqs.create_queue(QueueName=self.session.code)
+                # You can now access identifiers and attributes
+                self.subsession.sqs_url = queue.url
                 if self.session.mturk_HITId:
-                    # if self.session.mturk_use_sandbox:
-                    #     endpoint_url = 'https://mturk-requester-sandbox.us-east-1.amazonaws.com'
-                    # else:
-                    #     endpoint_url = 'https://mturk-requester.us-east-1.amazonaws.com'
                     client = get_mturk_client(use_sandbox=self.session.mturk_use_sandbox)
                     print('CURRENT BALANCE:: ', client.get_account_balance()['AvailableBalance'])
                     HITTypeId = client.get_hit(HITId=self.session.mturk_HITId)['HIT']['HITTypeId']
@@ -33,8 +32,8 @@ class Survey(Page):
                     response = client.update_notification_settings(
                         HITTypeId=HITTypeId,
                         Notification={
-                            'Destination': 'chapkovski@gmail.com',
-                            'Transport': 'Email',
+                            'Destination': self.subsession.sqs_url,
+                            'Transport': 'SQS',
                             'Version': '2006-05-05',
                             'EventTypes': [
                                 'AssignmentReturned',
@@ -46,8 +45,19 @@ class Survey(Page):
 
         return True
 
+class Results(Page):
+    def is_displayed(self):
+        if self.session.mturk_HITId:
+            # Get the service resource
+            sqs = boto3.resource('sqs')
+            # Get the queue
+            queue = sqs.get_queue_by_name(QueueName='test')
+            # Process messages by printing out body and optional author name
+            for message in queue.receive_messages():
+                print('Hello, {}'.format(message.body,))
+        return True
 
 page_sequence = [
     Survey,
-
+    Results,
 ]
