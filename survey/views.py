@@ -91,42 +91,43 @@ class Survey(Page):
                         },
                         Active=True,
                     )
-                    response = client.send_test_event_notification(
-                        Notification={
-                            'Destination': q.url,
-                            'Transport': 'SQS',
-                            'Version': '2006-05-05',
-                            'EventTypes': [
-                                'Ping'
-                            ]
-                        },
-                        TestEventType='Ping'
-                    )
+                    print('$$$$$$$$$$$$$$$$$$ ', response)
+                    # response = client.send_test_event_notification(
+                    #     Notification={
+                    #         'Destination': q.url,
+                    #         'Transport': 'SQS',
+                    #         'Version': '2006-05-05',
+                    #         'EventTypes': [
+                    #             'Ping'
+                    #         ]
+                    #     },
+                    #     TestEventType='Ping'
+                    # )
 
         return True
 
 
 class Results(Page):
     def is_displayed(self):
-        if self.session.mturk_HITId:
-            sqs = boto3.resource('sqs',
-                                 aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-                                 aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-                                 region_name='us-east-1',
-                                 )
-            # Get the queue
-            q = sqs.get_queue_by_name(QueueName=self.session.code)
-            counter = 0
-            while len(q.receive_messages()) > 0:
-                counter += 1
-                for message in q.receive_messages():
-                    d = json.loads(message.body)
-                    print(d)
-                    # if d.get('Events'):
-                    #     for e in d['Events']:
-                    #         print('EVENT TYPE: {event}'.format(event=e['EventType']))
-                    #         print('EVENT ASSIGNMENT: {event}'.format(event=e['AssignmentId']))
-                    message.delete()
+        # if self.session.mturk_HITId:
+        #     sqs = boto3.resource('sqs',
+        #                          aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+        #                          aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+        #                          region_name='us-east-1',
+        #                          )
+        #     # Get the queue
+        #     q = sqs.get_queue_by_name(QueueName=self.session.code)
+        #     counter = 0
+        #     while len(q.receive_messages()) > 0:
+        #         counter += 1
+        #         for message in q.receive_messages():
+        #             d = json.loads(message.body)
+        #             print(d)
+        #             # if d.get('Events'):
+        #             #     for e in d['Events']:
+        #             #         print('EVENT TYPE: {event}'.format(event=e['EventType']))
+        #             #         print('EVENT ASSIGNMENT: {event}'.format(event=e['AssignmentId']))
+        #             message.delete()
         return True
 
 
