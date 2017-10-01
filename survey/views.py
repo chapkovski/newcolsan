@@ -22,7 +22,8 @@ class Survey(Page):
         if self.round_number == 1:
             if not self.subsession.notification_set:
                 self.subsession.notification_set = True
-                qname = self.session.code
+                # qname = self.session.code
+                from django.conf import settings
                 sqs = boto3.resource('sqs',
                                      aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
                                      aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
