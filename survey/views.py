@@ -8,6 +8,7 @@ from otree.views.mturk import get_mturk_client
 
 import json
 
+
 class Survey(Page):
     form_model = models.Player
     form_fields = ['comment']
@@ -38,12 +39,12 @@ class Survey(Page):
                     }
                 )
 
-                q =sqs.get_queue_by_name(QueueName=qname)
+                q = sqs.get_queue_by_name(QueueName=qname)
                 #
                 qarn = q.attributes.get('QueueArn')
                 print(qarn)
                 settings = {'qarn': qarn}
-            
+
                 qpolicy = {
                     "Version": "2012-10-17",
                     "Id": "{qarn}/SQSDefaultPolicy".format(**settings),
@@ -82,10 +83,7 @@ class Survey(Page):
                             'Destination': self.subsession.sqs_url,
                             'Transport': 'SQS',
                             'Version': '2006-05-05',
-                            'EventTypes': [
-                                'AssignmentAccepted', 'AssignmentAbandoned', 'AssignmentReturned',
-                                'AssignmentSubmitted', 'HITExpired',
-                            ]
+                            'EventTypes': ['AssignmentAccepted']
                         },
                         Active=True,
                     )
