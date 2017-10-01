@@ -23,7 +23,11 @@ class Survey(Page):
             if not self.subsession.notification_set:
                 self.subsession.notification_set = True
                 qname = self.session.code
-                sqs = boto3.resource('sqs', )
+                sqs = boto3.resource('sqs',
+                                     aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+                                     aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+                                     region_name='us-east-1',
+                                     )
                 response = sqs.create_queue(
                     QueueName=qname,
                     Attributes={
