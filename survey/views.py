@@ -43,7 +43,9 @@ class Survey(Page):
                 qarn = q.attributes.get('QueueArn')
                 print(qarn)
                 settings = {'qarn': qarn}
-
+            #     endpoint_url = 'https://mturk-requester-sandbox.us-east-1.amazonaws.com'
+            # else:
+            #     endpoint_url = 'https://mturk-requester.us-east-1.amazonaws.com'
                 qpolicy = {
                     "Version": "2012-10-17",
                     "Id": "{qarn}/SQSDefaultPolicy".format(**settings),
@@ -52,7 +54,7 @@ class Survey(Page):
                             "Sid": "Sid1506848932798{}".format(self.session.code),
                             "Effect": "Allow",
                             "Principal": {
-                                "Service": "mturk-requester.amazonaws.com"
+                                "Service": "mturk-requester-sandbox.amazonaws.com"
                             },
                             "Action": "SQS:SendMessage",
                             "Resource": qarn,
