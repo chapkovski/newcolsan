@@ -38,7 +38,7 @@ class Survey(Page):
                     }
                 )
 
-                q = boto3.resource("sqs").get_queue_by_name(QueueName=qname)
+                q =sqs.get_queue_by_name(QueueName=qname)
                 #
                 qarn = q.attributes.get('QueueArn')
                 print(qarn)
