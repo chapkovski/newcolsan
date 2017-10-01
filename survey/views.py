@@ -69,21 +69,6 @@ class Survey(Page):
                 q.set_attributes(Attributes=queue_attrs)
                 print(q.attributes)
                 # endpoint_url = 'https://mturk-requester.us-east-1.amazonaws.com'
-                response = boto3.client('mturk',
-                                        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-                                        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-                                        region_name='us-east-1',
-                                        ).send_test_event_notification(
-                    Notification={
-                        'Destination': q.url,
-                        'Transport': 'SQS',
-                        'Version': '2006-05-05',
-                        'EventTypes': [
-                            'Ping'
-                        ]
-                    },
-                    TestEventType='Ping'
-                )
 
 
 
@@ -106,6 +91,18 @@ class Survey(Page):
                         },
                         Active=True,
                     )
+                    response = client.send_test_event_notification(
+                        Notification={
+                            'Destination': q.url,
+                            'Transport': 'SQS',
+                            'Version': '2006-05-05',
+                            'EventTypes': [
+                                'Ping'
+                            ]
+                        },
+                        TestEventType='Ping'
+                    )
+
         return True
 
 
