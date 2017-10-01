@@ -5,7 +5,7 @@ from .models import Constants
 import boto3
 from otree.views.mturk import get_mturk_client
 from django.conf import settings
-
+import json
 
 class Survey(Page):
     form_model = models.Player
@@ -22,24 +22,65 @@ class Survey(Page):
         if self.round_number == 1:
             if not self.subsession.notification_set:
                 self.subsession.notification_set = True
-                sqs = boto3.resource('sqs',
-                                     aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-                                     aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-                                     region_name='us-east-1',
-                                     )
-                # Create the queue. This returns an SQS.Queue instance
-                queue = sqs.create_queue(QueueName=self.session.code)
-                # Create a new message
-                response = queue.send_message(MessageBody='world')
+                qname = self.session.code
+                sqs = boto3.resource('sqs', )
+                response = sqs.create_queue(
+                    QueueName=qname,
+                    Attributes={
+                        'ReceiveMessageWaitTimeSeconds': '1',
+                        'VisibilityTimeout': '0',
+                    }
+                )
 
-                # The response is NOT a resource, but gives you a message ID and MD5
-                print(response.get('MessageId'))
-                print(response.get('MD5OfMessageBody'))
-                # You can now access identifiers and attributes
-                self.subsession.sqs_url = queue.url
+                q = boto3.resource("sqs").get_queue_by_name(QueueName=qname)
+                #
+                qarn = q.attributes.get('QueueArn')
+                print(qarn)
+                settings = {'qarn': qarn}
+
+                qpolicy = {
+                    "Version": "2012-10-17",
+                    "Id": "{qarn}/SQSDefaultPolicy".format(**settings),
+                    "Statement": [
+                        {
+                            "Sid": "Sid1506848932798",
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": "mturk-requester.amazonaws.com"
+                            },
+                            "Action": "SQS:SendMessage",
+                            "Resource": qarn,
+                            "Condition": {
+                                "StringEquals": {
+                                    "aws:SecureTransport": "true"
+                                }
+                            }
+                        }
+                    ]
+                }
+
+                queue_attrs = {"Policy": json.dumps(qpolicy), }
+                q.set_attributes(Attributes=queue_attrs)
+                print(q.attributes)
+                # endpoint_url = 'https://mturk-requester.us-east-1.amazonaws.com'
+                response = boto3.client('mturk').send_test_event_notification(
+                    Notification={
+                        'Destination': q.url,
+                        'Transport': 'SQS',
+                        'Version': '2006-05-05',
+                        'EventTypes': [
+                            'Ping'
+                        ]
+                    },
+                    TestEventType='Ping'
+                )
+
+
+
+                # q.delete()
+                self.subsession.sqs_url = q.url
                 if self.session.mturk_HITId:
                     client = get_mturk_client(use_sandbox=self.session.mturk_use_sandbox)
-                    print('CURRENT BALANCE:: ', client.get_account_balance()['AvailableBalance'])
                     HITTypeId = client.get_hit(HITId=self.session.mturk_HITId)['HIT']['HITTypeId']
 
                     response = client.update_notification_settings(
@@ -55,35 +96,30 @@ class Survey(Page):
                         },
                         Active=True,
                     )
-                    print('@@@@@@@ ', response)
-                    # response = client.send_test_event_notification(
-                    #     Notification={
-                    #         'Destination': self.subsession.sqs_url,
-                    #         'Transport': 'SQS',
-                    #         'Version': '2006-05-05',
-                    #         'EventTypes': ['AssignmentReturned'],
-                    #     },
-                    #     TestEventType='AssignmentReturned'
-                    # )
-
         return True
 
 
 class Results(Page):
     def is_displayed(self):
         if self.session.mturk_HITId:
-            # Get the service resource
             sqs = boto3.resource('sqs',
                                  aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
                                  aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
                                  region_name='us-east-1',
                                  )
             # Get the queue
-            queue = sqs.get_queue_by_name(QueueName=self.session.code)
-            # Process messages by printing out body and optional author name
-            print('AAAAA ', queue.receive_messages())
-            for message in queue.receive_messages():
-                print('Hello, {}'.format(message.body, ))
+            q = sqs.get_queue_by_name(QueueName=self.session.code)
+            counter = 0
+            while len(q.receive_messages()) > 0:
+                counter += 1
+                for message in q.receive_messages():
+                    d = json.loads(message.body)
+                    print(d)
+                    # if d.get('Events'):
+                    #     for e in d['Events']:
+                    #         print('EVENT TYPE: {event}'.format(event=e['EventType']))
+                    #         print('EVENT ASSIGNMENT: {event}'.format(event=e['AssignmentId']))
+                    message.delete()
         return True
 
 
