@@ -49,7 +49,7 @@ class Survey(Page):
                     "Id": "{qarn}/SQSDefaultPolicy".format(**settings),
                     "Statement": [
                         {
-                            "Sid": "Sid1506848932798",
+                            "Sid": "Sid1506848932798{}".format(self.session.code),
                             "Effect": "Allow",
                             "Principal": {
                                 "Service": "mturk-requester.amazonaws.com"
