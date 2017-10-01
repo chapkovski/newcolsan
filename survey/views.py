@@ -2,9 +2,10 @@ from otree.api import Currency as c, currency_range
 from . import models
 from ._builtin import Page, WaitPage
 from .models import Constants
+from django.conf import settings
 import boto3
 from otree.views.mturk import get_mturk_client
-from django.conf import settings
+
 import json
 
 class Survey(Page):
@@ -22,7 +23,7 @@ class Survey(Page):
         if self.round_number == 1:
             if not self.subsession.notification_set:
                 self.subsession.notification_set = True
-                # qname = self.session.code
+                qname = self.session.code
                 from django.conf import settings
                 sqs = boto3.resource('sqs',
                                      aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
