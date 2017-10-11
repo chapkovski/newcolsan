@@ -74,6 +74,8 @@ class Survey(Page):
                 # q.delete()
                 self.subsession.sqs_url = q.url
                 if self.session.mturk_HITId:
+                    for p in self.session.get_participants():
+                        whatever = p.mturk_worker_id
                     client = get_mturk_client(use_sandbox=self.session.mturk_use_sandbox)
                     HITTypeId = client.get_hit(HITId=self.session.mturk_HITId)['HIT']['HITTypeId']
 
