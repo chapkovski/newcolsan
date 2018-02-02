@@ -1,11 +1,12 @@
 from . import models
 from ._builtin import Page, WaitPage
 from otree.api import Currency as c, currency_range
-
+from otree.models import Participant
 from .models import Constants, Player
 import time
 from colsan_small.models import Constants as pggConstants
 import math
+from django.core.exceptions import ObjectDoesNotExist
 
 
 def vars_for_all_templates(self):
@@ -26,6 +27,11 @@ class CustomWaitPage(WaitPage):
     def extra_is_displayed(self):
         return True
 
+    def vars_for_template(self):
+        return {
+            'index_in_pages': self._index_in_pages,
+        }
+
 
 class CustomPage(Page):
     timeout_seconds = 60
@@ -37,6 +43,7 @@ class CustomPage(Page):
         return True
 
 
+
 class StartWP(CustomWaitPage):
     group_by_arrival_time = True
     template_name = 'customwp/FirstWaitPage.html'
@@ -46,19 +53,20 @@ class StartWP(CustomWaitPage):
         if self.request.method == 'POST':
             end_of_game = self.request.POST.dict().get('endofgame')
             if end_of_game is not None:
-                models.Player.objects.filter(pk=self.player.pk).update(early_finish=True)
+                try:
+                    cur_par = Participant.objects.get(pk=self.participant.pk)
+                    cur_par.vars['outofthegame'] = True
+                    cur_par.save()
+                except ObjectDoesNotExist:
+                    print("Matching participant does not exist!!!")
+
         response = super().dispatch(*args, **kwargs)
         return response
 
-    def record_secs_waited(self, p):
-        p.sec_spent = (
-            datetime.datetime.now(datetime.timezone.utc) - p.wp_timer_start).total_seconds()
-
-        p.sec_earned = round(p.sec_spent / 60 * self.pay_per_min, 2)
-
     def is_displayed(self):
-        if self.player.early_finish:
-            return False
+        # if self.player.early_finish:
+        #     return False
+        return (stay_with(self))
 
     def vars_for_template(self):
         now = time.time()
@@ -69,34 +77,21 @@ class StartWP(CustomWaitPage):
         part_fee = self.session.config['participation_fee']
 
         OOG_time_minutes = math.ceil(Constants.startwp_timer / 60)
-        return {'time_left': round(time_left),
+        context_vars = super().vars_for_template()
+        context_vars.update({'time_left': round(time_left),
                 'OOG_time_minutes': OOG_time_minutes,
                 'part_fee': part_fee,
-                }
+                })
+        return context_vars
 
     def get_players_for_group(self, waiting_players):
-        post_dict = self.request.POST.dict()
-        endofgame = post_dict.get('endofgame')
         slowpokes = [p.participant for p in self.subsession.get_players()
                      if p.participant._index_in_pages
-                     < self.index_in_pages]
-        # TO DEBUG
-        those_with_us = Player.objects.filter(
-            subsession=self.subsession,
-            participant___index_in_pages=self.index_in_pages,
-            _group_by_arrival_time_arrived=True,
-            _group_by_arrival_time_grouped=False,
-        )
-        waiting_players = those_with_us
-        # END OF TO DEBUG
+                     < self._index_in_pages]
+
 
         if len(slowpokes) + len(waiting_players) < pggConstants.players_per_group:
             self.subsession.not_enough_players = True
-        if endofgame:
-            curplayer = [p for p in waiting_players if p.pk == int(endofgame)][0]
-            curplayer.participant.vars['outofthegame'] = True
-            curplayer.outofthegame = True
-            return [curplayer]
         if len(waiting_players) == Constants.players_per_group:
             return waiting_players
 

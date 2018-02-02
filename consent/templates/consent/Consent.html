@@ -9,7 +9,8 @@
 <div class="panel panel-danger">
     <div class="panel-heading">Attention!</div>
     <div class="panel-body">
-        <p>You have <b>{{ consent_timeout_min}}</b> minute{{ consent_timeout_min|pluralize}} to read and accept this Consent Form.</p>
+        <p>You have <b>{{ consent_timeout_min }}</b> minute{{ consent_timeout_min|pluralize }} to read and accept this
+            Consent Form.</p>
         <p>If you are not going to proceed with this HIT <b>immediately</b>, please return it right now!</p>
     </div>
 </div>
@@ -66,10 +67,14 @@
                 participation is voluntary.
             </p>
             <p class='red'>
-                <i>{{form.consent}}
-                    I acknowledge that I have read the rules and privacy policy, I
-                    certify I am 18 years of age or older, and I agree that my registration in
-                    the subject pool is voluntary.</i>
+                <label for="id_consent">
+                    <i>{{form.consent}}
+                        I acknowledge that I have read the rules and privacy policy, I
+                        certify I am 18 years of age or older, and I agree that my registration in
+                        the subject pool is voluntary.</i>
+                </label>
+
+
             </p>
         </div>
     </div>

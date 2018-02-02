@@ -45,9 +45,6 @@ class MyPage(CustomPage):
 
 
 class FirstWaitPD(CustomWaitPage):
-    # def is_displayed(self):
-    #     return True
-
     def is_displayed(self):
         if self.round_number > 1:
             self.group.has_dropout = self.group.in_round(self.round_number - 1).has_dropout
@@ -80,7 +77,7 @@ class FirstWaitPD(CustomWaitPage):
                 else:
                     p.subgroup = p.in_round(1).subgroup
             for k, v in self.group.subgroups.items():
-                pairs = Constants.threesome
+                pairs = Constants.threesome.copy()
                 shuffle(pairs)
                 for i, p in enumerate(v):
                     p.pair = pairs[i]

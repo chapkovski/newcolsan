@@ -7,7 +7,7 @@ from boto.mturk import qualification
 import otree.settings
 
 CHANNEL_ROUTING = 'customwp.routing.channel_routing'
-SENTRY_DSN = 'http://2d6137799b914e1693146c5011f39030:46838e8caa374937a91b14b59ebbe164@sentry.otree.org/36'
+# SENTRY_DSN = 'http://2d6137799b914e1693146c5011f39030:46838e8caa374937a91b14b59ebbe164@sentry.otree.org/36'
 POINTS_DECIMAL_PLACES = 2
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -63,7 +63,8 @@ LANGUAGE_CODE = 'en'
 
 # if an app is included in SESSION_CONFIGS, you don't need to list it here
 INSTALLED_APPS = ['otree',
-                  'django.contrib.humanize', ]
+                  'django.contrib.humanize',
+                  'customwp']
 
 # SENTRY_DSN = ''
 
@@ -145,8 +146,8 @@ noreq_mturk_hit_settings = {
 # e.g. self.session.config['participation_fee']
 
 SESSION_CONFIG_DEFAULTS = {
-    'real_world_currency_per_point': 0.005,
-    'participation_fee': 0.25,
+    'real_world_currency_per_point': 0.0075,
+    'participation_fee': 1,
     'doc': "",
     'mturk_hit_settings': mturk_hit_settings,
 }
@@ -154,62 +155,20 @@ SESSION_CONFIG_DEFAULTS = {
 SESSION_CONFIGS = [
     {
         'name': 'colsan_small',
-        'display_name': 'Stage 1 version for mTurk',
+        'display_name': 'Colsan outgroup only',
         'num_demo_participants': 6,
-        'app_sequence': ['consent', 'customwp', 'colsan_small', ],
-        'colsan': False,
-        'ingroup': True,
-        'outgroup': True,
-        'debug': False,
-
-    },
-       {
-        'name': 'colsan',
-        'display_name': 'Collective sanctions treatment',
-        'num_demo_participants': 6,
-        'app_sequence': ['consent', 'customwp', 'colsan_small', ],
+        'app_sequence': [
+            'consent',
+            'customwp',
+            'colsan_small',
+        ],
         'colsan': True,
-        'ingroup': True,
+        'ingroup': False,
         'outgroup': True,
-        'debug': False,
+        # 'debug': True,
+        'outgrouponly': True,
 
     },
-    # {
-    #     'name': 'nocolsan',
-    #     'display_name': 'Individual sanctions - Outgroup and Ingroup',
-    #     'num_demo_participants': 6,
-    #     'app_sequence': ['customwp', 'colsan'],
-    #     'colsan':False,
-    #     'ingroup': True,
-    #     'outgroup': True,
-    # },
-    # {
-    #     'name': 'colsan',
-    #     'display_name': 'Collective sanctions - Outgroup and Ingroup',
-    #     'num_demo_participants': 6,
-    #     'app_sequence': ['customwp', 'colsan'],
-    #     'colsan':True,
-    #     'ingroup': True,
-    #     'outgroup': True,
-    # },
-    # {
-    #     'name': 'colsanoutgroup',
-    #     'display_name': 'Individual sanctions - Outgroup only',
-    #     'num_demo_participants': 6,
-    #     'app_sequence': ['customwp', 'colsan'],
-    #     'colsan':False,
-    #     'ingroup': False,
-    #     'outgroup': True,
-    # },
-    # {
-    #     'name': 'indsanoutgroup',
-    #     'display_name': 'Collective sanctions - Outgroup only',
-    #     'num_demo_participants': 6,
-    #     'app_sequence': ['customwp', 'colsan'],
-    #     'colsan': True,
-    #     'ingroup': False,
-    #     'outgroup': True,
-    # },
 
 ]
 
@@ -217,6 +176,3 @@ SESSION_CONFIGS = [
 # oTree's default settings. Use with caution.
 
 otree.settings.augment_settings(globals())
-# print('BEFORE::: ', CHANNEL_LAYERS['inmemory']['BACKEND'])
-# CHANNEL_LAYERS['inmemory']['BACKEND'] = 'otree.channels.asgi_redis.RedisChannelLayer'
-# print('AFTER::: ', CHANNEL_LAYERS['inmemory']['BACKEND'])

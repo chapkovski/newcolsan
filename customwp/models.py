@@ -23,7 +23,7 @@ class Constants(BaseConstants):
     # first waiting page
     # before he or she has an option to finish the game without waiting for
     # others
-    startwp_timer = int(environ.get('STARTWP_TIMEOUT', 300))
+    startwp_timer = int(environ.get('STARTWP_TIMEOUT', 10))
     payment_per_minute = pggConstants.payment_per_minute
 
 

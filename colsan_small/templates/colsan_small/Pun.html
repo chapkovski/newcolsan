@@ -9,12 +9,24 @@
     <div class="list-group">
         <a href="" class="list-group-item ">
             <h4 class="list-group-item-heading">Your endowment in Stage 2</h4>
-            <p class="list-group-item-text">You receive <b>{{ player.punishment_endowment }}</b> extra points which you
-                can use to send deduction tokens to
-                other participants or to keep for yourself. </p>
-            <p class="list-group-item-text">You can send to each of the two participants from 0
-                to {{ player.punishment_endowment }} points (so that sum of these two amounts is less or
-                equal {{ player.punishment_endowment }}) </p>
+            {% if session.config.outgrouponly %}
+
+                <p class="list-group-item-text">You receive <b>{{ player.punishment_endowment }}</b> extra points which
+                    you
+                    can use to send deduction tokens to
+                    a <b>randomly chosen</b> participant from another group or to keep for yourself. </p>
+
+
+            {% else %}
+
+                <p class="list-group-item-text">You receive <b>{{ player.punishment_endowment }}</b> extra points which
+                    you
+                    can use to send deduction tokens to
+                    other participants or to keep for yourself. </p>
+                <p class="list-group-item-text">You can send to each of the two participants from 0
+                    to {{ player.punishment_endowment }} points (so that sum of these two amounts is less or
+                    equal {{ player.punishment_endowment }}) </p>
+            {% endif %}
         </a>
         <a href="" class="list-group-item">
             <h4 class="list-group-item-heading ">You belong to the <span class="text-danger"><strong>
@@ -24,21 +36,32 @@
                 matched with one participant from the other group ({{ player.another_subgroup_name }}).
             </p>
         </a>
-        {% if  session.config.colsan %}
-            <div class="bs-callout bs-callout-danger">
-                <p>
+        <div class="bs-callout bs-callout-danger">
+            <p>
+                {% if session.config.outgrouponly %}
                     If you decide to send 1 deduction point to a member of the other group, the income of a
                     <b>randomly</b>
                     chosen
-                    member of the other group will be decreased by 3 points. If you decide to send 1 deduction point to
-                    a
-                    member of your own group, the income of the participant, <b>whose decision you see</b>, will be
-                    decreased by 3 points.
+                    member of the other group will be decreased by 3 points.
 
-                </p>
-            </div>
-        {% endif %}
+                {% else %}
 
+                    {% if  session.config.colsan %}
+
+                        If you decide to send 1 deduction point to a member of the other group, the income of a
+                        <b>randomly</b>
+                        chosen
+                        member of the other group will be decreased by 3 points. If you decide to send 1 deduction point
+                        to
+                        a
+                        member of your own group, the income of the participant, <b>whose decision you see</b>, will be
+                        decreased by 3 points.
+
+
+                    {% endif %}
+                {% endif %}
+            </p>
+        </div>
     </div>
 
 
@@ -76,7 +99,10 @@
             </td>
         </tr>
         <tr>
-            <th>How many deduction points you send to your group member ({{ player.subgroup }}):</th>
+            <th>
+                {% if session.config.ingroup %}How many deduction points you send to your group member (
+                    {{ player.subgroup }}):{% endif %}
+            </th>
             <th>How many deduction points you send to a {% if session.config.colsan %}random{% endif %}
                 group {{ player.another_subgroup_name }} member:
             </th>
@@ -93,43 +119,54 @@
                 {% endif %}
             </td>
         </tr>
-        {% if not  session.config.colsan %}
-            <tr class="warning">
-                <td>Participant {{ player.subgroup }}'s payoff after that:</td>
-                <td>Participant {{ player.another_subgroup_name }}'s payoff after that:</td>
-            </tr>
 
-            <tr>
-                <td>
-                    <div class="sliders in_sliders" id="payoff_in_after"></div>
-                </td>
-                <td>
-                    <div class="sliders out_sliders" id="payoff_out_after"></div>
-                </td>
-            </tr>
-        {% endif %}
+        <tr class="warning">
+            <td>
+                {% if session.config.ingroup %}
+                    Participant {{ player.subgroup }}'s payoff after that:
+                {% endif %}
+            </td>
+            <td>Participant {{ player.another_subgroup_name }}'s payoff after that:</td>
+        </tr>
+
+        <tr>
+            <td>
+                <div class="sliders in_sliders" id="payoff_in_after"></div>
+            </td>
+            <td>
+                <div class="sliders out_sliders" id="payoff_out_after"></div>
+            </td>
+        </tr>
+
         </tbody>
     </table>
 
 
+    {% if session.config.outgrouponly %}
+
+    {% else %}
+        {% if session.config.colsan  and  session.config.outgroup %}
+            <div class="alert alert-warning alert-dismissable">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <p>If you send deduction points to a Participant of another group ({{ player.another_subgroup_name }}),
+                    an
+                    income of a <b>random</b>
+                    participant from group {{ player.another_subgroup_name }}
+                    will
+                    be decreased.</p>
+                <p>
+                    <strong>Remember that deduction points you send, are multiplied by 3, i.e. if you send 2 deduction
+                        points, the
+                        income of the other participant will be decreased by 6 points</strong>
+                </p>
+            </div>
 
 
-    {% if session.config.colsan  and  session.config.outgroup %}
-        <div class="alert alert-warning alert-dismissable">
-            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-            <p>If you send deduction points to a Participant of another group ({{ player.another_subgroup_name }}), an
-                income of a <b>random</b>
-                participant from group {{ player.another_subgroup_name }}
-                will
-                be decreased.</p>
-            <p>
-                <strong>Remember that deduction points you send, are multiplied by 3, i.e. if you send 2 deduction points, the
-                income of the other participant will be decreased by 6 points</strong>
-            </p>
-        </div>
-
+        {% endif %}
 
     {% endif %}
+
+
 
     {% next_button %}
 
@@ -277,14 +314,13 @@
         }
 
         var max_pun = {{ Constants.punishment_endowment }};
-        var ingroup_punishment_input = document.getElementById('id_ingroup_punishment');
         var outgroup_punishment_input = document.getElementById('id_outgroup_punishment');
         var payoff_in_after_slider = document.getElementById('payoff_in_after');
         var payoff_out_after_slider = document.getElementById('payoff_out_after');
         var pun_coef = {{ Constants.punishment_factor }};
-        var pun_in = pun_coef * parseInt(ingroup_punishment_input.value);
+        {#        var pun_in = pun_coef * parseInt(ingroup_punishment_input.value);#}
         var pun_out = pun_coef * parseInt(outgroup_punishment_input.value);
-        var initial_payoff_in_after = {{ player.random_pair.ingroup_member.pd_payoff }} -(pun_in || 0);
+        {#        var initial_payoff_in_after = {{ player.random_pair.ingroup_member.pd_payoff }} -(pun_in || 0);#}
         var initial_payoff_out_after = {{ player.random_pair.outgroup_member.pd_payoff }} -(pun_out || 0);
         var pd_ingroup_slider = {
             where: document.getElementById('pd_ingroup'),
@@ -306,11 +342,7 @@
             value: {{ player.random_pair.outgroup_member.pd_payoff }},
             max: {{ egoistic_pd }}
         };
-        var payoff_in_after = {
-            where: document.getElementById('payoff_in_after'),
-            value: initial_payoff_in_after,
-            max: {{ egoistic_pd }}
-        };
+
         var payoff_out_after = {
             where: document.getElementById('payoff_out_after'),
             value: initial_payoff_out_after,
@@ -321,19 +353,19 @@
             pd_outgroup_slider,
             stage1_in_payoff_slider,
             stage1_out_payoff_slider,
-            payoff_in_after,
-            payoff_out_after
+            payoff_out_after,
         ]
 
         for (var i = 0; i < sliders.length; i++) {
+
             creatingSlider(sliders[i].where, sliders[i].value, sliders[i].max);
         }
         ;
         {#        var in_slider = document.getElementById('slider-color');#}
         {#        var connect = s/lider.querySelectorAll('.noUi-connect');#}
-        ingroup_punishment_input.addEventListener('keyup', function () {
-            updatingPayoffs(this, payoff_in_after_slider, {{ player.random_pair.ingroup_member.pd_payoff }});
-        });
+        {#        ingroup_punishment_input.addEventListener('keyup', function () {#}
+        {#            updatingPayoffs(this, payoff_in_after_slider, {{ player.random_pair.ingroup_member.pd_payoff }});#}
+        {#        });#}
         outgroup_punishment_input.addEventListener('keyup', function () {
             updatingPayoffs(this, payoff_out_after_slider, {{ player.random_pair.outgroup_member.pd_payoff }});
         });

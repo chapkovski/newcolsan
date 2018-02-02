@@ -5,11 +5,8 @@
         In this stage you can see the decisions and thus payoffs of another pair of participants in the same game, i.e.
         of a random member of your own group and a member of the other group, with whom the member of your group was
         matched. After seeing the results of their game, you can transfer points from your endowment to decrease the
-        income of the participants. By transferring 1 point from your endowment you decrease the income of another
-        participant by 3 points. <strong>While in your own group your action decreases the payoff of the specific
-        participant,
-        whose decisions you have just seen, in the other group your action will affect a random participant of the other
-        group.</strong>
+        income of the  {% if session.config.outgrouponly %}randomly chosen participant from another group {% else %}participants{% endif %}. By transferring 1 point from your endowment you decrease the income of another
+        participant by 3 points.
     </p>
     {% if  session.config.colsan %}
         <div class="bs-callout bs-callout-danger">
@@ -17,16 +14,16 @@
             <p>
                 If you decide to send 1 deduction point to a member of the other group, the income of a <b>randomly</b>
                 chosen
-                member of the other group will be decreased by 3 points. If you decide to send 1 deduction point to a
+                member of the other group will be decreased by 3 points. {% if session.config.outgrouponly %} {% else %}If you decide to send 1 deduction point to a
                 member of your own group, the income of the participant, <b>whose decision you have just seen</b>, will be
-                decreased by 3 points.
+                decreased by 3 points.{% endif %}
 
             </p>
         </div>
     {% endif %}
-
+{% if session.config.outgrouponly %} {% else %}
     <p>You can not send more than {{ Constants.punishment_endowment }} points to both participants in total.</p>
-
+{% endif %}
 
     <p>Other members of both groups can make the same decisions about other participants. When you make your decision in
         Stage 2 and click ‘Next’, you will be shown your own and your partner’s decisions made in Stage 1 and your

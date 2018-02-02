@@ -34,8 +34,8 @@ def send_message(message, session_code, index_in_pages, participant_code, player
                 those_with_us = models_module.Player.objects.filter(
                     subsession=subsession,
                     participant___index_in_pages=index_in_pages,
-                    _group_by_arrival_time_arrived=True,
-                    _group_by_arrival_time_grouped=False,
+                    _gbat_arrived=True,
+                    _gbat_grouped=False,
                 )
             else:
                 those_with_us = models_module.Player.objects.filter(
