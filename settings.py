@@ -83,35 +83,27 @@ mturk_hit_settings = {
     'description': '20 min long study. Participants have to work in groups of 6 mTurkers. If you have any issues please write as immediately at chapkovskii@soziologie.uzh.ch',
     'frame_height': 1000,
     'preview_template': 'global/MTurkPreview.html',
-    'minutes_allotted_per_assignment': 70,
-    'expiration_hours': 3,
-    # 'grant_qualification_id': '3OY1URRDRY4R2QV6PQDSN7TCTMNTIF',  # to prevent retakes
+    'minutes_allotted_per_assignment': 60,
+    'expiration_hours': 2,
+    # 'grant_qualification_id': '3JQA2VZA3H07L5GGAPCKFZHKDN54IT',  # to prevent retakes
     'qualification_requirements': [
-        # {
-        #     'QualificationTypeId': "3BH2VZXPB8PDRPCZKDE5783ZRKC7CF",
-        #     'Comparator': "DoesNotExist",
-        # },
-        # {
-        #     'QualificationTypeId': "3OY1URRDRY4R2QV6PQDSN7TCTMNTIF",
-        #     'Comparator': "DoesNotExist",
-        # },
-        # {
-        #     'QualificationTypeId': "00000000000000000071",
-        #     'Comparator': "EqualTo",
-        #     'LocaleValues': [{
-        #         'Country': "US",
-        #     }]
-        # },
-        # {
-        #     'QualificationTypeId': "000000000000000000L0",
-        #     'Comparator': "GreaterThanOrEqualTo",
-        #     "IntegerValues": [90],
-        # },
-        # {
-        #     'QualificationTypeId': "00000000000000000040",
-        #     'Comparator': "GreaterThanOrEqualTo",
-        #     "IntegerValues": [100],
-        # },
+        {
+            'QualificationTypeId': "00000000000000000071",
+            'Comparator': "EqualTo",
+            'LocaleValues': [{
+                'Country': "US",
+            }]
+        },
+        {
+            'QualificationTypeId': "000000000000000000L0",
+            'Comparator': "GreaterThanOrEqualTo",
+            "IntegerValues": [90],
+        },
+        {
+            'QualificationTypeId': "00000000000000000040",
+            'Comparator': "GreaterThanOrEqualTo",
+            "IntegerValues": [100],
+        },
 
     ],
 }
@@ -160,28 +152,28 @@ SESSION_CONFIG_DEFAULTS = {
 }
 
 SESSION_CONFIGS = [
-    # {
-    #     'name': 'colsan_small',
-    #     'display_name': 'Stage 1 version for mTurk',
-    #     'num_demo_participants': 6,
-    #     'app_sequence': ['consent', 'customwp', 'colsan_small', ],
-    #     'colsan': False,
-    #     'ingroup': True,
-    #     'outgroup': True,
-    #     'debug': False,
-    #
-    # },
-    # {
-    #     'name': 'colsan',
-    #     'display_name': 'Collective sanctions treatment',
-    #     'num_demo_participants': 6,
-    #     'app_sequence': ['consent', 'customwp', 'colsan_small', ],
-    #     'colsan': True,
-    #     'ingroup': True,
-    #     'outgroup': True,
-    #     'debug': False,
-    #
-    # },
+    {
+        'name': 'colsan_small',
+        'display_name': 'Stage 1 version for mTurk',
+        'num_demo_participants': 6,
+        'app_sequence': ['consent', 'customwp', 'colsan_small', ],
+        'colsan': False,
+        'ingroup': True,
+        'outgroup': True,
+        'debug': False,
+
+    },
+       {
+        'name': 'colsan',
+        'display_name': 'Collective sanctions treatment',
+        'num_demo_participants': 6,
+        'app_sequence': ['consent', 'customwp', 'colsan_small', ],
+        'colsan': True,
+        'ingroup': True,
+        'outgroup': True,
+        'debug': False,
+
+    },
     # {
     #     'name': 'nocolsan',
     #     'display_name': 'Individual sanctions - Outgroup and Ingroup',
@@ -209,12 +201,15 @@ SESSION_CONFIGS = [
     #     'ingroup': False,
     #     'outgroup': True,
     # },
-    {
-        'name': 'survey',
-        'display_name': 'survey',
-        'num_demo_participants': 1,
-        'app_sequence': ['survey'],
-    },
+    # {
+    #     'name': 'indsanoutgroup',
+    #     'display_name': 'Collective sanctions - Outgroup only',
+    #     'num_demo_participants': 6,
+    #     'app_sequence': ['customwp', 'colsan'],
+    #     'colsan': True,
+    #     'ingroup': False,
+    #     'outgroup': True,
+    # },
 
 ]
 

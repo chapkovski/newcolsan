@@ -41,6 +41,25 @@ class StartWP(CustomWaitPage):
     group_by_arrival_time = True
     template_name = 'customwp/FirstWaitPage.html'
 
+    def dispatch(self, *args, **kwargs):
+        super().dispatch(*args, **kwargs)
+        if self.request.method == 'POST':
+            end_of_game = self.request.POST.dict().get('endofgame')
+            if end_of_game is not None:
+                models.Player.objects.filter(pk=self.player.pk).update(early_finish=True)
+        response = super().dispatch(*args, **kwargs)
+        return response
+
+    def record_secs_waited(self, p):
+        p.sec_spent = (
+            datetime.datetime.now(datetime.timezone.utc) - p.wp_timer_start).total_seconds()
+
+        p.sec_earned = round(p.sec_spent / 60 * self.pay_per_min, 2)
+
+    def is_displayed(self):
+        if self.player.early_finish:
+            return False
+
     def vars_for_template(self):
         now = time.time()
         if not self.player.startwp_timer_set:
@@ -74,7 +93,6 @@ class StartWP(CustomWaitPage):
         if len(slowpokes) + len(waiting_players) < pggConstants.players_per_group:
             self.subsession.not_enough_players = True
         if endofgame:
-
             curplayer = [p for p in waiting_players if p.pk == int(endofgame)][0]
             curplayer.participant.vars['outofthegame'] = True
             curplayer.outofthegame = True
