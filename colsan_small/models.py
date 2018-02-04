@@ -3,7 +3,8 @@ from otree.api import (
     Currency as c, currency_range
 )
 import random
-from django import forms
+import statuses
+from django.db import models as djmodels
 
 doc = """
 new collective sanctions experiment based on Stoff's paper
@@ -42,9 +43,7 @@ class Constants(BaseConstants):
 
 
 class Subsession(BaseSubsession):
-    def before_session_starts(self):
-        if self.session.config['ingroup']:
-            assert self.session.config['outgroup'], "You can't create ingroup treatment without outgroup"
+    def creating_session(self):
         for p in self.get_players():
             p.punishment_endowment = Constants.punishment_endowment
 
@@ -188,3 +187,14 @@ class Player(BasePlayer):
     payoff_minutes_waited = models.FloatField()
     payoff_min_added = models.BooleanField()
     is_dropout = models.BooleanField(default=False)
+
+
+class TimeStamp(djmodels.Model):
+    player = djmodels.ForeignKey(to=Player, related_name='timestamps')
+    created_at = djmodels.DateTimeField(auto_now_add=True)
+    updated_at = djmodels.DateTimeField(auto_now=True)
+    cur_page = models.IntegerField()
+    opened = models.BooleanField()
+
+    def __str__(self):
+        return 'TIMESTAMP {} CREATED {}, CLOSED {}, OPENED:{}'.format(self.pk, self.created_at, self.updated_at, self.opened)

@@ -4,9 +4,8 @@ from otree.api import (
     Currency as c, currency_range
 )
 from colsan_small.models import Constants as pggConstants
-from customwp.models import Constants as CWPConstants
 from django import forms as djforms
-
+import statuses
 author = 'Philipp Chapkovski, UZH'
 
 doc = """
@@ -21,11 +20,14 @@ class Constants(BaseConstants):
     num_rounds = 1
     consent_timeout = int(environ.get('CONSENT_TIMEOUT', 300))
 
-    startwp_timer = CWPConstants.startwp_timer
+
 
 
 class Subsession(BaseSubsession):
-    pass
+    def creating_session(self):
+        if self.round_number == 1:
+            for p in self.session.get_participants():
+                p.vars['status'] = statuses.NON_INITIATED
 
 
 class Group(BaseGroup):

@@ -2,46 +2,83 @@ from . import models
 from ._builtin import Page, WaitPage
 from .models import Constants, Player, Group
 import random
-from customwp.views import CustomWaitPage, CustomPage
+import statuses
 from itertools import cycle
 from random import shuffle
 from functions import debug_session
 from otree.api import Currency as c
 from otree.models_concrete import PageCompletion
-import time
+from django.views.generic.base import TemplateResponseMixin
 
 
-# class WP(WaitPage):
-#     def after_all_players_arrive(self):
-
-
-
-def vars_for_all_templates(self):
-    max_pd = Constants.endowment * Constants.pd_factor
-    egoistic_pd = max_pd + Constants.endowment
-    return {'max_pd': max_pd,
-            'egoistic_pd': egoistic_pd,
-            'base_points': round(1 / self.session.config['real_world_currency_per_point']),
-            'payment_per_minute_in_usd': Constants.payment_per_minute.to_real_world_currency(self.session),
-            }
-
-
-class FirstRoundWP(CustomWaitPage):
-    group_by_arrival_time = True
-
-    def extra_is_displayed(self):
-        return self.subsession.round_number == 1
-
-
-class MyPage(CustomPage):
-    timeout_seconds = Constants.time_to_decide
+class CustomWaitPage(WaitPage):
+    template_name = 'custom_pages/CustomWaitPage.html'
+    status = statuses.HEALTHY
 
     def is_displayed(self):
-        out_of_game = self.participant.vars.get('outofthegame', False)
-        return self.extra_is_displayed() and not self.group.has_dropout and not out_of_game
+        return self.extra_is_displayed() and self.participant.vars['status'] == self.status
 
     def extra_is_displayed(self):
         return True
+
+    def vars_for_template(self):
+        return {
+            'index_in_pages': self._index_in_pages,
+        }
+
+
+class CustomPage(Page):
+    timeout_seconds = 90
+    status = statuses.HEALTHY
+
+    def is_displayed(self):
+        return self.extra_is_displayed() and self.participant.vars['status'] == self.status
+
+    def extra_is_displayed(self):
+        return True
+
+
+class StartWP(CustomWaitPage):
+    # group_by_arrival_time = True
+    template_name = 'colsan_small/FirstWaitPage.html'
+
+    def dispatch(self, *args, **kwargs):
+        super().dispatch(*args, **kwargs)
+        if self.request.method == 'POST':
+            wp_dropout = self.request.POST.dict().get('wp_dropout')
+            not_enough_players_in_subsession = self.request.POST.dict().get('not_enough_players_in_subsession')
+            if wp_dropout is not None:
+                self.participant.vars['status'] = statuses.WP_DROPOUT
+            if not_enough_players_in_subsession is not None:
+                self.participant.vars['status'] = statuses.NOT_ENOUGH_PLAYERS_IN_SUBSESSION
+
+        response = super().dispatch(*args, **kwargs)
+        return response
+
+    # def get_players_for_group(self, waiting_players):
+    #     # slowpokes = [p.participant for p in self.subsession.get_players()
+    #     #              if p.participant._index_in_pages
+    #     #              < self._index_in_pages]
+    #     #
+    #     # if len(slowpokes) + len(waiting_players) < pggConstants.players_per_group:
+    #     #     self.subsession.not_enough_players = True
+    #     #     for w in waiting_players:
+    #     #         w.participant.vars['outofthegame'] = True
+    #     #         return waiting_players
+    #     if len(waiting_players) == Constants.players_per_group:
+    #         return waiting_players
+
+
+# def vars_for_all_templates(self):
+#     max_pd = Constants.endowment * Constants.pd_factor
+#     egoistic_pd = max_pd + Constants.endowment
+#     return {'max_pd': max_pd,
+#             'egoistic_pd': egoistic_pd,
+#             'base_points': round(1 / self.session.config['real_world_currency_per_point']),
+#             'payment_per_minute_in_usd': Constants.payment_per_minute.to_real_world_currency(self.session),
+#             }
+
+
 
 
 class FirstWaitPD(CustomWaitPage):
@@ -83,27 +120,26 @@ class FirstWaitPD(CustomWaitPage):
                     p.pair = pairs[i]
 
 
-class InstructionsStage1(MyPage):
+class InstructionsStage1(CustomPage):
     timeout_seconds = 300
 
     def extra_is_displayed(self):
         return self.subsession.round_number == 1
 
 
-class InstructionsStage2(MyPage):
+class InstructionsStage2(CustomPage):
     timeout_seconds = 300
 
     def extra_is_displayed(self):
         return self.subsession.round_number == 1
 
     def get_timeout_seconds(self):
-
         if debug_session(self):
             return 30000
         return 300
 
 
-class PD(MyPage):
+class PD(CustomPage):
     def is_displayed(self):
         self.player.refresh_from_db()
         self.group.refresh_from_db()
@@ -152,7 +188,7 @@ class WaitPD(CustomWaitPage):
                     p.set_pd_payoff()
 
 
-class Pun(MyPage):
+class Pun(CustomPage):
     form_model = models.Player
 
     def vars_for_template(self):
@@ -186,7 +222,7 @@ class Pun(MyPage):
 
     def before_next_page(self):
         if self.timeout_happened:
-            self.player.participant.vars['dropout']=True
+            self.player.participant.vars['dropout'] = True
             self.group.has_dropout = True
             self.group.save()
             groups_in_all_rounds = Group.objects.filter(session=self.session,
@@ -215,7 +251,7 @@ class WaitResults(CustomWaitPage):
             self.group.set_payoffs()
 
 
-class Results(MyPage):
+class Results(CustomPage):
     timeout_seconds = 240
 
     def vars_for_template(self):
@@ -227,7 +263,7 @@ class Results(MyPage):
                 'real_currency_payoff': self.player.payoff.to_real_world_currency(self.session), }
 
 
-class FinalResults(MyPage):
+class FinalResults(CustomPage):
     timeout_seconds = 900
 
     def extra_is_displayed(self):
@@ -287,16 +323,52 @@ class DropOutFinal(Page):
                 }
 
 
+class HealthyFinal(CustomPage):
+    ...
+
+
+class DropOutsPage(CustomPage, TemplateResponseMixin):
+    def extra_is_displayed(self):
+        return self.round_number == Constants.num_rounds
+
+    def get_template_names(self):
+        return ['dropouts/{}.html'.format(self.__name__)]
+
+
+class ConsentDropoutFinal(DropOutsPage):
+    status = statuses.CONSENT_DROPOUT
+
+
+class WPDropoutFinal(DropOutsPage):
+    status = statuses.WP_DROPOUT
+
+
+class NotEnoughPlayersInSubsessionFinal(DropOutsPage):
+    status = statuses.NOT_ENOUGH_PLAYERS_IN_SUBSESSION
+
+
+class IngameDropoutFinal(DropOutsPage):
+    status = statuses.INGAME_DROPOUT
+
+
+class GroupHasDropoutFinal(DropOutsPage):
+    status = statuses.GROUP_HAS_DROPOUT
+
+
 page_sequence = [
-    FirstRoundWP,
-    FirstWaitPD,
-    InstructionsStage1,
-    InstructionsStage2,
-    PD,
-    WaitPD,
-    Pun,
-    WaitResults,
-    Results,
-    DropOutFinal,
-    FinalResults,
+    StartWP,
+    # FirstWaitPD,
+    # InstructionsStage1,
+    # InstructionsStage2,
+    # PD,
+    # WaitPD,
+    # Pun,
+    # WaitResults,
+    # Results,
+    # HealthyFinal,
+    # ConsentDropoutFinal,
+    # WPDropoutFinal,
+    # NotEnoughPlayersInSubsessionFinal,
+    # IngameDropoutFinal,
+    # GroupHasDropoutFinal,
 ]

@@ -4,6 +4,7 @@ from ._builtin import Page, WaitPage
 from .models import Constants
 import math
 from functions import debug_session
+import statuses
 
 
 class Consent(Page):
@@ -26,21 +27,11 @@ class Consent(Page):
 
     def before_next_page(self):
         if self.timeout_happened and not debug_session(self):
-            self.player.consent = False
-            self.player.is_dropout = True
-            self.player.participant.vars['dropout'] = True
-            self.player.participant.vars['consent_dropout'] = True
+            self.participant.vars['status'] = statuses.CONSENT_DROPOUT
             return
-        if self.timeout_happened and debug_session(self):
-            self.player.consent = True
-
-
-class BlockDropouts(Page):
-    def is_displayed(self):
-        return self.round_number == 1 and self.player.participant.vars.get('consent_dropout', False)
+        self.participant.vars['status'] = statuses.HEALTHY
 
 
 page_sequence = [
     Consent,
-    BlockDropouts,
 ]

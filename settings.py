@@ -6,7 +6,7 @@ from boto.mturk import qualification
 
 import otree.settings
 
-CHANNEL_ROUTING = 'customwp.routing.channel_routing'
+
 # SENTRY_DSN = 'http://2d6137799b914e1693146c5011f39030:46838e8caa374937a91b14b59ebbe164@sentry.otree.org/36'
 POINTS_DECIMAL_PLACES = 2
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -63,8 +63,8 @@ LANGUAGE_CODE = 'en'
 
 # if an app is included in SESSION_CONFIGS, you don't need to list it here
 INSTALLED_APPS = ['otree',
-                  'django.contrib.humanize',
-                  'customwp']
+
+                  ]
 
 # SENTRY_DSN = ''
 
@@ -159,7 +159,6 @@ SESSION_CONFIGS = [
         'num_demo_participants': 6,
         'app_sequence': [
             'consent',
-            'customwp',
             'colsan_small',
         ],
         'colsan': True,

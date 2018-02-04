@@ -8,3 +8,4 @@ def debug_session(page):
         if env_debug:
             return True
         return page.session.config.get('debug', False)
+

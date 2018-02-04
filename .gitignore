@@ -11,3 +11,4 @@ _coverage_results/
 __pycache__/
 
 latest.dump.1
+./_static_root
