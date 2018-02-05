@@ -19,7 +19,8 @@ class Consent(Page):
         return {'consent_timeout_min': math.ceil(self.timeout_seconds / 60)}
 
     def is_displayed(self):
-        return self.round_number == 1
+        return self.round_number == 1 and (self.participant.vars['status'] == statuses.HEALTHY or
+                                           self.participant.vars['status'] == statuses.NON_INITIATED)
 
     def consent_error_message(self, value):
         if not value:

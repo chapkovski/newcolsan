@@ -5,10 +5,11 @@ import random
 import statuses
 from itertools import cycle
 from random import shuffle
-from functions import debug_session
+from functions import debug_session, check_and_update_NEPS
 from otree.api import Currency as c
 from otree.models_concrete import PageCompletion
 from django.views.generic.base import TemplateResponseMixin
+from otree.models import Participant
 
 
 class CustomWaitPage(WaitPage):
@@ -45,40 +46,38 @@ class StartWP(CustomWaitPage):
     def dispatch(self, *args, **kwargs):
         super().dispatch(*args, **kwargs)
         if self.request.method == 'POST':
+            print('WHAT IS RECEIVED BY POST?', self.request.POST.dict())
             wp_dropout = self.request.POST.dict().get('wp_dropout')
-            not_enough_players_in_subsession = self.request.POST.dict().get('not_enough_players_in_subsession')
             if wp_dropout is not None:
-                self.participant.vars['status'] = statuses.WP_DROPOUT
-            if not_enough_players_in_subsession is not None:
-                self.participant.vars['status'] = statuses.NOT_ENOUGH_PLAYERS_IN_SUBSESSION
-
+                p = Participant.objects.get(pk=self.participant.pk)
+                p.vars['status'] = statuses.WP_DROPOUT
+                p.save()
+                print('IS there enough  players in session???',
+                      check_and_update_NEPS(self.session, self._index_in_pages))
         response = super().dispatch(*args, **kwargs)
         return response
 
-    # def get_players_for_group(self, waiting_players):
-    #     # slowpokes = [p.participant for p in self.subsession.get_players()
-    #     #              if p.participant._index_in_pages
-    #     #              < self._index_in_pages]
-    #     #
-    #     # if len(slowpokes) + len(waiting_players) < pggConstants.players_per_group:
-    #     #     self.subsession.not_enough_players = True
-    #     #     for w in waiting_players:
-    #     #         w.participant.vars['outofthegame'] = True
-    #     #         return waiting_players
-    #     if len(waiting_players) == Constants.players_per_group:
-    #         return waiting_players
+        # def get_players_for_group(self, waiting_players):
+        #     # slowpokes = [p.participant for p in self.subsession.get_players()
+        #     #              if p.participant._index_in_pages
+        #     #              < self._index_in_pages]
+        #     #
+        #     # if len(slowpokes) + len(waiting_players) < pggConstants.players_per_group:
+        #     #     self.subsession.not_enough_players = True
+        #     #     for w in waiting_players:
+        #     #         w.participant.vars['outofthegame'] = True
+        #     #         return waiting_players
+        #     if len(waiting_players) == Constants.players_per_group:
+        #         return waiting_players
 
-
-# def vars_for_all_templates(self):
-#     max_pd = Constants.endowment * Constants.pd_factor
-#     egoistic_pd = max_pd + Constants.endowment
-#     return {'max_pd': max_pd,
-#             'egoistic_pd': egoistic_pd,
-#             'base_points': round(1 / self.session.config['real_world_currency_per_point']),
-#             'payment_per_minute_in_usd': Constants.payment_per_minute.to_real_world_currency(self.session),
-#             }
-
-
+        # def vars_for_all_templates(self):
+        #     max_pd = Constants.endowment * Constants.pd_factor
+        #     egoistic_pd = max_pd + Constants.endowment
+        #     return {'max_pd': max_pd,
+        #             'egoistic_pd': egoistic_pd,
+        #             'base_points': round(1 / self.session.config['real_world_currency_per_point']),
+        #             'payment_per_minute_in_usd': Constants.payment_per_minute.to_real_world_currency(self.session),
+        #             }
 
 
 class FirstWaitPD(CustomWaitPage):
@@ -217,8 +216,10 @@ class Pun(CustomPage):
         return fields
 
     def error_message(self, values):
-        if values.get('ingroup_punishment', 0) + values.get('outgroup_punishment', 0) > Constants.punishment_endowment:
-            return 'Total amount of deduction points should not be more than {}'.format(Constants.punishment_endowment)
+        if values.get('ingroup_punishment', 0) + values.get('outgroup_punishment',
+                                                            0) > Constants.punishment_endowment:
+            return 'Total amount of deduction points should not be more than {}'.format(
+                Constants.punishment_endowment)
 
     def before_next_page(self):
         if self.timeout_happened:
@@ -332,7 +333,8 @@ class DropOutsPage(CustomPage, TemplateResponseMixin):
         return self.round_number == Constants.num_rounds
 
     def get_template_names(self):
-        return ['dropouts/{}.html'.format(self.__name__)]
+
+        return ['dropouts/{}.html'.format(self.__class__.__name__)]
 
 
 class ConsentDropoutFinal(DropOutsPage):
@@ -344,7 +346,7 @@ class WPDropoutFinal(DropOutsPage):
 
 
 class NotEnoughPlayersInSubsessionFinal(DropOutsPage):
-    status = statuses.NOT_ENOUGH_PLAYERS_IN_SUBSESSION
+    status = statuses.NOT_ENOUGH_PLAYERS_IN_SESSION
 
 
 class IngameDropoutFinal(DropOutsPage):
@@ -355,7 +357,7 @@ class GroupHasDropoutFinal(DropOutsPage):
     status = statuses.GROUP_HAS_DROPOUT
 
 
-page_sequence = [
+health_pages = [
     StartWP,
     # FirstWaitPD,
     # InstructionsStage1,
@@ -366,9 +368,13 @@ page_sequence = [
     # WaitResults,
     # Results,
     # HealthyFinal,
-    # ConsentDropoutFinal,
-    # WPDropoutFinal,
-    # NotEnoughPlayersInSubsessionFinal,
-    # IngameDropoutFinal,
-    # GroupHasDropoutFinal,
 ]
+dropouts_pages = [
+    ConsentDropoutFinal,
+    WPDropoutFinal,
+    NotEnoughPlayersInSubsessionFinal,
+    IngameDropoutFinal,
+    GroupHasDropoutFinal,
+]
+
+page_sequence = health_pages + dropouts_pages

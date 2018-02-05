@@ -6,5 +6,15 @@
 {% endblock %}
 {% block content %}
 
+    <form action="" method="post" role="form" class="form">
+        {% csrf_token %}
+        <div>
+            <button class="btn btn-primary" id='wp_dropout'
 
+                    name="wp_dropout" value="{{ player.pk }}">
+                Finish the study
+            </button>
+        </div>
+        <br>
+    </form>
 {% endblock %}

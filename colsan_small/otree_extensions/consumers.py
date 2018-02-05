@@ -11,9 +11,14 @@
 
 
 from channels.generic.websockets import WebsocketConsumer, JsonWebsocketConsumer
-from colsan_small.models import Group, Player
+from colsan_small.models import Group, Player, TimeStamp, Constants
 from otree.models import Participant
 import json
+# from django.db.models import F, DateTimeField, ExpressionWrapper, IntegerField, DurationField, FloatField, Sum
+from django.db.models import Q
+import datetime
+import statuses
+from functions import check_and_update_NEPS
 
 CONNECT = 1
 DISCONNECT = 0
@@ -39,32 +44,58 @@ class GenericWatcher(WebsocketConsumer):
         participant_code = self.kwargs['participant_code']
         return Participant.objects.get(code__exact=participant_code)._index_in_pages
 
-    def get_num_connected_in_group(self):
+    def get_those_with_us(self):
         group_pk = self.kwargs['group_pk']
         cur_page = self.get_cur_page()
         cur_group = Group.objects.get(pk__exact=group_pk)
-        num_those_here = cur_group.player_set.filter(participant___index_in_pages=cur_page).count()
-        return num_those_here
+        players_with_us = cur_group.player_set.filter(participant___index_in_pages=cur_page)
+        parts_with_us = [p.participant for p in players_with_us]
+        return parts_with_us
 
-    def update_connected(self):
-        number_connected = self.get_num_connected_in_group()
-        group_name = self.get_group(self.kwargs['group_pk'])
-        self.group_send(name=group_name, text=json.dumps({'number_connected': number_connected}))
+    def get_num_connected_in_group(self):
+        return len(self.get_those_with_us())
 
     def update_time_stamp(self):
         player = Player.objects.get(pk__exact=self.kwargs['player_pk'])
         if self.event_type == CONNECT:
-            timestamp, _ = player.timestamps.update_or_create(player=player,  cur_page=self.get_cur_page(),
+            timestamp, _ = player.timestamps.update_or_create(player=player, cur_page=self.get_cur_page(),
                                                               defaults={'opened': True})
         if self.event_type == DISCONNECT:
             timestamp, _ = player.timestamps.update_or_create(player=player, cur_page=self.get_cur_page(),
-                                                              defaults={'opened': False})
+                                                              defaults={'opened': False,
+                                                                        'closed_at': datetime.datetime.now()})
+
+    def get_time_earned(self):
+        player = Player.objects.get(pk__exact=self.kwargs['player_pk'])
+        ts = player.timestamps.exclude(Q(created_at__isnull=True))
+
+        for t in ts:
+            closed = t.closed_at or datetime.datetime.now(datetime.timezone.utc)
+            t.diff = closed - t.created_at
+            t.save()
+        if ts.exists():
+            time_earned = sum([p.diff.total_seconds() for p in player.timestamps.all() if p.diff is not None]) / 60
+            return time_earned
+        else:
+            return 0
+
+    # checking that there is enough participants left in subsession
+    # NEPS stays for Not Enough Players in Session
+    # Returns True if NEPS
 
 
+    def _check_NEPS(self):
+        player = Player.objects.get(pk__exact=self.kwargs['player_pk'])
+        return check_and_update_NEPS(player.session, self.get_cur_page())
 
     def process_connection(self):
-        self.update_connected()
+        num_connected = self.get_num_connected_in_group()
         self.update_time_stamp()
+        group_name = self.get_group(self.kwargs['group_pk'])
+        self.group_send(name=group_name, text=json.dumps({'number_connected': num_connected,
+                                                          'not_enough_players_in_subsession': self._check_NEPS()
+                                                          }))
+        self.send(text=json.dumps(self.get_back_request()))
 
     def connect(self, message, **kwargs):
         self.event_type = CONNECT
@@ -74,5 +105,18 @@ class GenericWatcher(WebsocketConsumer):
         self.event_type = DISCONNECT
         self.process_connection()
 
+    def get_back_request(self):
+        time_so_far = self.get_time_earned()
+        player = Player.objects.get(pk__exact=self.kwargs['player_pk'])
+        session = player.session
+        earn_so_far = time_so_far * float(Constants.payment_per_minute.to_real_world_currency(session))
+        return {'time_earned': time_so_far,
+                'earn_so_far': round(earn_so_far, 2)}
+
     def receive(self, text=None, bytes=None, **kwargs):
-        self.send(text=text, bytes=bytes)
+        try:
+            jsn_msg = json.loads(text)
+            if jsn_msg.get('update_request'):
+                self.send(text=json.dumps(self.get_back_request()))
+        except ValueError:
+            print('no json received')

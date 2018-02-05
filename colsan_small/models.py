@@ -192,9 +192,12 @@ class Player(BasePlayer):
 class TimeStamp(djmodels.Model):
     player = djmodels.ForeignKey(to=Player, related_name='timestamps')
     created_at = djmodels.DateTimeField(auto_now_add=True)
-    updated_at = djmodels.DateTimeField(auto_now=True)
+    closed_at = djmodels.DateTimeField(null=True)
     cur_page = models.IntegerField()
     opened = models.BooleanField()
+    diff = djmodels.DurationField(null=True)
 
     def __str__(self):
-        return 'TIMESTAMP {} CREATED {}, CLOSED {}, OPENED:{}'.format(self.pk, self.created_at, self.updated_at, self.opened)
+        return 'TIMESTAMP {} CREATED {}, CLOSED {}, OPENED:{}. SEC {} '.format(self.pk, self.created_at,
+                                                                                      self.closed_at, self.opened,
+                                                                                      self.diff)

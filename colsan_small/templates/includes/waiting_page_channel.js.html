@@ -1,35 +1,40 @@
 <script>
-        $(function () {
+    var SECOND = 1000;
+    var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
+    var wpsocket = new WebSocket(ws_scheme + '://' + window.location.host + "/watcher/group/{{ group.pk }}/participant/{{participant.code}}/player/{{player.pk}}");
 
-        var socket;
+    $(function () {
+
 
         initWebSocket();
-         function initWebSocket() {
-        var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
-        var wpsocket = new WebSocket(ws_scheme + '://' + window.location.host + "/watcher/group/{{ group.pk }}/participant/{{participant.code}}/player/{{player.pk}}");
 
-        // Handle any errors that occur.
-        wpsocket.onerror = function (error) {
-            console.log('WebSocket Error: ' + error);
-        };
+        function initWebSocket() {
 
-        // Show a connected message when the WebSocket is opened.
-        wpsocket.onopen = function (event) {
-            console.log('connected to oTree');
-            if (wpsocket.readyState == WebSocket.OPEN) {
-                msg = "I AM CONNECTED!";
-                wpsocket.send(msg);
+            // Handle any errors that occur.
+            wpsocket.onerror = function (error) {
+                console.log('WebSocket Error: ' + error);
+            };
 
-            }
-            ;
+            // Show a connected message when the WebSocket is opened.
+            wpsocket.onopen = function (event) {
+                console.log('connected to oTree');
+                if (wpsocket.readyState == WebSocket.OPEN) {
+                    msg = JSON.stringify({'update_request': true});
+                    wpsocket.send(msg);
 
-        };
+                }
+                ;
+
+            };
             // Handle messages sent by the server.
             wpsocket.onmessage = function (event) {
-{#                var obj = JSON.parse(event.data);#}
-{#                console.log(obj);#}
+                {#                var obj = JSON.parse(event.data);#}
+                {#                console.log(obj);#}
                 console.log('message received!', event.data)
-
+                var obj= JSON.parse(event.data)
+                if (obj.not_enough_players_in_subsession) {
+                  $('form').submit();
+                };
 
 
             };
@@ -40,10 +45,15 @@
                 console.log('disconnected from oTree');
             };
         };
+        setInterval(function () {
+            if (wpsocket.readyState == WebSocket.OPEN) {
+                msg = JSON.stringify({'update_request': true});
+                wpsocket.send(msg);
 
+            }
+            ;
+        }, 1 * SECOND);
     });
-
-
 
 
 </script>
