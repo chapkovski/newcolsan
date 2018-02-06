@@ -18,7 +18,7 @@ class Constants(BaseConstants):
     players_per_group = None
     num_others_per_group = pggConstants.num_others_per_group
     num_rounds = 1
-    consent_timeout = int(environ.get('CONSENT_TIMEOUT', 300))
+    consent_timeout = int(environ.get('CONSENT_TIMEOUT', 600))
 
 
 

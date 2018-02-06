@@ -5,6 +5,10 @@ from otree.api import (
 import random
 import statuses
 from django.db import models as djmodels
+from django.db.models import Sum
+from itertools import cycle
+from random import shuffle
+from otree.models import Participant
 
 doc = """
 new collective sanctions experiment based on Stoff's paper
@@ -19,7 +23,7 @@ class Constants(BaseConstants):
     players_per_group = 6
     num_others_per_group = players_per_group - 1
     time_to_decide = 120
-    num_rounds = 20
+    num_rounds = 1
     A_group_size = players_per_group / 2 - 1
     B_group_size = players_per_group / 2
     # how much money can be invested into public good project
@@ -36,8 +40,8 @@ class Constants(BaseConstants):
     # payment for each correct answer in control question set of pages:
     correct_answer_payoff = 0.5
     # set of constants to include instructions to other pages:
-    instructions_stage1_wrapper = 'colsan_small/ins_s1_wrapper.html'
-    instructions_stage2_wrapper = 'colsan_small/ins_s2_wrapper.html'
+    instructions_stage1_wrapper = 'includes/ins_s1_wrapper.html'
+    instructions_stage2_wrapper = 'includes/ins_s2_wrapper.html'
     q6_choices = ['My own', 'A random member of my group']
     payment_per_minute = c(20)
 
@@ -49,14 +53,29 @@ class Subsession(BaseSubsession):
 
 
 class Group(BaseGroup):
-    has_dropout = models.BooleanField(initial=False)
+    def check_and_update_dropouts(self):
+        ingame_drops = [p for p in self.get_players() if p.participant.vars['status'] == statuses.INGAME_DROPOUT]
+        if ingame_drops:
+            others = [p for p in self.get_players() if p not in ingame_drops]
+            for o in others:
+                o.participant.vars['status'] = statuses.GROUP_HAS_DROPOUT
+        return ingame_drops
 
-    @property
-    def dropout_exists(self):
-        dropouts = [p for p in self.get_players() if p.participant.vars.get('dropout', False)]
-        if len(dropouts) > 0:
-            return True
-        return False
+    def update_subgroups_and_pairs(self):
+        if not self.check_and_update_dropouts():
+            allplayers = self.get_players()
+            random.shuffle(allplayers)
+            sg = cycle(Constants.groupset)
+            for i, p in enumerate(allplayers):
+                if self.round_number == 1:
+                    p.subgroup = next(sg)
+                else:
+                    p.subgroup = p.in_round(1).subgroup
+            for k, v in self.subgroups.items():
+                pairs = Constants.threesome.copy()
+                shuffle(pairs)
+                for i, p in enumerate(v):
+                    p.pair = pairs[i]
 
     @property
     def subgroups(self):
@@ -73,14 +92,16 @@ class Group(BaseGroup):
             chosen = [o for o in p.get_others_in_group()
                       if o.pair == p.random_id]
             assert len(chosen) == 2, 'Too few chosen!'
-            ingroup_punishee = [_ for _ in chosen if _.subgroup == p.subgroup][0]
+            ingroup_punishee = next(_ for _ in chosen if _.subgroup == p.subgroup)
+            observed_outgroup_punishee = next(_ for _ in chosen if _.subgroup != p.subgroup)
             if self.session.config['colsan']:
                 outgroup_punishee = random.choice([_ for _ in
                                                    p.get_others_in_group()
                                                    if _.subgroup != p.subgroup])
             else:
-                outgroup_punishee = [_ for _ in chosen if _.subgroup != p.subgroup][0]
-
+                outgroup_punishee = observed_outgroup_punishee
+            p.outgroup_punishee_decision = observed_outgroup_punishee.pd_decision
+            p.ingroup_punishee_decision = ingroup_punishee.pd_decision
             ingroup_punishee.punishment_received_in += (p.ingroup_punishment or 0)
             ingroup_punishee.punishment_received += (p.ingroup_punishment or 0)
             outgroup_punishee.punishment_received_out += (p.outgroup_punishment or 0)
@@ -100,6 +121,7 @@ class Group(BaseGroup):
             p.payoff_stage2 = p.punishment_endowment_remain - \
                               p.punishment_received * Constants.punishment_factor
             p.payoff = p.pd_payoff + p.payoff_stage2
+
 
 
 def gamechoices(n):
@@ -147,6 +169,13 @@ class Player(BasePlayer):
         self.endowment_remain = Constants.endowment - self.pd_decision
         self.pd_payoff = self.pd_received_mult + self.endowment_remain
 
+    def set_waiting_payoff(self):
+        tot_sec_waited = sum([t.diff.total_seconds() for t in self.participant.timestamps.all() if t.diff is not None])
+        self.tot_minutes_waited = round(tot_sec_waited/ 60, 2)
+        self.payoff_minutes_waited = self.tot_minutes_waited * Constants.payment_per_minute
+        if self.round_number == Constants.num_rounds:
+            self.payoff += self.payoff_minutes_waited
+
     random_id = models.IntegerField(choices=Constants.threesome)
     punishment_endowment = models.IntegerField()
     punishment_sent = models.IntegerField(initial=0)
@@ -182,6 +211,10 @@ class Player(BasePlayer):
                                               min=0,
                                               max=Constants.punishment_endowment,
                                               )
+    outgroup_punishee_decision = models.IntegerField(
+        doc='to store the decision of observed target of outgroup punishment')
+    ingroup_punishee_decision = models.IntegerField(
+        doc='to store the decision of observed target of ingroup punishment')
     participant_vars_dump = models.CharField()
     tot_minutes_waited = models.IntegerField()
     payoff_minutes_waited = models.FloatField()
@@ -190,7 +223,7 @@ class Player(BasePlayer):
 
 
 class TimeStamp(djmodels.Model):
-    player = djmodels.ForeignKey(to=Player, related_name='timestamps')
+    participant = djmodels.ForeignKey(to=Participant, related_name='timestamps')
     created_at = djmodels.DateTimeField(auto_now_add=True)
     closed_at = djmodels.DateTimeField(null=True)
     cur_page = models.IntegerField()
@@ -199,5 +232,5 @@ class TimeStamp(djmodels.Model):
 
     def __str__(self):
         return 'TIMESTAMP {} CREATED {}, CLOSED {}, OPENED:{}. SEC {} '.format(self.pk, self.created_at,
-                                                                                      self.closed_at, self.opened,
-                                                                                      self.diff)
+                                                                               self.closed_at, self.opened,
+                                                                               self.diff)

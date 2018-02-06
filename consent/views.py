@@ -14,8 +14,6 @@ class Consent(Page):
     timeout_submission = {'consent': False}
 
     def vars_for_template(self):
-        if self.session.config.get('name') == 'survey':
-            self.template_name = 'consent/AltConsent.html'
         return {'consent_timeout_min': math.ceil(self.timeout_seconds / 60)}
 
     def is_displayed(self):
@@ -27,10 +25,12 @@ class Consent(Page):
             return 'You must accept the consent form in order to proceed with the study!'
 
     def before_next_page(self):
-        if self.timeout_happened and not debug_session(self):
+        if self.timeout_happened:
             self.participant.vars['status'] = statuses.CONSENT_DROPOUT
-            return
-        self.participant.vars['status'] = statuses.HEALTHY
+        else:
+            self.participant.vars['status'] = statuses.HEALTHY
+        # if debug_session(self):
+        #
 
 
 page_sequence = [

@@ -1,8 +1,28 @@
 <script>
     var SECOND = 1000;
     var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
-    var wpsocket = new WebSocket(ws_scheme + '://' + window.location.host + "/watcher/group/{{ group.pk }}/participant/{{participant.code}}/player/{{player.pk}}");
+    var wpsocket = new WebSocket(ws_scheme + '://' + window.location.host + "/watcher/group/{{ group.pk }}/participant/{{participant.code}}/player/{{player.pk}}/page_type/{{ page_type }}");
+    var sec_spent = 0;
+    var sec_earned = 0;
+    var pay_per_sec = {{ pay_per_sec }};
 
+    function fancyTimeFormat(time) {
+        // Hours, minutes and seconds
+        var hrs = ~~(time / 3600);
+        var mins = ~~((time % 3600) / 60);
+        var secs = time % 60;
+
+        // Output like "1:01" or "4:03:59" or "123:03:59"
+        var ret = "";
+
+        if (hrs > 0) {
+            ret += "" + hrs + ":" + (mins < 10 ? "0" : "");
+        }
+
+        ret += "" + mins + ":" + (secs < 10 ? "0" : "");
+        ret += "" + secs;
+        return ret;
+    };
     $(function () {
 
 
@@ -31,10 +51,16 @@
                 {#                var obj = JSON.parse(event.data);#}
                 {#                console.log(obj);#}
                 console.log('message received!', event.data)
-                var obj= JSON.parse(event.data)
+                var obj = JSON.parse(event.data);
+                if (obj.time_earned) {
+                    sec_spent = obj.time_earned;
+                    sec_earned = obj.earn_so_far;
+                    update_spans();
+                }
                 if (obj.not_enough_players_in_subsession) {
-                  $('form').submit();
-                };
+                    $('form').submit();
+                }
+                ;
 
 
             };
@@ -52,7 +78,22 @@
 
             }
             ;
-        }, 1 * SECOND);
+        }, 10 * SECOND);
+
+        function update_spans() {
+            var curtime_spent = fancyTimeFormat(Math.round(sec_spent));
+            $('#sec_spent_span').html(curtime_spent);
+            $('#sec_earned_span').html('$' + sec_earned.toFixed(2));
+        }
+
+
+        window.setInterval(function () {
+            sec_spent += 1;
+            sec_earned +=pay_per_sec;
+            update_spans();
+        }, SECOND);
+
+
     });
 
 

@@ -3,17 +3,38 @@
 {% block title %}Please wait!{% endblock %}
 
 {% block content %}
-
+<div class="waiting_block">
+    Please wait for other participants to join.
+    You are earning {{ pay_per_min }} per minute spent on this waiting
+    page. So far, you have earned <span class="timers " id="sec_earned_span"></span> for waiting
+    <span class=" timers" id="sec_spent_span"></span> minutes.
+</div>
 {% endblock %}
 
 {% block scripts %}
-    {% include 'includes/waiting_page_channel.js.html' %}
+
+{% include 'includes/waiting_page_channel.js.html' %}
 
 {% endblock %}
 
 
 {% block styles %}
+    <style>
 
+            .finish_study_div {
+                display: none;
+            }
+
+
+        span.timers {
+            font-size: 120%;
+            font-weight: bold;
+        }
+
+        .waiting_block {
+            margin-top: 10px
+        }
+    </style>
 {% endblock %}
 
 

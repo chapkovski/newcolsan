@@ -19,6 +19,7 @@ from django.db.models import Q
 import datetime
 import statuses
 from functions import check_and_update_NEPS
+from colsan_small.views import FIRST_WP, OTHER_WP
 
 CONNECT = 1
 DISCONNECT = 0
@@ -30,6 +31,7 @@ class GenericWatcher(WebsocketConsumer):
         '/group/(?P<group_pk>[0-9]+)' +
         '/participant/(?P<participant_code>[a-zA-Z0-9_-]+)' +
         '/player/(?P<player_pk>[a-zA-Z0-9_-]+)' +
+        '/page_type/(?P<page_type>[0-9]+)' +
         '$')
     event_type = None
 
@@ -56,25 +58,25 @@ class GenericWatcher(WebsocketConsumer):
         return len(self.get_those_with_us())
 
     def update_time_stamp(self):
-        player = Player.objects.get(pk__exact=self.kwargs['player_pk'])
+        participant = Participant.objects.get(code__exact=self.kwargs['participant_code'])
         if self.event_type == CONNECT:
-            timestamp, _ = player.timestamps.update_or_create(player=player, cur_page=self.get_cur_page(),
+            timestamp, _ = participant.timestamps.update_or_create(cur_page=self.get_cur_page(),
                                                               defaults={'opened': True})
         if self.event_type == DISCONNECT:
-            timestamp, _ = player.timestamps.update_or_create(player=player, cur_page=self.get_cur_page(),
+            timestamp, _ = participant.timestamps.update_or_create(cur_page=self.get_cur_page(),
                                                               defaults={'opened': False,
                                                                         'closed_at': datetime.datetime.now()})
 
     def get_time_earned(self):
-        player = Player.objects.get(pk__exact=self.kwargs['player_pk'])
-        ts = player.timestamps.exclude(Q(created_at__isnull=True))
+        participant = Participant.objects.get(code__exact=self.kwargs['participant_code'])
+        ts = participant.timestamps.exclude(Q(created_at__isnull=True))
 
         for t in ts:
             closed = t.closed_at or datetime.datetime.now(datetime.timezone.utc)
             t.diff = closed - t.created_at
             t.save()
         if ts.exists():
-            time_earned = sum([p.diff.total_seconds() for p in player.timestamps.all() if p.diff is not None]) / 60
+            time_earned = sum([t.diff.total_seconds() for t in participant.timestamps.all() if t.diff is not None])
             return time_earned
         else:
             return 0
@@ -86,16 +88,21 @@ class GenericWatcher(WebsocketConsumer):
 
     def _check_NEPS(self):
         player = Player.objects.get(pk__exact=self.kwargs['player_pk'])
-        return check_and_update_NEPS(player.session, self.get_cur_page())
+        return check_and_update_NEPS(player.session, self.get_cur_page(), player.round_number, player.group)
 
     def process_connection(self):
         num_connected = self.get_num_connected_in_group()
         self.update_time_stamp()
         group_name = self.get_group(self.kwargs['group_pk'])
-        self.group_send(name=group_name, text=json.dumps({'number_connected': num_connected,
-                                                          'not_enough_players_in_subsession': self._check_NEPS()
-                                                          }))
-        self.send(text=json.dumps(self.get_back_request()))
+        group_msg = {'number_connected': num_connected, }
+        msg = self.get_back_request()
+        page_type = self.kwargs['page_type']
+        if int(page_type) == FIRST_WP:
+            NEPS = {'not_enough_players_in_subsession': self._check_NEPS()}
+            group_msg.update(NEPS)
+            msg.update(NEPS)
+        self.group_send(name=group_name, text=json.dumps(group_msg))
+        self.send(text=json.dumps(msg))
 
     def connect(self, message, **kwargs):
         self.event_type = CONNECT
@@ -109,9 +116,10 @@ class GenericWatcher(WebsocketConsumer):
         time_so_far = self.get_time_earned()
         player = Player.objects.get(pk__exact=self.kwargs['player_pk'])
         session = player.session
-        earn_so_far = time_so_far * float(Constants.payment_per_minute.to_real_world_currency(session))
+        earn_so_far = time_so_far/60 * float(Constants.payment_per_minute.to_real_world_currency(session))
         return {'time_earned': time_so_far,
-                'earn_so_far': round(earn_so_far, 2)}
+                'earn_so_far': round(earn_so_far, 2),
+                }
 
     def receive(self, text=None, bytes=None, **kwargs):
         try:
