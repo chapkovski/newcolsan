@@ -22,8 +22,8 @@ class Constants(BaseConstants):
     name_in_url = 'colsansmall'
     players_per_group = 6
     num_others_per_group = players_per_group - 1
-    time_to_decide = 120
-    num_rounds = 2
+    time_to_decide = 150
+    num_rounds = 20
     A_group_size = players_per_group / 2 - 1
     B_group_size = players_per_group / 2
     # how much money can be invested into public good project
@@ -43,8 +43,9 @@ class Constants(BaseConstants):
     instructions_stage1_wrapper = 'includes/ins_s1_wrapper.html'
     instructions_stage2_wrapper = 'includes/ins_s2_wrapper.html'
     q6_choices = ['My own', 'A random member of my group']
-    payment_per_minute = c(20)
-
+    payment_per_minute = c(5)
+    # how long should they wait at first wp before they can quit:
+    wait_at_first_wp =600
 
 class Subsession(BaseSubsession):
     def creating_session(self):
@@ -173,11 +174,10 @@ class Player(BasePlayer):
         self.tot_minutes_waited = round(tot_sec_waited / 60, 2)
         self.payoff_minutes_waited = self.tot_minutes_waited * Constants.payment_per_minute
         if self.round_number == Constants.num_rounds and not self.payoff_min_added:
-            print('adding payoff, old payoff was:{}'.format(self.payoff))
             self.payoff += self.payoff_minutes_waited
             self.payoff_min_added = True
-            print('new payoff is:{}'.format(self.payoff))
-            # raise ValueError('STOP THE BULLSHIT')
+
+
 
     random_id = models.IntegerField(choices=Constants.threesome)
     punishment_endowment = models.IntegerField()

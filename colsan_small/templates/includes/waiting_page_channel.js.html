@@ -1,5 +1,5 @@
 <script>
-    var SECOND = 1000;
+    const SECOND = 1000;
     var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
     var wpsocket = new WebSocket(ws_scheme + '://' + window.location.host + "/watcher/group/{{ group.pk }}/participant/{{participant.code}}/player/{{player.pk}}/page_type/{{ page_type }}");
     var sec_spent = 0;
@@ -77,14 +77,7 @@
                 console.log('disconnected from oTree');
             };
         };
-        setInterval(function () {
-            if (wpsocket.readyState == WebSocket.OPEN) {
-                msg = JSON.stringify({'update_request': true});
-                wpsocket.send(msg);
 
-            }
-            ;
-        }, 10 * SECOND);
 
         function update_spans() {
             var curtime_spent = fancyTimeFormat(Math.round(sec_spent));

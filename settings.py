@@ -6,6 +6,7 @@ from boto.mturk import qualification
 
 import otree.settings
 
+EXTENSION_APPS = ['colsan_small']
 
 SENTRY_DSN = 'http://2d6137799b914e1693146c5011f39030:46838e8caa374937a91b14b59ebbe164@sentry.otree.org/36'
 POINTS_DECIMAL_PLACES = 2
@@ -80,15 +81,16 @@ oTree games
 
 mturk_hit_settings = {
     'keywords': ['bonus', 'choice', 'study', 'academic'],
-    'title': 'Academic study on collective decision making (min. 8$/hour)',
+    'title': 'Academic study on collective decision making (up to $4 bonus payment)',
     'description': '20 min long study. Participants have to work in groups of 6 mTurkers. If you have any issues please write as immediately at chapkovskii@soziologie.uzh.ch',
     'frame_height': 1000,
     'preview_template': 'global/MTurkPreview.html',
-    'minutes_allotted_per_assignment': 60,
-    'expiration_hours': 2,
-    # 'grant_qualification_id': '3JQA2VZA3H07L5GGAPCKFZHKDN54IT',  # to prevent retakes
+    'minutes_allotted_per_assignment': 180,
+    'expiration_hours': 12,
+    'grant_qualification_id': '3DDNYIPUQOE0H17OL5WJNNVK1E6RZB',  # colsan_outgrouponly - the name of this qualification
     'qualification_requirements': [
         {
+            # Worker_Locale
             'QualificationTypeId': "00000000000000000071",
             'Comparator': "EqualTo",
             'LocaleValues': [{
@@ -96,49 +98,46 @@ mturk_hit_settings = {
             }]
         },
         {
+            # Worker_​PercentAssignmentsApproved
             'QualificationTypeId': "000000000000000000L0",
             'Comparator': "GreaterThanOrEqualTo",
-            "IntegerValues": [90],
+            "IntegerValues": [95],
         },
         {
+            # Worker_​NumberHITsApproved
             'QualificationTypeId': "00000000000000000040",
             'Comparator': "GreaterThanOrEqualTo",
-            "IntegerValues": [100],
+            "IntegerValues": [300],
+        },
+        {
+            'QualificationTypeId': "3CIRY6VDUW5WSALPOBLQ22DKVHVVB0",
+            'Comparator': "DoesNotExist",
+        },
+        {
+            'QualificationTypeId': "3OY1URRDRY4R2QV6PQDSN7TCTMNTIF",
+            'Comparator': "DoesNotExist",
+        },
+        {
+            'QualificationTypeId': "3BH2VZXPB8PDRPCZKDE5783ZRKC7CF",
+            'Comparator': "DoesNotExist",
+        },
+        {
+            'QualificationTypeId': "32DH4YCIPHCJENE6HELR7P0RLZNYJ6",
+            'Comparator': "DoesNotExist",
+        },
+        {
+            'QualificationTypeId': "3JQA2VZA3H07L5GGAPCKFZHKDN54IT",
+            'Comparator': "DoesNotExist",
+        },
+        {
+            'QualificationTypeId': "3DDNYIPUQOE0H17OL5WJNNVK1E6RZB",
+            'Comparator': "DoesNotExist",
         },
 
     ],
 }
 
-noreq_mturk_hit_settings = {
-    'keywords': ['bonus', 'choice', 'study', 'academic'],
-    'title': '5 min survey about your experience in interactive experiments in mTurk',
-    'description': 'A brief questionnaire about interactive experiments in mTurk',
-    'frame_height': 800,
-    'preview_template': 'global/MTurkPreviewSinglePlayer.html',
-    'minutes_allotted_per_assignment': 20,
-    'expiration_hours': 1,
-
-    'qualification_requirements': [
-        {
-            'QualificationTypeId': "00000000000000000071",
-            'Comparator': "EqualTo",
-            'LocaleValues': [{
-                'Country': "US",
-            }]
-        },
-        {
-            'QualificationTypeId': "000000000000000000L0",
-            'Comparator': "GreaterThanOrEqualTo",
-            "IntegerValues": [80],
-        },
-        {
-            'QualificationTypeId': "00000000000000000040",
-            'Comparator': "GreaterThanOrEqualTo",
-            "IntegerValues": [100],
-        },
-
-    ],
-}
+#
 
 # if you set a property in SESSION_CONFIG_DEFAULTS, it will be inherited by all configs
 # in SESSION_CONFIGS, except those that explicitly override it.
@@ -146,8 +145,8 @@ noreq_mturk_hit_settings = {
 # e.g. self.session.config['participation_fee']
 
 SESSION_CONFIG_DEFAULTS = {
-    'real_world_currency_per_point': 0.0075,
-    'participation_fee': 1,
+    'real_world_currency_per_point': 0.01,
+    'participation_fee': .25,
     'doc': "",
     'mturk_hit_settings': mturk_hit_settings,
 }

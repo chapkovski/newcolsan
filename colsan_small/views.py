@@ -7,6 +7,9 @@ from functions import debug_session
 from otree.api import Currency as c
 from django.views.generic.base import TemplateResponseMixin
 from otree.models import Participant
+from django.db.models import Q
+from django.core.exceptions import ObjectDoesNotExist
+import datetime
 
 FIRST_WP = 1
 OTHER_WP = 0
@@ -37,6 +40,11 @@ class CustomWaitPage(WaitPage):
         return {'page_type': self.page_type,
                 'pay_per_sec': float(Constants.payment_per_minute.to_real_world_currency(self.session)) / 60, }
 
+    def after_all_players_arrive(self):
+        parts = [p.participant for p in self.group.get_players()]
+        for p in parts:
+            p.timestamps.all().update(opened=False)
+
 
 class CustomPage(Page):
     timeout_seconds = 90
@@ -59,19 +67,16 @@ class DecisionPage(CustomPage):
             self.register_ingame_dropout()
 
     def get_timeout_seconds(self):
-        # TODO delete next line after debugging
-        return 6000
-        if debug_session(self):
-            return 30000
         if self.round_number > 1:
             return Constants.time_to_decide
-        return Constants.time_to_decide + 30
+        return Constants.time_to_decide + 120
 
 
 class StartWP(CustomWaitPage):
     group_by_arrival_time = True
     template_name = 'colsan_small/FirstWaitPage.html'
     page_type = FIRST_WP
+    timer = Constants.wait_at_first_wp
 
     def extra_is_displayed(self):
         return self.round_number == 1
@@ -88,31 +93,38 @@ class StartWP(CustomWaitPage):
         response = super().dispatch(*args, **kwargs)
         return response
 
+    def vars_for_template(self):
+        context = super().vars_for_template()
+        now = datetime.datetime.now(datetime.timezone.utc)
+        try:
+            current_time_stamp = self.participant.timestamps.get(cur_page=self._index_in_pages, )
+            started_at = current_time_stamp.created_at
+        except ObjectDoesNotExist:
+            started_at = now
+        timer = self.timer
+        time_left = timer + (started_at - now).total_seconds()
+        context.update({'time_left': time_left})
+        return context
+
 
 class FirstWaitPD(CustomWaitPage):
     def after_all_players_arrive(self):
+        super().after_all_players_arrive()
         self.group.update_subgroups_and_pairs()
 
 
 class InstructionsStage1(CustomPage):
-    # TODO REMOVE NEXT!
-    timeout_seconds = 3000
+    timeout_seconds = 300
 
     def extra_is_displayed(self):
         return self.subsession.round_number == 1
 
 
 class InstructionsStage2(CustomPage):
-    # TODO REMOVE NEXT!
-    timeout_seconds = 3000
+    timeout_seconds = 300
 
     def extra_is_displayed(self):
         return self.subsession.round_number == 1
-
-    def get_timeout_seconds(self):
-        if debug_session(self):
-            return 30000
-        return 300
 
 
 class PD(DecisionPage):
@@ -122,6 +134,7 @@ class PD(DecisionPage):
 
 class WaitPD(CustomWaitPage):
     def after_all_players_arrive(self):
+        super().after_all_players_arrive()
         if not self.group.check_and_update_dropouts():
             allplayers = self.group.get_players()
             for p in allplayers:
@@ -162,6 +175,7 @@ class Pun(DecisionPage):
 
 class WaitResults(CustomWaitPage):
     def after_all_players_arrive(self):
+        super().after_all_players_arrive()
         if not self.group.check_and_update_dropouts():
             self.group.set_payoffs()
 

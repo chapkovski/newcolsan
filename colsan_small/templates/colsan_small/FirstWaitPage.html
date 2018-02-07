@@ -3,16 +3,84 @@
 {% block title %}Please wait!{% endblock %}
 
 {% block content %}
-{{ block.super }}
+    {{ block.super }}
+    <div id="otree-timeout-warning" class="alert alert-warning" style="display:block;">
+        <p>You can finish the study if not enough participants arrive in:
+            <span class="glyphicon glyphicon-time"></span>
+            <strong><span id="otree-timer__time-left"></span></strong>
+        </p>
+    </div>
     <form action="" method="post" role="form" class="form">
         {% csrf_token %}
-        <div>
-            <button class="btn btn-primary" id='wp_dropout'
-
-                    name="wp_dropout" value="{{ player.pk }}">
+        <div class="finish_study_div">
+            <div id="part_fee_info" class="alert alert-danger" role="alert">
+                <b>If you do not want to wait for other mTurkers to join you to proceed with the study, you may exit the
+                    study now. You will receive your participant fee plus everything you have earned
+                    by
+                    waiting.</b>
+            </div>
+            <button class="btn btn-primary" id='wp_dropout' name="wp_dropout" value="{{ player.pk }}">
                 Finish the study
             </button>
         </div>
-        <br>
+
     </form>
+
+
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    <script src="{% static 'otree/js/jquery.countdown.min.js' %}"></script>
+    <script>
+        var time_left = {{time_left|json}};
+        $(function () {
+                var currentDate = new Date();
+                var milliseconds = Math.floor(time_left * SECOND);
+
+
+                $('div#otree-timeout-warning').show();
+                $('span#otree-timer__time-left').countdown(currentDate.valueOf() + milliseconds)
+                    .on('update.countdown', function (event) {
+                        // %-N is "Total count of minutes till the end, non-padded"
+                        // %S is seconds left
+                        var format = '%-N:%S';
+                        var remainingTime = event.strftime(format);
+                        $(this).html(remainingTime);
+
+                        if (event.strftime('%-M') > 30) {
+                            // Do not show if max waiting time is above 30 minutes
+                            $('div#otree-timeout-warning').filter(":visible").hide(duration = 0);
+                        }
+                        ;
+                    })
+                    .on('finish.countdown', function (event) {
+                        $('div#otree-timeout-warning').hide(duration = 0);
+                        $('.finish_study_div').show();
+                    });
+
+            }
+        )
+
+
+    </script>
+{% endblock %}
+
+{% block styles %}
+    {{ block.super }}
+    <style>
+
+        .finish_study_div {
+            display: none;
+            margin-bottom: 10px;
+        }
+
+        span.timers {
+            font-size: 120%;
+            font-weight: bold;
+        }
+
+
+    </style>
+
 {% endblock %}

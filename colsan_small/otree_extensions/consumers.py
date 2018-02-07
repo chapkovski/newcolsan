@@ -74,14 +74,14 @@ class GenericWatcher(WebsocketConsumer):
 
     def get_time_earned(self):
         participant = Participant.objects.get(code__exact=self.kwargs['participant_code'])
-        ts = participant.timestamps.exclude(Q(created_at__isnull=True))
-
+        ts = participant.timestamps.exclude(created_at__isnull=True)
+        now=datetime.datetime.now(datetime.timezone.utc)
+        ts.filter(closed_at__isnull=True).update(closed_at=now)
         for t in ts:
-            closed = t.closed_at or datetime.datetime.now(datetime.timezone.utc)
-            t.diff = closed - t.created_at
+            t.diff = t.closed_at - t.created_at
             t.save()
         if ts.exists():
-            time_earned = sum([t.diff.total_seconds() for t in participant.timestamps.all() if t.diff is not None])
+            time_earned = sum([t.diff.total_seconds() for t in ts])
             return time_earned
         else:
             return 0
@@ -130,6 +130,7 @@ class GenericWatcher(WebsocketConsumer):
         try:
             jsn_msg = json.loads(text)
             if jsn_msg.get('update_request'):
-                self.send(text=json.dumps(self.get_back_request()))
+                ...
+                # self.send(text=json.dumps(self.get_back_request()))
         except ValueError:
             print('no json received')
