@@ -12,6 +12,16 @@ FIRST_WP = 1
 OTHER_WP = 0
 
 
+def vars_for_all_templates(self):
+    max_pd = Constants.endowment * Constants.pd_factor
+    egoistic_pd = max_pd + Constants.endowment
+    return {'max_pd': max_pd,
+            'egoistic_pd': egoistic_pd,
+            'base_points': round(1 / self.session.config['real_world_currency_per_point']),
+            'payment_per_minute_in_usd': Constants.payment_per_minute.to_real_world_currency(self.session),
+            }
+
+
 class CustomWaitPage(WaitPage):
     template_name = 'custom_pages/CustomWaitPage.html'
     status = statuses.HEALTHY
@@ -85,14 +95,16 @@ class FirstWaitPD(CustomWaitPage):
 
 
 class InstructionsStage1(CustomPage):
-    timeout_seconds = 300
+    # TODO REMOVE NEXT!
+    timeout_seconds = 3000
 
     def extra_is_displayed(self):
         return self.subsession.round_number == 1
 
 
 class InstructionsStage2(CustomPage):
-    timeout_seconds = 300
+    # TODO REMOVE NEXT!
+    timeout_seconds = 3000
 
     def extra_is_displayed(self):
         return self.subsession.round_number == 1
@@ -165,9 +177,9 @@ class Results(CustomPage):
                 'real_currency_payoff': self.player.payoff.to_real_world_currency(self.session), }
 
 
-
 class FinalPage(CustomPage):
     timeout_seconds = 600
+
     def vars_for_template(self):
         if self.player.payoff_minutes_waited is not None:
             earned_by_waiting = self.player.payoff_minutes_waited
@@ -225,8 +237,8 @@ class GroupHasDropoutFinal(DropOutsPage):
 health_pages = [
     StartWP,
     FirstWaitPD,
-    # InstructionsStage1,
-    # InstructionsStage2,
+    InstructionsStage1,
+    InstructionsStage2,
     PD,
     WaitPD,
     Pun,

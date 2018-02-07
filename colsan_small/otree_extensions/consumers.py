@@ -20,6 +20,7 @@ import datetime
 import statuses
 from functions import check_and_update_NEPS
 from colsan_small.views import FIRST_WP, OTHER_WP
+from django.core.exceptions import ObjectDoesNotExist
 
 CONNECT = 1
 DISCONNECT = 0
@@ -49,10 +50,14 @@ class GenericWatcher(WebsocketConsumer):
     def get_those_with_us(self):
         group_pk = self.kwargs['group_pk']
         cur_page = self.get_cur_page()
-        cur_group = Group.objects.get(pk__exact=group_pk)
-        players_with_us = cur_group.player_set.filter(participant___index_in_pages=cur_page)
-        parts_with_us = [p.participant for p in players_with_us]
-        return parts_with_us
+        try:
+            cur_group = Group.objects.get(pk__exact=group_pk)
+            players_with_us = cur_group.player_set.filter(participant___index_in_pages=cur_page)
+            parts_with_us = [p.participant for p in players_with_us]
+            return parts_with_us
+        except ObjectDoesNotExist:
+            print('We tried to find a group {} and failed'.format(group_pk))
+            return []
 
     def get_num_connected_in_group(self):
         return len(self.get_those_with_us())

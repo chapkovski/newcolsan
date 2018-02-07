@@ -76,6 +76,7 @@
             var received_val = $(this).val() * {{ Constants.pd_factor }};
             var remain_val = {{ Constants.endowment }} -$(this).val();
             if ($(this).val() > max_inv) {
+                $(this).val(max_inv);
                 received_val = max_inv;
                 remain_val = 0;
             }

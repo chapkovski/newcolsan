@@ -79,10 +79,12 @@
         <tr>
 
             <td>
-                <div class="sliders in_sliders" id="pd_ingroup">{{ player.random_pair.ingroup_member.pd_decision }}</div>
+                <div class="sliders in_sliders"
+                     id="pd_ingroup">{{ player.random_pair.ingroup_member.pd_decision }}</div>
             </td>
             <td>
-                <div class="sliders out_sliders" id="pd_outgroup">{{ player.random_pair.outgroup_member.pd_decision }}</div>
+                <div class="sliders out_sliders"
+                     id="pd_outgroup">{{ player.random_pair.outgroup_member.pd_decision }}</div>
             </td>
         </tr>
         <tr class="warning">
@@ -92,10 +94,12 @@
 
         <tr>
             <td>
-                <div class="sliders in_sliders" id="stage1_in_payoff">{{ player.random_pair.ingroup_member.pd_payoff }}</div>
+                <div class="sliders in_sliders"
+                     id="stage1_in_payoff">{{ player.random_pair.ingroup_member.pd_payoff }}</div>
             </td>
             <td>
-                <div class="sliders out_sliders" id="stage1_out_payoff">{{ player.random_pair.outgroup_member.pd_payoff }}</div>
+                <div class="sliders out_sliders"
+                     id="stage1_out_payoff">{{ player.random_pair.outgroup_member.pd_payoff }}</div>
             </td>
         </tr>
         <tr>
@@ -134,9 +138,24 @@
                 <div class="sliders in_sliders" id="payoff_in_after"></div>
             </td>
             <td>
-                <div class="sliders out_sliders" id="payoff_out_after"></div>
+                <div class="sliders out_sliders" id="payoff_out_after">{{ player.random_pair.outgroup_member.pd_payoff }}</div>
             </td>
         </tr>
+         <tr class="warning">
+            <td>
+            </td>
+            <td>Your remaining endowment in this stage:</td>
+        </tr>
+
+        <tr>
+            <td>
+
+            </td>
+            <td>
+                <div class="sliders " id="remaining_endowment">{{ Constants.punishment_endowment }}</div>
+            </td>
+        </tr>
+
 
         </tbody>
     </table>
@@ -200,7 +219,8 @@
             font-weight: bold;
             color: red;
         }
-     .sliders {
+
+        .sliders {
             font-size: 120%;
             font-weight: bold;
         }
@@ -232,17 +252,22 @@
         }
 
 
-
         var max_pun = {{ Constants.punishment_endowment }};
         var outgroup_punishment_input = document.getElementById('id_outgroup_punishment');
-        var payoff_in_after_slider = document.getElementById('payoff_in_after');
-        var payoff_out_after_slider = document.getElementById('payoff_out_after');
         var pun_coef = {{ Constants.punishment_factor }};
         var pun_out = pun_coef * parseInt(outgroup_punishment_input.value);
-        var initial_payoff_out_after = {{ player.random_pair.outgroup_member.pd_payoff }} -(pun_out || 0);
-        $('#id_outgroup_punishment').keyup(function(){
 
+        $('#id_outgroup_punishment').keyup(function () {
 
+            var pun_out = $(this).val();
+            if (pun_out > max_pun) {
+                $(this).val(max_pun);
+                pun_out = $(this).val();
+            }
+            var initial_payoff_out_after = {{ player.random_pair.outgroup_member.pd_payoff }} -(pun_out * pun_coef || 0);
+            var remaining_endowment = max_pun - pun_out;
+            $('#payoff_out_after').html(initial_payoff_out_after);
+            $('#remaining_endowment').html(remaining_endowment);
         })
 
     </script>
