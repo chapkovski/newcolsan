@@ -5,6 +5,7 @@
     var sec_spent = 0;
     var sec_earned = 0;
     var pay_per_sec = {{ pay_per_sec }};
+    var total_in_group = {{ Constants.players_per_group }};
 
     function fancyTimeFormat(time) {
         // Hours, minutes and seconds
@@ -48,19 +49,24 @@
             };
             // Handle messages sent by the server.
             wpsocket.onmessage = function (event) {
-                {#                var obj = JSON.parse(event.data);#}
-                {#                console.log(obj);#}
-                console.log('message received!', event.data)
+
+
                 var obj = JSON.parse(event.data);
-                if (obj.time_earned) {
+                console.log(obj);
+                if (obj.hasOwnProperty('time_earned')) {
                     sec_spent = obj.time_earned;
                     sec_earned = obj.earn_so_far;
                     update_spans();
                 }
-                if (obj.not_enough_players_in_subsession) {
-                    $('form').submit();
+                if (obj.hasOwnProperty('not_enough_players_in_subsession')) {
+                    if (obj.not_enough_players_in_subsession) {
+                        $('form').submit();
+                    }
                 }
                 ;
+                if (obj.hasOwnProperty('number_connected')) {
+                    $('.arrived').html(get_arrived_line(obj.number_connected));
+                }
 
 
             };
@@ -86,10 +92,17 @@
             $('#sec_earned_span').html('$' + sec_earned.toFixed(2));
         }
 
+        function get_arrived_line(n_arrived){
+         if (n_arrived==1) {
+             return "So far <span class='timers'>" + n_arrived +"</span> participant out of <span class='timers'>" + total_in_group + "</span> is already here.";
 
+        } else {
+         return "So far <span class='timers'>" + n_arrived +"</span> participants out of <span class='timers'>" + total_in_group + "</span> are already here.";
+         }
+        }
         window.setInterval(function () {
             sec_spent += 1;
-            sec_earned +=pay_per_sec;
+            sec_earned += pay_per_sec;
             update_spans();
         }, SECOND);
 

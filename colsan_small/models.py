@@ -23,7 +23,7 @@ class Constants(BaseConstants):
     players_per_group = 6
     num_others_per_group = players_per_group - 1
     time_to_decide = 120
-    num_rounds = 1
+    num_rounds = 2
     A_group_size = players_per_group / 2 - 1
     B_group_size = players_per_group / 2
     # how much money can be invested into public good project
@@ -123,7 +123,6 @@ class Group(BaseGroup):
             p.payoff = p.pd_payoff + p.payoff_stage2
 
 
-
 def gamechoices(n):
     result = []
     for i in range(n + 1):
@@ -171,10 +170,14 @@ class Player(BasePlayer):
 
     def set_waiting_payoff(self):
         tot_sec_waited = sum([t.diff.total_seconds() for t in self.participant.timestamps.all() if t.diff is not None])
-        self.tot_minutes_waited = round(tot_sec_waited/ 60, 2)
+        self.tot_minutes_waited = round(tot_sec_waited / 60, 2)
         self.payoff_minutes_waited = self.tot_minutes_waited * Constants.payment_per_minute
-        if self.round_number == Constants.num_rounds:
+        if self.round_number == Constants.num_rounds and not self.payoff_min_added:
+            print('adding payoff, old payoff was:{}'.format(self.payoff))
             self.payoff += self.payoff_minutes_waited
+            self.payoff_min_added = True
+            print('new payoff is:{}'.format(self.payoff))
+            # raise ValueError('STOP THE BULLSHIT')
 
     random_id = models.IntegerField(choices=Constants.threesome)
     punishment_endowment = models.IntegerField()
@@ -216,10 +219,9 @@ class Player(BasePlayer):
     ingroup_punishee_decision = models.IntegerField(
         doc='to store the decision of observed target of ingroup punishment')
     participant_vars_dump = models.CharField()
-    tot_minutes_waited = models.IntegerField()
-    payoff_minutes_waited = models.FloatField()
-    payoff_min_added = models.BooleanField()
-    is_dropout = models.BooleanField(default=False)
+    tot_minutes_waited = models.IntegerField(doc='total amount of minutes waited by participant which should be paid')
+    payoff_minutes_waited = models.FloatField(doc='minutes waited multiplied by price per minute')
+    payoff_min_added = models.BooleanField(doc='whether payoff for waiting has been already added')
 
 
 class TimeStamp(djmodels.Model):

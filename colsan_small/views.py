@@ -50,7 +50,7 @@ class DecisionPage(CustomPage):
 
     def get_timeout_seconds(self):
         # TODO delete next line after debugging
-        return 60
+        return 6000
         if debug_session(self):
             return 30000
         if self.round_number > 1:
@@ -165,21 +165,12 @@ class Results(CustomPage):
                 'real_currency_payoff': self.player.payoff.to_real_world_currency(self.session), }
 
 
-class FinalResults(CustomPage):
-    def vars_for_template(self):
-        tot_game_payoff = self.participant.payoff - self.player.payoff_minutes_waited
-        return {'last_round_payoff': self.player.payoff - self.player.payoff_minutes_waited,
-                'tot_game_payoff': tot_game_payoff,
-                'payoff_waiting': c(self.player.payoff_minutes_waited).to_real_world_currency(self.session),
-                'participant_real_currency_payoff': tot_game_payoff.to_real_world_currency(self.session),
-                }
-
 
 class FinalPage(CustomPage):
+    timeout_seconds = 600
     def vars_for_template(self):
-
         if self.player.payoff_minutes_waited is not None:
-            earned_by_waiting= self.player.tot_minutes_waited
+            earned_by_waiting = self.player.payoff_minutes_waited
         else:
             earned_by_waiting = 0
         tot_game_payoff = self.participant.payoff - earned_by_waiting
@@ -194,19 +185,16 @@ class FinalPage(CustomPage):
 
 
 class HealthyFinal(FinalPage):
-    # TODO: MOVE IT AOUT!
-    timeout_seconds = 90000
-
     def extra_is_displayed(self):
-        #TODO: finish the payoff calculation for waiting time!!1
         self.player.participant_vars_dump = self.participant.vars
-        return self.round_number == Constants.num_rounds
+        last_round = self.round_number == Constants.num_rounds
+        if last_round:
+            self.player.set_waiting_payoff()
+
+        return last_round
 
 
 class DropOutsPage(FinalPage, TemplateResponseMixin):
-    # TODO: MOVE IT AOUT!
-    timeout_seconds = 90000
-
     def extra_is_displayed(self):
         return self.round_number == Constants.num_rounds
 
@@ -243,7 +231,7 @@ health_pages = [
     WaitPD,
     Pun,
     WaitResults,
-    # Results,
+    Results,
     HealthyFinal,
 ]
 dropouts_pages = [
