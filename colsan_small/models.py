@@ -9,6 +9,7 @@ from django.db.models import Sum
 from itertools import cycle
 from random import shuffle
 from otree.models import Participant
+from otree.models_concrete import PageCompletion
 
 doc = """
 new collective sanctions experiment based on Stoff's paper
@@ -45,7 +46,8 @@ class Constants(BaseConstants):
     q6_choices = ['My own', 'A random member of my group']
     payment_per_minute = c(5)
     # how long should they wait at first wp before they can quit:
-    wait_at_first_wp =600
+    wait_at_first_wp = 6
+
 
 class Subsession(BaseSubsession):
     def creating_session(self):
@@ -170,14 +172,30 @@ class Player(BasePlayer):
         self.pd_payoff = self.pd_received_mult + self.endowment_remain
 
     def set_waiting_payoff(self):
-        tot_sec_waited = sum([t.diff.total_seconds() for t in self.participant.timestamps.all() if t.diff is not None])
-        self.tot_minutes_waited = round(tot_sec_waited / 60, 2)
-        self.payoff_minutes_waited = self.tot_minutes_waited * Constants.payment_per_minute
-        if self.round_number == Constants.num_rounds and not self.payoff_min_added:
-            self.payoff += self.payoff_minutes_waited
-            self.payoff_min_added = True
+        if self.round_number == Constants.num_rounds:
+            waiting_pages = ['StartWP',
+                             'FirstRoundWP',
+                             'FirstWaitPD',
+                             'WaitPD',
+                             'WaitResults',
+                             ]
 
+            wp_sec_in_min = sum(PageCompletion.objects.filter(participant=self.participant,
+                                                              page_name__in=waiting_pages).values_list(
+                'seconds_on_page',
+                flat=True)) / 60
+            self.tot_minutes_waited = round(wp_sec_in_min, 2)
+            self.payoff_minutes_waited = round(wp_sec_in_min * Constants.payment_per_minute, 2)
+            if not self.payoff_min_added:
+                self.payoff += self.payoff_minutes_waited
+                self.payoff_min_added = True
 
+        # tot_sec_waited = sum([t.diff.total_seconds() for t in self.participant.timestamps.all() if t.diff is not None])
+        # self.tot_minutes_waited = round(tot_sec_waited / 60, 2)
+        # self.payoff_minutes_waited = self.tot_minutes_waited * Constants.payment_per_minute
+        # if self.round_number == Constants.num_rounds and not self.payoff_min_added:
+        #     self.payoff += self.payoff_minutes_waited
+        #     self.payoff_min_added = True
 
     random_id = models.IntegerField(choices=Constants.threesome)
     punishment_endowment = models.IntegerField()
